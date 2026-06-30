@@ -1110,6 +1110,9 @@
         grid-template-columns: repeat(3, 1fr);
         border-top: 1px solid var(--line);
       }
+      .lab-bets-single {
+        grid-template-columns: 1fr;
+      }
       .lab-bet {
         min-height: 168px;
         padding: 20px;
@@ -2572,9 +2575,9 @@
             Product bets, made clickable.
           </h2>
           <p class="section-copy reveal">
-            ThaiMart is a marketplace exploration: three focused prototypes
-            testing retention, fulfillment, and seller onboarding as one
-            product loop.
+            Two product explorations turned into runnable interfaces: ThaiMart
+            tests marketplace leverage, while EduSight translates coding-class
+            telemetry into one combined insight loop.
           </p>
 
           <div class="lab-panel reveal">
@@ -2592,7 +2595,13 @@
                   Open prototype hub
                 </a>
                 <a href="thaimart/01-smartrewards.html" class="btn">
-                  Start with SmartRewards
+                  Open SmartRewards
+                </a>
+                <a href="thaimart/02-localpick.html" class="btn">
+                  Open LocalPick
+                </a>
+                <a href="thaimart/03-vendorexpress.html" class="btn">
+                  Open VendorExpress
                 </a>
               </div>
             </div>
@@ -2677,6 +2686,98 @@
                     Seller onboarding and AI-assisted catalog mapping.
                   </span>
                   <em>SUPPLY</em>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="lab-panel reveal">
+            <div class="lab-copy">
+              <div>
+                <h3>EduSight Cognitive Replay.</h3>
+                <p>
+                  A behavior-diagnostic prototype for coding classes: capture
+                  IDE-like learning signals, detect support moments, and show
+                  progress inside one unified diagnostic experience.
+                </p>
+              </div>
+              <div class="lab-actions">
+                <a href="edusight/index.html" class="btn btn-primary">
+                  Open EduSight prototype
+                </a>
+              </div>
+            </div>
+
+            <div class="lab-board">
+              <div class="lab-diagram" aria-hidden="true">
+                <svg viewBox="0 0 360 300">
+                  <circle class="lab-track" cx="180" cy="148" r="100" />
+                  <path
+                    class="lab-arc lab-arc-supply proto-line"
+                    style="--dash: 220"
+                    d="M188 48.3A100 100 0 0 1 269.8 190"
+                  />
+                  <path
+                    class="lab-arc lab-arc-fulfillment proto-line"
+                    style="--dash: 220"
+                    d="M259.6 207.1A100 100 0 0 1 100.4 207.1"
+                  />
+                  <path
+                    class="lab-arc lab-arc-demand proto-line"
+                    style="--dash: 220"
+                    d="M90.2 190A100 100 0 0 1 172 48.3"
+                  />
+                  <circle
+                    class="proto-node"
+                    cx="267"
+                    cy="91"
+                    r="6"
+                    fill="#75b4d5"
+                  />
+                  <circle
+                    class="proto-node"
+                    cx="180"
+                    cy="248"
+                    r="6"
+                    fill="#7bd88f"
+                  />
+                  <circle
+                    class="proto-active"
+                    cx="93"
+                    cy="91"
+                    r="6"
+                    fill="#ff6b5f"
+                  />
+                  <circle class="lab-hub" cx="180" cy="148" r="46" />
+                  <text class="lab-hub-label" x="180" y="145" text-anchor="middle">
+                    EduSight
+                  </text>
+                  <text class="lab-label" x="180" y="164" text-anchor="middle">
+                    LEARNING SIGNAL LOOP
+                  </text>
+                  <text class="lab-label" x="252" y="82" text-anchor="middle">
+                    TELEMETRY
+                  </text>
+                  <text class="lab-label" x="180" y="270" text-anchor="middle">
+                    INSIGHT
+                  </text>
+                  <text class="lab-label" x="108" y="82" text-anchor="middle">
+                    SUPPORT
+                  </text>
+                </svg>
+              </div>
+
+              <div
+                class="lab-bets lab-bets-single"
+                aria-label="EduSight prototype path"
+              >
+                <a class="lab-bet" href="edusight/index.html">
+                  <span>
+                    <b>Cognitive Replay</b>
+                    One-page sandbox for telemetry, support signals, and
+                    progress evidence.
+                  </span>
+                  <em>ALL-IN-ONE</em>
                 </a>
               </div>
             </div>
