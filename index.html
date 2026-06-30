@@ -84,6 +84,20 @@
         animation: grid-breathe 18s var(--ease-out-quart) both;
       }
 
+      .starfield {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        opacity: 0.35;
+      }
+
+      .starfield canvas {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+
       body::before {
         content: "";
         position: fixed;
@@ -1764,6 +1778,9 @@
     >
   </head>
   <body>
+    <div class="starfield" aria-hidden="true">
+      <canvas id="starfieldCanvas"></canvas>
+    </div>
     <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
     <a href="#main" class="skip">Skip to content</a>
 
@@ -3216,6 +3233,391 @@
         document
           .querySelectorAll(".reveal")
           .forEach((element) => element.classList.add("in"));
+      }
+    </script>
+
+    <script type="module">
+      import * as THREE from "https://esm.sh/three@0.181.1?bundle";
+
+      const starfieldCanvas = document.getElementById("starfieldCanvas");
+
+      if (starfieldCanvas) {
+        const motionQuery = window.matchMedia(
+          "(prefers-reduced-motion: reduce)",
+        );
+        const sectionPresets = {
+          top: {
+            parallaxX: 0.18,
+            parallaxY: 0.12,
+            scrollShift: -0.06,
+            driftBoost: 1,
+            cluster: 0.08,
+            anchorX: 0.5,
+            anchorY: 0.45,
+            wave: 0.04,
+            waveFreq: 1.1,
+            orbit: 0.04,
+            grid: 0,
+          },
+          experience: {
+            parallaxX: 0.13,
+            parallaxY: 0.08,
+            scrollShift: -0.04,
+            driftBoost: 0.8,
+            cluster: 0.2,
+            anchorX: 0.32,
+            anchorY: 0.52,
+            wave: 0.07,
+            waveFreq: 1.9,
+            orbit: 0.02,
+            grid: 0.04,
+          },
+          work: {
+            parallaxX: 0.16,
+            parallaxY: 0.1,
+            scrollShift: -0.05,
+            driftBoost: 0.95,
+            cluster: 0.34,
+            anchorX: 0.68,
+            anchorY: 0.42,
+            wave: 0.05,
+            waveFreq: 1.4,
+            orbit: 0.07,
+            grid: 0.02,
+          },
+          "prototype-lab": {
+            parallaxX: 0.22,
+            parallaxY: 0.14,
+            scrollShift: -0.07,
+            driftBoost: 1.08,
+            cluster: 0.22,
+            anchorX: 0.52,
+            anchorY: 0.5,
+            wave: 0.08,
+            waveFreq: 2.2,
+            orbit: 0.12,
+            grid: 0,
+          },
+          skills: {
+            parallaxX: 0.1,
+            parallaxY: 0.06,
+            scrollShift: -0.03,
+            driftBoost: 0.72,
+            cluster: 0.12,
+            anchorX: 0.5,
+            anchorY: 0.48,
+            wave: 0.03,
+            waveFreq: 0.9,
+            orbit: 0.015,
+            grid: 0.12,
+          },
+          background: {
+            parallaxX: 0.08,
+            parallaxY: 0.05,
+            scrollShift: -0.02,
+            driftBoost: 0.55,
+            cluster: 0.16,
+            anchorX: 0.58,
+            anchorY: 0.62,
+            wave: 0.04,
+            waveFreq: 1.2,
+            orbit: 0.03,
+            grid: 0.08,
+          },
+        };
+
+        const pointer = { x: 0, y: 0, targetX: 0, targetY: 0 };
+        const scrollState = { current: window.scrollY, target: window.scrollY };
+        const presetState = { ...sectionPresets.top };
+        const sectionNodes = Array.from(
+          document.querySelectorAll("main section[id]"),
+        );
+        let activeSectionId = "top";
+
+        const renderer = new THREE.WebGLRenderer({
+          canvas: starfieldCanvas,
+          alpha: true,
+          antialias: false,
+          powerPreference: "low-power",
+        });
+        renderer.setClearColor(0x000000, 0);
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(52, 1, 0.1, 10);
+        camera.position.z = 2.8;
+
+        const geometry = new THREE.BufferGeometry();
+        const material = new THREE.PointsMaterial({
+          size: 0.028,
+          sizeAttenuation: true,
+          vertexColors: true,
+          transparent: true,
+          opacity: 0.35,
+          depthWrite: false,
+          blending: THREE.AdditiveBlending,
+        });
+
+        let positions = new Float32Array(0);
+        let colors = new Float32Array(0);
+        let stars = [];
+        let width = 0;
+        let height = 0;
+        let animationFrame = 0;
+        let time = 0;
+        let fieldHalfWidth = 1.9;
+        let fieldHalfHeight = 1.3;
+
+        const points = new THREE.Points(geometry, material);
+        scene.add(points);
+
+        function clamp(value, min, max) {
+          return Math.min(Math.max(value, min), max);
+        }
+
+        function makeColor(tint, alpha) {
+          const color = new THREE.Color(
+            tint === "signal"
+              ? "#7bd88f"
+              : tint === "draft"
+                ? "#75b4d5"
+                : "#f4f7f2",
+          );
+          color.multiplyScalar(alpha);
+          return color;
+        }
+
+        function rebuildStars() {
+          const count = clamp(Math.round((width * height) / 3200), 180, 520);
+          positions = new Float32Array(count * 3);
+          colors = new Float32Array(count * 3);
+          stars = Array.from({ length: count }, (_, index) => {
+            const star = {
+              baseX: (Math.random() * 2 - 1) * fieldHalfWidth * 1.18,
+              baseY: (Math.random() * 2 - 1) * fieldHalfHeight * 1.18,
+              depth: 0.25 + Math.random() * 0.95,
+              size: 0.55 + Math.random() * 1.9,
+              driftX: (Math.random() - 0.5) * 0.0009,
+              driftY: 0.0008 + Math.random() * 0.0016,
+              tint:
+                Math.random() < 0.1
+                  ? "signal"
+                  : Math.random() < 0.2
+                    ? "draft"
+                    : "paper",
+              alpha: 0.34 + Math.random() * 0.72,
+              twinkleOffset: Math.random() * Math.PI * 2,
+              twinkleSpeed: 0.7 + Math.random() * 1.3,
+              phase: Math.random() * Math.PI * 2,
+              anchorMix: Math.random(),
+              index,
+            };
+            const color = makeColor(star.tint, 0.7 + star.alpha * 0.45);
+            colors[index * 3] = color.r;
+            colors[index * 3 + 1] = color.g;
+            colors[index * 3 + 2] = color.b;
+            return star;
+          });
+
+          geometry.setAttribute(
+            "position",
+            new THREE.BufferAttribute(positions, 3),
+          );
+          geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+        }
+
+        function resizeStarfield() {
+          width = window.innerWidth;
+          height = window.innerHeight;
+          const dpr = clamp(window.devicePixelRatio || 1, 1, 1.5);
+          renderer.setPixelRatio(dpr);
+          renderer.setSize(width, height, false);
+          camera.aspect = width / Math.max(height, 1);
+          camera.updateProjectionMatrix();
+          fieldHalfHeight =
+            Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) *
+            camera.position.z;
+          fieldHalfWidth = fieldHalfHeight * camera.aspect;
+          rebuildStars();
+        }
+
+        function movePointer(clientX, clientY) {
+          pointer.targetX = width ? clientX / width - 0.5 : 0;
+          pointer.targetY = height ? clientY / height - 0.5 : 0;
+        }
+
+        function updateActiveSection() {
+          const pivot = window.innerHeight * 0.4;
+          let current = sectionNodes[0];
+
+          for (const section of sectionNodes) {
+            const rect = section.getBoundingClientRect();
+            if (rect.top <= pivot) current = section;
+          }
+
+          const atPageEnd =
+            window.innerHeight + window.scrollY >=
+            document.documentElement.scrollHeight - 4;
+          if (atPageEnd && sectionNodes.length) {
+            current = sectionNodes[sectionNodes.length - 1];
+          }
+
+          activeSectionId = current?.id || "top";
+        }
+
+        function easePresets() {
+          const targetPreset =
+            sectionPresets[activeSectionId] || sectionPresets.top;
+          Object.keys(presetState).forEach((key) => {
+            presetState[key] += (targetPreset[key] - presetState[key]) * 0.08;
+          });
+        }
+
+        function animate() {
+          const reducedMotion = motionQuery.matches;
+          easePresets();
+
+          pointer.x +=
+            (pointer.targetX - pointer.x) * (reducedMotion ? 0.08 : 0.065);
+          pointer.y +=
+            (pointer.targetY - pointer.y) * (reducedMotion ? 0.08 : 0.065);
+          scrollState.current +=
+            (scrollState.target - scrollState.current) *
+            (reducedMotion ? 0.08 : 0.11);
+          time += reducedMotion ? 0.002 : 0.01;
+
+          for (const star of stars) {
+            if (!reducedMotion) {
+              star.baseX += star.driftX * star.depth * presetState.driftBoost;
+              star.baseY += star.driftY * star.depth * presetState.driftBoost;
+            }
+
+            if (star.baseX < -fieldHalfWidth * 1.3) {
+              star.baseX = fieldHalfWidth * 1.3;
+            }
+            if (star.baseX > fieldHalfWidth * 1.3) {
+              star.baseX = -fieldHalfWidth * 1.3;
+            }
+            if (star.baseY < -fieldHalfHeight * 1.3) {
+              star.baseY = fieldHalfHeight * 1.3;
+            }
+            if (star.baseY > fieldHalfHeight * 1.3) {
+              star.baseY = -fieldHalfHeight * 1.3;
+              star.baseX = (Math.random() * 2 - 1) * fieldHalfWidth * 1.18;
+            }
+
+            const offsetX = reducedMotion
+              ? 0
+              : pointer.x * star.depth * presetState.parallaxX;
+            const offsetY = reducedMotion
+              ? 0
+              : pointer.y * star.depth * presetState.parallaxY +
+                (scrollState.current / Math.max(height, 1)) *
+                  star.depth *
+                  presetState.scrollShift;
+
+            const anchorX = (presetState.anchorX - 0.5) * fieldHalfWidth * 2;
+            const anchorY = (0.5 - presetState.anchorY) * fieldHalfHeight * 2;
+            const clusterPull =
+              presetState.cluster * star.depth * (0.45 + star.anchorMix * 0.55);
+            const clusteredX =
+              star.baseX + (anchorX - star.baseX) * clusterPull;
+            const clusteredY =
+              star.baseY + (anchorY - star.baseY) * clusterPull;
+            const waveX =
+              Math.sin(
+                star.baseY * presetState.waveFreq * 10 + star.phase + time,
+              ) *
+              presetState.wave *
+              star.depth;
+            const orbitX =
+              Math.cos(time * 1.4 + star.phase) *
+              presetState.orbit *
+              star.depth;
+            const orbitY =
+              Math.sin(time * 1.1 + star.phase) *
+              presetState.orbit *
+              star.depth;
+            const gridX =
+              presetState.grid > 0
+                ? (Math.round(clusteredX / (fieldHalfWidth * 0.1)) *
+                    (fieldHalfWidth * 0.1) -
+                    clusteredX) *
+                  presetState.grid
+                : 0;
+            const gridY =
+              presetState.grid > 0
+                ? (Math.round(clusteredY / (fieldHalfHeight * 0.14)) *
+                    (fieldHalfHeight * 0.14) -
+                    clusteredY) *
+                  presetState.grid
+                : 0;
+
+            const index = star.index * 3;
+            positions[index] = clusteredX + offsetX + waveX + orbitX + gridX;
+            positions[index + 1] = clusteredY + offsetY + orbitY + gridY;
+            positions[index + 2] = -star.depth * 0.6;
+          }
+
+          geometry.attributes.position.needsUpdate = true;
+          renderer.render(scene, camera);
+
+          window.__starfieldDebug = {
+            section: activeSectionId,
+            preset: { ...presetState },
+            engine: "three",
+          };
+
+          if (!reducedMotion) {
+            animationFrame = window.requestAnimationFrame(animate);
+          }
+        }
+
+        function startStarfield() {
+          window.cancelAnimationFrame(animationFrame);
+          animate();
+        }
+
+        resizeStarfield();
+        updateActiveSection();
+        startStarfield();
+
+        window.addEventListener("resize", () => {
+          resizeStarfield();
+          updateActiveSection();
+          startStarfield();
+        });
+
+        document.addEventListener(
+          "scroll",
+          () => {
+            scrollState.target = window.scrollY;
+            updateActiveSection();
+          },
+          { passive: true },
+        );
+
+        window.addEventListener(
+          "pointermove",
+          (event) => movePointer(event.clientX, event.clientY),
+          { passive: true },
+        );
+
+        window.addEventListener(
+          "pointerleave",
+          () => {
+            pointer.targetX = 0;
+            pointer.targetY = 0;
+          },
+          { passive: true },
+        );
+
+        motionQuery.addEventListener("change", () => {
+          pointer.targetX = 0;
+          pointer.targetY = 0;
+          updateActiveSection();
+          startStarfield();
+        });
       }
     </script>
   </body>
