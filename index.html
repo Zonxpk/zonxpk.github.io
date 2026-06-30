@@ -1001,6 +1001,157 @@
         letter-spacing: 0.02em;
       }
 
+      .lab-panel {
+        margin-top: 44px;
+        display: grid;
+        grid-template-columns: minmax(0, 0.92fr) minmax(340px, 1.08fr);
+        gap: clamp(24px, 4vw, 52px);
+        align-items: stretch;
+        border: 1px solid var(--line-strong);
+        border-radius: var(--radius);
+        background:
+          linear-gradient(
+            135deg,
+            rgba(47, 111, 159, 0.16),
+            rgba(123, 216, 143, 0.055) 48%,
+            rgba(255, 107, 95, 0.075)
+          ),
+          var(--surface);
+        overflow: hidden;
+      }
+      .lab-copy {
+        padding: clamp(24px, 4vw, 42px);
+        display: grid;
+        align-content: space-between;
+        gap: 28px;
+      }
+      .lab-copy h3 {
+        margin: 0;
+        font-family: var(--font-display);
+        font-size: clamp(1.75rem, 3.8vw, 3.2rem);
+        line-height: 0.98;
+        letter-spacing: -0.035em;
+      }
+      .lab-copy p {
+        margin: 16px 0 0;
+        max-width: 52ch;
+        color: var(--paper-dim);
+        font-size: 1.05rem;
+        line-height: 1.62;
+      }
+      .lab-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .lab-board {
+        min-height: 420px;
+        display: grid;
+        grid-template-rows: minmax(220px, 1fr) auto;
+        border-left: 1px solid var(--line);
+        background:
+          linear-gradient(
+            90deg,
+            rgba(244, 247, 242, 0.045) 1px,
+            transparent 1px
+          ),
+          linear-gradient(rgba(244, 247, 242, 0.045) 1px, transparent 1px),
+          rgba(16, 18, 22, 0.34);
+        background-size: 26px 26px;
+      }
+      .lab-diagram {
+        padding: clamp(20px, 3vw, 34px);
+        display: grid;
+        place-items: center;
+      }
+      .lab-diagram svg {
+        width: min(100%, 440px);
+        height: auto;
+        display: block;
+      }
+      .lab-track {
+        fill: none;
+        stroke: rgba(244, 247, 242, 0.16);
+        stroke-width: 14;
+      }
+      .lab-arc {
+        fill: none;
+        stroke-width: 14;
+        stroke-linecap: round;
+      }
+      .lab-arc-demand {
+        stroke: var(--coral);
+      }
+      .lab-arc-fulfillment {
+        stroke: var(--signal);
+      }
+      .lab-arc-supply {
+        stroke: var(--draft-light);
+      }
+      .lab-hub {
+        fill: rgba(16, 18, 22, 0.92);
+        stroke: var(--line-strong);
+      }
+      .lab-label {
+        fill: var(--paper);
+        font-family: var(--font-mono);
+        font-size: 10px;
+        letter-spacing: 0.03em;
+      }
+      .lab-hub-label {
+        fill: var(--paper);
+        font-family: var(--font-display);
+        font-size: 20px;
+        font-weight: 750;
+        letter-spacing: -0.03em;
+      }
+      .lab-bets {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        border-top: 1px solid var(--line);
+      }
+      .lab-bet {
+        min-height: 168px;
+        padding: 20px;
+        display: grid;
+        align-content: space-between;
+        gap: 18px;
+        color: inherit;
+        text-decoration: none;
+        border-right: 1px solid var(--line);
+        transition:
+          background 0.2s var(--ease-out-quart),
+          color 0.2s var(--ease-out-quart);
+      }
+      .lab-bet:last-child {
+        border-right: 0;
+      }
+      .lab-bet:hover,
+      .lab-bet:focus-visible {
+        background: rgba(123, 216, 143, 0.055);
+      }
+      .lab-bet b {
+        display: block;
+        color: var(--paper);
+        font-family: var(--font-display);
+        font-size: 1.1rem;
+        letter-spacing: -0.02em;
+      }
+      .lab-bet span {
+        display: block;
+        margin-top: 8px;
+        color: var(--steel);
+        font-size: 0.92rem;
+        line-height: 1.42;
+      }
+      .lab-bet em {
+        color: var(--draft-light);
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        font-style: normal;
+        letter-spacing: 0.02em;
+      }
+
       .skills-grid {
         margin-top: 44px;
         display: grid;
@@ -1058,6 +1209,146 @@
       }
       .skill-head > div > p {
         margin-top: 8px;
+      }
+      .ai-workflow {
+        margin-top: 1px;
+        display: grid;
+        grid-template-columns: minmax(240px, 0.72fr) minmax(0, 1.28fr);
+        border: 1px solid var(--line);
+        background: var(--ink);
+      }
+      .ai-workflow-intro {
+        padding: clamp(24px, 4vw, 34px);
+        border-right: 1px solid var(--line);
+        background:
+          linear-gradient(135deg, rgba(47, 111, 159, 0.12), transparent 62%),
+          rgba(244, 247, 242, 0.025);
+      }
+      .ai-workflow-label {
+        margin: 0 0 10px;
+        color: var(--draft-light);
+        font-family: var(--font-mono);
+        font-size: 0.74rem;
+      }
+      .ai-workflow-intro h3 {
+        margin: 0;
+        font-family: var(--font-display);
+        font-size: clamp(1.65rem, 3vw, 2.35rem);
+        line-height: 1.02;
+        letter-spacing: -0.03em;
+      }
+      .ai-workflow-intro p:last-child {
+        margin: 16px 0 0;
+        color: var(--steel);
+        line-height: 1.65;
+      }
+      .ai-diagram {
+        position: relative;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(150px, 1fr));
+        gap: 1px;
+        background: var(--line);
+      }
+      .ai-diagram::before {
+        content: "";
+        position: absolute;
+        left: clamp(42px, 6vw, 72px);
+        right: clamp(42px, 6vw, 72px);
+        top: 68px;
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(123, 216, 143, 0.74),
+          rgba(117, 180, 213, 0.76),
+          transparent
+        );
+        pointer-events: none;
+      }
+      .ai-tool {
+        position: relative;
+        min-height: 190px;
+        padding: 26px;
+        background: var(--ink);
+        display: grid;
+        align-content: start;
+        gap: 14px;
+      }
+      .ai-tool::after {
+        content: "";
+        position: absolute;
+        top: 64px;
+        right: -5px;
+        z-index: 1;
+        width: 9px;
+        height: 9px;
+        border: 1px solid rgba(123, 216, 143, 0.72);
+        border-radius: 50%;
+        background: var(--ink);
+      }
+      .ai-tool:last-of-type::after {
+        display: none;
+      }
+      .ai-tool-icon {
+        position: relative;
+        z-index: 2;
+        width: 44px;
+        height: 44px;
+        display: grid;
+        place-items: center;
+        border: 1px solid rgba(123, 216, 143, 0.36);
+        border-radius: var(--radius);
+        background: rgba(123, 216, 143, 0.08);
+        color: var(--signal);
+      }
+      .ai-tool-icon svg {
+        width: 25px;
+        height: 25px;
+        display: block;
+      }
+      .ai-tool h4 {
+        margin: 0;
+        color: var(--paper);
+        font-family: var(--font-display);
+        font-size: 1.08rem;
+        letter-spacing: -0.02em;
+      }
+      .ai-tool p {
+        margin: 0;
+        color: var(--steel);
+        line-height: 1.55;
+      }
+      .ai-addon {
+        grid-column: 1 / -1;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+        padding: 18px 24px;
+        background: rgba(244, 247, 242, 0.03);
+      }
+      .ai-addon strong {
+        color: var(--paper-dim);
+        font-family: var(--font-mono);
+        font-size: 0.76rem;
+        font-weight: 500;
+      }
+      .ai-addon-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .ai-addon-list span {
+        min-height: 32px;
+        display: inline-flex;
+        align-items: center;
+        border: 1px solid rgba(117, 180, 213, 0.28);
+        border-radius: 999px;
+        padding: 0.36rem 0.66rem;
+        color: var(--paper-dim);
+        background: rgba(117, 180, 213, 0.08);
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
       }
       .also {
         margin-top: 18px;
@@ -1266,8 +1557,13 @@
       @media (max-width: 980px) {
         .hero-grid,
         .work-layout,
-        .feature-panel {
+        .feature-panel,
+        .lab-panel {
           grid-template-columns: 1fr;
+        }
+        .lab-board {
+          border-left: 0;
+          border-top: 1px solid var(--line);
         }
         .hero {
           min-height: auto;
@@ -1282,6 +1578,16 @@
         .skills-grid,
         .other-work {
           grid-template-columns: repeat(2, 1fr);
+        }
+        .ai-workflow {
+          grid-template-columns: 1fr;
+        }
+        .ai-workflow-intro {
+          border-right: 0;
+          border-bottom: 1px solid var(--line);
+        }
+        .ai-diagram {
+          grid-column: 1 / -1;
         }
         .section-heading {
           align-items: flex-start;
@@ -1350,9 +1656,42 @@
         }
         .evidence,
         .skills-grid,
+        .ai-workflow,
+        .ai-diagram,
         .other-work,
+        .lab-bets,
         .background-grid {
           grid-template-columns: 1fr;
+        }
+        .ai-workflow-intro {
+          border-right: 0;
+          border-bottom: 1px solid var(--line);
+        }
+        .ai-diagram::before,
+        .ai-tool::after {
+          display: none;
+        }
+        .ai-tool {
+          min-height: 0;
+          padding: 22px;
+        }
+        .ai-addon {
+          align-items: flex-start;
+          padding: 18px 22px;
+        }
+        .lab-bet {
+          min-height: 0;
+          border-right: 0;
+          border-bottom: 1px solid var(--line);
+        }
+        .lab-bet:last-child {
+          border-bottom: 0;
+        }
+        .lab-board {
+          min-height: 0;
+        }
+        .lab-diagram {
+          padding: 18px;
         }
         .section-heading {
           flex-direction: column;
@@ -1433,6 +1772,7 @@
         <nav class="nav-links" id="navLinks" aria-label="Primary navigation">
           <a href="#experience">Experience</a>
           <a href="#work">Featured work</a>
+          <a href="#prototype-lab">Explore</a>
           <a href="#skills">Skills</a>
           <a href="#background">Background</a>
           <a href="mailto:pakawat.zon@gmail.com">Contact</a>
@@ -2225,6 +2565,125 @@
         </div>
       </section>
 
+      <section class="section" id="prototype-lab">
+        <div class="wrap">
+          <p class="section-kicker reveal">Prototype Lab</p>
+          <h2 class="section-title reveal">
+            Product bets, made clickable.
+          </h2>
+          <p class="section-copy reveal">
+            ThaiMart is a marketplace exploration: three focused prototypes
+            testing retention, fulfillment, and seller onboarding as one
+            product loop.
+          </p>
+
+          <div class="lab-panel reveal">
+            <div class="lab-copy">
+              <div>
+                <h3>ThaiMart Marketplace Flywheel.</h3>
+                <p>
+                  A PM-style prototype set that starts from business leverage,
+                  then turns each opportunity into a runnable interface with
+                  user flows, metrics, and system logic.
+                </p>
+              </div>
+              <div class="lab-actions">
+                <a href="thaimart/index.html" class="btn btn-primary">
+                  Open prototype hub
+                </a>
+                <a href="thaimart/01-smartrewards.html" class="btn">
+                  Start with SmartRewards
+                </a>
+              </div>
+            </div>
+
+            <div class="lab-board">
+              <div class="lab-diagram" aria-hidden="true">
+                <svg viewBox="0 0 360 300">
+                  <circle class="lab-track" cx="180" cy="148" r="100" />
+                  <path
+                    class="lab-arc lab-arc-supply proto-line"
+                    style="--dash: 220"
+                    d="M188 48.3A100 100 0 0 1 269.8 190"
+                  />
+                  <path
+                    class="lab-arc lab-arc-fulfillment proto-line"
+                    style="--dash: 220"
+                    d="M259.6 207.1A100 100 0 0 1 100.4 207.1"
+                  />
+                  <path
+                    class="lab-arc lab-arc-demand proto-line"
+                    style="--dash: 220"
+                    d="M90.2 190A100 100 0 0 1 172 48.3"
+                  />
+                  <circle
+                    class="proto-node"
+                    cx="267"
+                    cy="91"
+                    r="6"
+                    fill="#75b4d5"
+                  />
+                  <circle
+                    class="proto-node"
+                    cx="180"
+                    cy="248"
+                    r="6"
+                    fill="#7bd88f"
+                  />
+                  <circle
+                    class="proto-active"
+                    cx="93"
+                    cy="91"
+                    r="6"
+                    fill="#ff6b5f"
+                  />
+                  <circle class="lab-hub" cx="180" cy="148" r="46" />
+                  <text class="lab-hub-label" x="180" y="145" text-anchor="middle">
+                    ThaiMart
+                  </text>
+                  <text class="lab-label" x="180" y="164" text-anchor="middle">
+                    MARKETPLACE LOOP
+                  </text>
+                  <text class="lab-label" x="252" y="82" text-anchor="middle">
+                    SUPPLY
+                  </text>
+                  <text class="lab-label" x="180" y="270" text-anchor="middle">
+                    FULFILLMENT
+                  </text>
+                  <text class="lab-label" x="108" y="82" text-anchor="middle">
+                    DEMAND
+                  </text>
+                </svg>
+              </div>
+
+              <div class="lab-bets" aria-label="ThaiMart prototype bets">
+                <a class="lab-bet" href="thaimart/01-smartrewards.html">
+                  <span>
+                    <b>SmartRewards</b>
+                    Retention and predictive cart behavior for repeat shoppers.
+                  </span>
+                  <em>DEMAND</em>
+                </a>
+                <a class="lab-bet" href="thaimart/02-localpick.html">
+                  <span>
+                    <b>LocalPick</b>
+                    Online-to-store pickup with real-time stock and staff flow.
+                  </span>
+                  <em>FULFILLMENT</em>
+                </a>
+                <a class="lab-bet" href="thaimart/03-vendorexpress.html">
+                  <span>
+                    <b>VendorExpress</b>
+                    Seller onboarding and AI-assisted catalog mapping.
+                  </span>
+                  <em>SUPPLY</em>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section class="section" id="skills">
         <div class="wrap">
           <div class="section-head reveal">
@@ -2334,6 +2793,98 @@
                 </div>
               </div>
             </article>
+          </div>
+          <div
+            class="ai-workflow reveal"
+            aria-labelledby="ai-workflow-title"
+          >
+            <div class="ai-workflow-intro">
+              <p class="ai-workflow-label">AI toolchain</p>
+              <h3 id="ai-workflow-title">Tools route by kind of work.</h3>
+              <p>
+                Everyday coding, interface judgment, and complex debugging stay
+                in the same workflow, with skills layered on when the task needs
+                stronger process.
+              </p>
+            </div>
+            <div class="ai-diagram" aria-label="AI tools and skill add-ons">
+              <article class="ai-tool">
+                <span class="ai-tool-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M4 3.8 20.2 12 12.8 14.2 9.4 21 4 3.8Z"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linejoin="round"
+                    />
+                    <path
+                      d="m12.8 14.2 4.9 4.9"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                    />
+                  </svg>
+                </span>
+                <div>
+                  <h4>Cursor Composer 2.5</h4>
+                  <p>All-around everyday code.</p>
+                </div>
+              </article>
+              <article class="ai-tool">
+                <span class="ai-tool-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M12 3.5c1.1 3.2 2.3 5.1 5.7 5.8-3.4.7-4.6 2.6-5.7 5.8-1.1-3.2-2.3-5.1-5.7-5.8 3.4-.7 4.6-2.6 5.7-5.8Z"
+                      stroke="currentColor"
+                      stroke-width="1.7"
+                      stroke-linejoin="round"
+                    />
+                    <path
+                      d="M18.2 14.8c.5 1.4 1 2.2 2.5 2.6-1.5.4-2 1.2-2.5 2.6-.5-1.4-1-2.2-2.5-2.6 1.5-.4 2-1.2 2.5-2.6Z"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </span>
+                <div>
+                  <h4>Claude Opus 4.8</h4>
+                  <p>Designer and frontend partner.</p>
+                </div>
+              </article>
+              <article class="ai-tool">
+                <span class="ai-tool-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="m8.2 7.2-4.4 4.7 4.4 4.9M15.8 7.2l4.4 4.7-4.4 4.9"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                    <path
+                      d="M13.8 5.5 10.2 18.5"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                    />
+                  </svg>
+                </span>
+                <div>
+                  <h4>Codex GPT 5.5</h4>
+                  <p>Bug hunts and complex solving.</p>
+                </div>
+              </article>
+              <div class="ai-addon">
+                <strong>Add-on skills</strong>
+                <div class="ai-addon-list" aria-label="AI workflow skills">
+                  <span>Superpowers</span>
+                  <span>Obsidian Vault</span>
+                  <span>Ponytail</span>
+                  <span>Loop Engineering</span>
+                </div>
+              </div>
+            </div>
           </div>
           <p class="also reveal">
             Also experienced with JavaScript, Kotlin, C#, QR workflows, bot

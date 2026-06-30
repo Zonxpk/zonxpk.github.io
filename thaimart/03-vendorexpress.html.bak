@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ThaiMart VendorExpress</title>
+<!--
+========================================================================
+ThaiMart VendorExpress — clickable prototype (single file)
+========================================================================
+SCREENS (Prototype view, JS show/hide):
+  1. onboarding   — 3-step wizard: Business info -> KYC docs -> Bank/payout.
+                    Per-step validation (Thai tax ID 13 digits, required fields).
+  2. upload       — Bulk CSV drag-drop (faked file) -> processing -> AI
+                    column mapping table (vendor col -> ThaiMart field + confidence).
+  3. review       — Imported products table, AI category + status chips
+                    (Ready / Needs review). Inline fix one row. Bulk Publish.
+  4. dashboard    — Onboarding progress ring, time-to-live counter
+                    (Live in 41h vs legacy 14 days), product counts, next steps.
+
+VIEWS (top tab bar): "Prototype"  |  "How it works" (Mermaid diagram + PM context)
+
+STATE (persisted to localStorage key tm_vx_state):
+  currentView      'proto' | 'how'
+  currentScreen    'onboarding' | 'upload' | 'review' | 'dashboard'
+  wizardStep       1..3
+  business         { name, taxId, type, address, phone, email }
+  kycDone          bool
+  bankDone         bool
+  uploadDone       bool      (csv processed + published)
+  products[]       { id, name, price, vendorCat, aiCat, conf, status }
+  onboardingPct    derived 0..100
+========================================================================
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --primary:#E84A27; --primary-dark:#C13A1C;
+    --green:#138A5E; --gold:#E8A33D;
+    --ink:#1A1614; --muted:#6B6460;
+    --surface:#FFFFFF; --canvas:#F7F3EF; --hair:#E9E1D8;
+    --r-card:14px; --r-input:10px; --r-pill:999px;
+    --sh-sm:0 1px 3px rgba(26,22,20,.08);
+    --sh-lg:0 8px 24px rgba(26,22,20,.06);
+    --focus:0 0 0 2px var(--surface), 0 0 0 4px var(--green);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:'Inter','Noto Sans Thai',system-ui,sans-serif;
+    background:#ECE6DF; color:var(--ink);
+    -webkit-font-smoothing:antialiased; line-height:1.5;
+    min-height:100vh; padding:24px 16px 64px;
+  }
+  button{font-family:inherit; cursor:pointer}
+  :focus-visible{outline:none; box-shadow:var(--focus)}
+  .visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+  /* ---- Browser frame ---- */
+  .frame{
+    max-width:1180px; margin:0 auto;
+    background:var(--surface); border-radius:16px;
+    box-shadow:var(--sh-lg), 0 24px 60px rgba(26,22,20,.14);
+    overflow:hidden; border:1px solid var(--hair);
+  }
+  .chrome{
+    background:#E4DDD4; padding:11px 16px; display:flex; align-items:center; gap:14px;
+    border-bottom:1px solid var(--hair);
+  }
+  .dots{display:flex; gap:8px}
+  .dots i{width:12px;height:12px;border-radius:50%;display:block}
+  .dots i:nth-child(1){background:#FF5F57}
+  .dots i:nth-child(2){background:#FEBC2E}
+  .dots i:nth-child(3){background:#28C840}
+  .urlbar{
+    flex:1; background:var(--surface); border-radius:var(--r-pill);
+    padding:7px 16px; font-size:13px; color:var(--muted);
+    display:flex; align-items:center; gap:8px; max-width:520px; border:1px solid var(--hair);
+  }
+  .urlbar .lock{color:var(--green); font-size:12px}
+  .urlbar b{color:var(--ink); font-weight:500}
+
+  /* ---- App shell ---- */
+  .app{min-height:660px; display:flex; flex-direction:column}
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 28px; border-bottom:1px solid var(--hair); background:var(--surface);
+  }
+  .brand{display:flex; align-items:center; gap:11px; font-weight:700; font-size:17px}
+  .logo{
+    width:30px;height:30px;border-radius:9px;
+    background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+    display:grid;place-items:center;color:#fff;font-weight:700;font-size:15px;
+    box-shadow:0 2px 6px rgba(232,74,39,.35);
+  }
+  .brand small{display:block;font-weight:500;font-size:11px;color:var(--muted);letter-spacing:.3px}
+  .tabs{display:flex; gap:4px; background:var(--canvas); padding:4px; border-radius:var(--r-pill)}
+  .tabs button{
+    border:none; background:transparent; padding:8px 18px; border-radius:var(--r-pill);
+    font-size:13px; font-weight:600; color:var(--muted); min-height:36px;
+  }
+  .tabs button[aria-selected="true"]{background:var(--surface); color:var(--ink); box-shadow:var(--sh-sm)}
+  .vendor-chip{display:flex;align-items:center;gap:9px;font-size:13px}
+  .vendor-chip .av{
+    width:32px;height:32px;border-radius:9px;background:var(--gold);color:#3a2a00;
+    display:grid;place-items:center;font-weight:700;font-size:13px;
+  }
+  .vendor-chip b{font-weight:600}
+  .vendor-chip span{display:block;color:var(--muted);font-size:11px}
+
+  .body{flex:1; display:flex; min-height:0}
+  /* ---- Stepper sidebar (proto) ---- */
+  .rail{
+    width:248px; flex-shrink:0; background:var(--canvas);
+    border-right:1px solid var(--hair); padding:24px 18px;
+  }
+  .rail h2{font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin:0 0 16px 6px}
+  .navitem{
+    display:flex; align-items:center; gap:12px; width:100%; text-align:left;
+    border:none; background:transparent; padding:11px 12px; border-radius:10px;
+    font-size:14px; font-weight:500; color:var(--ink); margin-bottom:4px; min-height:44px;
+  }
+  .navitem:hover{background:#fff}
+  .navitem[aria-current="true"]{background:#fff; box-shadow:var(--sh-sm); font-weight:600}
+  .navitem .num{
+    width:24px;height:24px;border-radius:50%;flex-shrink:0;
+    display:grid;place-items:center;font-size:12px;font-weight:700;
+    background:var(--hair); color:var(--muted);
+  }
+  .navitem[aria-current="true"] .num{background:var(--primary); color:#fff}
+  .navitem.done .num{background:var(--green); color:#fff}
+  .rail .pct-card{
+    margin-top:24px; background:#fff; border-radius:var(--r-card); padding:16px;
+    box-shadow:var(--sh-sm);
+  }
+  .rail .pct-card .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  .rail .pct-card .big{font-size:22px;font-weight:700;margin-top:2px}
+  .miniring{display:flex;align-items:center;gap:12px;margin-top:8px}
+
+  .main{flex:1; padding:32px 40px; overflow-y:auto; max-height:calc(660px - 0px)}
+  .screen{display:none; animation:fade .35s ease}
+  .screen.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  h1.title{font-size:24px;font-weight:700;margin:0 0 4px}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 24px}
+
+  /* ---- Forms ---- */
+  .field{margin-bottom:18px;max-width:520px}
+  .field.half{display:inline-block;width:calc(50% - 8px);max-width:none}
+  .field.half:nth-of-type(odd){margin-right:14px}
+  label{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
+  label .req{color:var(--primary)}
+  input,select{
+    width:100%; padding:12px 14px; border:1.5px solid var(--hair); border-radius:var(--r-input);
+    font-size:14px; font-family:inherit; background:var(--surface); color:var(--ink); min-height:44px;
+  }
+  input:focus,select:focus{border-color:var(--green); outline:none; box-shadow:0 0 0 3px rgba(19,138,94,.13)}
+  input.err,select.err{border-color:var(--primary); box-shadow:0 0 0 3px rgba(232,74,39,.12)}
+  .hint{font-size:12px;color:var(--muted);margin-top:5px}
+  .errmsg{font-size:12px;color:var(--primary-dark);margin-top:5px;display:none;font-weight:500}
+  .errmsg.show{display:block}
+
+  .btn{
+    border:none;border-radius:var(--r-input);padding:12px 22px;font-size:14px;font-weight:600;
+    min-height:44px; display:inline-flex;align-items:center;gap:8px;
+  }
+  .btn-primary{background:var(--primary);color:#fff;box-shadow:0 2px 8px rgba(232,74,39,.3)}
+  .btn-primary:hover{background:var(--primary-dark)}
+  .btn-primary:disabled{opacity:.55;cursor:not-allowed;box-shadow:none}
+  .btn-ghost{background:transparent;color:var(--ink);border:1.5px solid var(--hair)}
+  .btn-ghost:hover{background:var(--canvas)}
+  .btn-green{background:var(--green);color:#fff}
+  .btn-green:hover{filter:brightness(.94)}
+  .actions{display:flex;gap:12px;align-items:center;margin-top:28px;max-width:520px}
+  .actions .spacer{flex:1}
+
+  .spinner{width:15px;height:15px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* ---- Cards / chips ---- */
+  .card{background:var(--surface);border:1px solid var(--hair);border-radius:var(--r-card);padding:22px;box-shadow:var(--sh-sm)}
+  .chip{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:var(--r-pill);font-size:12px;font-weight:600}
+  .chip.ready{background:rgba(19,138,94,.12);color:var(--green)}
+  .chip.review{background:rgba(232,163,61,.18);color:#9a6b13}
+  .chip.dot::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+
+  /* ---- Dropzone ---- */
+  .dropzone{
+    border:2px dashed var(--hair); border-radius:var(--r-card); padding:46px 24px; text-align:center;
+    background:var(--canvas); transition:.18s; max-width:680px;
+  }
+  .dropzone.drag{border-color:var(--green);background:rgba(19,138,94,.06)}
+  .dropzone .ic{font-size:40px;margin-bottom:10px}
+  .dropzone h3{margin:0 0 4px;font-size:17px}
+  .dropzone p{margin:0;color:var(--muted);font-size:13px}
+  .filecard{display:flex;align-items:center;gap:14px;max-width:680px;background:#fff;border:1px solid var(--hair);border-radius:var(--r-input);padding:14px 18px;margin-bottom:8px}
+  .filecard .fic{width:40px;height:40px;border-radius:9px;background:rgba(19,138,94,.12);color:var(--green);display:grid;place-items:center;font-weight:700;font-size:13px}
+  .filecard b{font-size:14px}
+  .filecard small{color:var(--muted);font-size:12px}
+
+  .progress{height:8px;border-radius:var(--r-pill);background:var(--hair);overflow:hidden;max-width:680px;margin-top:18px}
+  .progress i{display:block;height:100%;background:linear-gradient(90deg,var(--primary),var(--gold));width:0;transition:width .25s}
+
+  /* ---- Tables ---- */
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  thead th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);padding:0 14px 10px;font-weight:600;border-bottom:1px solid var(--hair)}
+  tbody td{padding:13px 14px;border-bottom:1px solid var(--hair);vertical-align:middle}
+  tbody tr:hover{background:var(--canvas)}
+  tbody tr:last-child td{border-bottom:none}
+  .conf{display:flex;align-items:center;gap:8px;min-width:120px}
+  .conf .bar{flex:1;height:6px;border-radius:var(--r-pill);background:var(--hair);overflow:hidden;max-width:80px}
+  .conf .bar i{display:block;height:100%;border-radius:var(--r-pill)}
+  .conf b{font-size:12px;font-variant-numeric:tabular-nums}
+  .arrow{color:var(--muted)}
+  .vendcol{font-family:'SF Mono',ui-monospace,monospace;font-size:12px;background:var(--canvas);padding:3px 8px;border-radius:6px;color:var(--ink)}
+  .tmfield{font-weight:600;color:var(--green)}
+  .price{font-variant-numeric:tabular-nums;font-weight:600}
+
+  .toolbar{display:flex;align-items:center;gap:12px;margin:0 0 16px;flex-wrap:wrap}
+  .toolbar .grow{flex:1}
+  .selinfo{font-size:13px;color:var(--muted)}
+
+  .linkbtn{background:none;border:none;color:var(--green);font-weight:600;font-size:13px;padding:4px 6px;border-radius:6px}
+  .linkbtn:hover{background:rgba(19,138,94,.1)}
+
+  /* ---- inline edit category select ---- */
+  td select.inline{padding:6px 8px;min-height:34px;font-size:12px;border-radius:8px;max-width:170px}
+
+  /* ---- Dashboard ---- */
+  .dash-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:20px;align-items:start}
+  .ring-wrap{display:flex;align-items:center;gap:26px}
+  .ring{position:relative;width:140px;height:140px;flex-shrink:0}
+  .ring svg{transform:rotate(-90deg)}
+  .ring .lbl{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+  .ring .lbl b{font-size:30px;font-weight:700;display:block}
+  .ring .lbl span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  .ttl{background:linear-gradient(135deg,#fff,var(--canvas));border:1px solid var(--hair)}
+  .ttl .big{font-size:32px;font-weight:700;color:var(--green);font-variant-numeric:tabular-nums}
+  .compare{display:flex;gap:10px;margin-top:14px}
+  .compare .pill{flex:1;border-radius:10px;padding:12px;text-align:center}
+  .compare .old{background:rgba(232,74,39,.08)}
+  .compare .new{background:rgba(19,138,94,.1)}
+  .compare .pill span{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  .compare .pill b{font-size:20px;font-weight:700}
+  .compare .old b{color:var(--primary-dark);text-decoration:line-through;opacity:.7}
+  .compare .new b{color:var(--green)}
+  .stat-row{display:flex;gap:14px;margin-top:18px}
+  .stat{flex:1;background:#fff;border:1px solid var(--hair);border-radius:var(--r-card);padding:16px}
+  .stat b{font-size:24px;font-weight:700;display:block}
+  .stat span{font-size:12px;color:var(--muted)}
+  .steps-list{list-style:none;margin:0;padding:0}
+  .steps-list li{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--hair);font-size:14px}
+  .steps-list li:last-child{border-bottom:none}
+  .steps-list .tick{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:13px;flex-shrink:0}
+  .steps-list .tick.ok{background:var(--green);color:#fff}
+  .steps-list .tick.pend{background:var(--canvas);border:1.5px solid var(--hair);color:var(--muted)}
+  .steps-list li.pend{color:var(--muted)}
+
+  .banner{
+    background:linear-gradient(135deg,#fff,#FFF6F2);border:1px solid #F4D4C7;border-radius:var(--r-card);
+    padding:18px 22px;display:flex;align-items:center;gap:18px;margin-bottom:24px;
+  }
+  .banner .vp{font-size:15px;font-weight:600}
+  .banner .vp em{font-style:normal;color:var(--primary);font-weight:700}
+  .banner .arrowbig{font-size:22px;color:var(--gold)}
+
+  /* ---- How it works ---- */
+  .how{padding:32px 44px;overflow-y:auto;max-height:660px}
+  .how h1{font-size:24px;margin:0 0 6px}
+  .how .lead{color:var(--muted);max-width:720px;margin:0 0 28px}
+  .how section{margin-bottom:30px}
+  .how h3{font-size:13px;text-transform:uppercase;letter-spacing:.7px;color:var(--primary);margin:0 0 12px}
+  .kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .kpi{background:var(--surface);border:1px solid var(--hair);border-radius:var(--r-card);padding:18px;box-shadow:var(--sh-sm)}
+  .kpi .num{font-size:26px;font-weight:700}
+  .kpi .num .from{color:var(--muted);font-size:15px;text-decoration:line-through;font-weight:600}
+  .kpi .num .to{color:var(--green)}
+  .kpi .k{font-size:12px;color:var(--muted);margin-top:4px}
+  .persona{display:flex;gap:16px;background:var(--surface);border:1px solid var(--hair);border-radius:var(--r-card);padding:18px;box-shadow:var(--sh-sm)}
+  .persona .av{width:48px;height:48px;border-radius:12px;background:var(--gold);color:#3a2a00;display:grid;place-items:center;font-weight:700;font-size:18px;flex-shrink:0}
+  .persona b{font-size:15px}
+  .persona p{margin:4px 0 0;font-size:13px;color:var(--muted)}
+  .mermaid{background:var(--surface);border:1px solid var(--hair);border-radius:var(--r-card);padding:20px;box-shadow:var(--sh-sm);text-align:center}
+  .twocol{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .note-card{background:var(--surface);border:1px solid var(--hair);border-radius:var(--r-card);padding:18px;box-shadow:var(--sh-sm)}
+  .note-card h4{margin:0 0 10px;font-size:14px}
+  .note-card ul{margin:0;padding-left:18px;font-size:13px;color:var(--ink)}
+  .note-card li{margin-bottom:7px}
+  .tag{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:var(--r-pill);margin-right:4px}
+  .tag.auto{background:rgba(19,138,94,.12);color:var(--green)}
+  .tag.human{background:rgba(232,163,61,.18);color:#9a6b13}
+  .tag.reuse{background:rgba(232,74,39,.1);color:var(--primary-dark)}
+
+  /* ---- Toast ---- */
+  .toast{
+    position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(80px);
+    background:var(--ink);color:#fff;padding:13px 22px;border-radius:var(--r-pill);
+    font-size:14px;font-weight:500;box-shadow:var(--sh-lg);opacity:0;transition:.3s;z-index:90;
+    display:flex;align-items:center;gap:9px;
+  }
+  .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+  .toast.ok{background:var(--green)}
+
+  /* ---- Modal ---- */
+  .overlay{position:fixed;inset:0;background:rgba(26,22,20,.5);display:none;place-items:center;z-index:80;padding:20px}
+  .overlay.show{display:grid}
+  .modal{background:#fff;border-radius:var(--r-card);max-width:440px;width:100%;padding:28px;box-shadow:var(--sh-lg);animation:fade .25s ease}
+  .modal h3{margin:0 0 8px;font-size:19px}
+  .modal p{color:var(--muted);font-size:14px;margin:0 0 22px}
+  .modal .row{display:flex;gap:12px;justify-content:flex-end}
+  .modal .check{width:56px;height:56px;border-radius:50%;background:rgba(19,138,94,.12);color:var(--green);display:grid;place-items:center;font-size:28px;margin:0 auto 16px}
+
+  @media(max-width:880px){
+    .rail{display:none}
+    .dash-grid,.twocol,.kpi-grid{grid-template-columns:1fr}
+    .field.half{width:100%;margin-right:0}
+  }
+</style>
+</head>
+<body>
+<div class="frame">
+  <!-- Browser chrome -->
+  <div class="chrome">
+    <div class="dots"><i></i><i></i><i></i></div>
+    <div class="urlbar"><span class="lock">&#128274;</span><b>vendor.thaimart.co</b>/onboarding</div>
+  </div>
+
+  <div class="app">
+    <!-- Top bar -->
+    <header class="topbar">
+      <div class="brand">
+        <span class="logo">TM</span>
+        <span>ThaiMart VendorExpress<small>Self-service vendor onboarding</small></span>
+      </div>
+      <div class="tabs" role="tablist" aria-label="Views">
+        <button role="tab" id="tab-proto" aria-selected="true" onclick="setView('proto')">Prototype</button>
+        <button role="tab" id="tab-how" aria-selected="false" onclick="setView('how')">How it works</button>
+      </div>
+      <div class="vendor-chip">
+        <span class="av">BK</span>
+        <span><b>Baan Khanom</b><span>OTOP merchant</span></span>
+      </div>
+    </header>
+
+    <!-- ============ PROTOTYPE VIEW ============ -->
+    <div class="body" id="view-proto">
+      <!-- Rail -->
+      <nav class="rail" aria-label="Onboarding steps">
+        <h2>Get set up</h2>
+        <button class="navitem" id="nav-onboarding" onclick="goScreen('onboarding')"><span class="num">1</span>Business profile</button>
+        <button class="navitem" id="nav-upload" onclick="goScreen('upload')"><span class="num">2</span>Catalog upload</button>
+        <button class="navitem" id="nav-review" onclick="goScreen('review')"><span class="num">3</span>Catalog review</button>
+        <button class="navitem" id="nav-dashboard" onclick="goScreen('dashboard')"><span class="num">4</span>Go-live status</button>
+        <div class="pct-card">
+          <div class="lbl">Onboarding</div>
+          <div class="miniring">
+            <div class="ring" style="width:54px;height:54px">
+              <svg width="54" height="54" viewBox="0 0 54 54">
+                <circle cx="27" cy="27" r="23" fill="none" stroke="#E9E1D8" stroke-width="6"/>
+                <circle id="mini-ring" cx="27" cy="27" r="23" fill="none" stroke="#138A5E" stroke-width="6" stroke-linecap="round" stroke-dasharray="144.5" stroke-dashoffset="144.5"/>
+              </svg>
+              <div class="lbl" style="position:absolute;inset:0;display:grid;place-items:center"><b id="mini-pct" style="font-size:14px">0%</b></div>
+            </div>
+            <div><div class="big" id="rail-pct">0%</div><div class="lbl">complete</div></div>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Main -->
+      <main class="main">
+        <!-- SCREEN 1: ONBOARDING -->
+        <section class="screen" id="screen-onboarding" role="region" aria-label="Business profile">
+          <h1 class="title" id="wiz-title">Business information</h1>
+          <p class="sub" id="wiz-sub">Step 1 of 3 — Tell us about your shop. Everything saves as you go.</p>
+
+          <!-- step 1 -->
+          <div id="step-1">
+            <div class="field">
+              <label for="b-name">Business name <span class="req">*</span></label>
+              <input id="b-name" type="text" placeholder="e.g. Baan Khanom Thai Sweets Co." autocomplete="organization" />
+              <div class="errmsg" id="e-name">Business name is required.</div>
+            </div>
+            <div class="field">
+              <label for="b-tax">Thai Tax ID (13 digits) <span class="req">*</span></label>
+              <input id="b-tax" type="text" inputmode="numeric" maxlength="13" placeholder="0 1055 12345 67 8" />
+              <div class="hint">Your 13-digit juristic / taxpayer ID — used for KYC verification.</div>
+              <div class="errmsg" id="e-tax">Enter exactly 13 digits.</div>
+            </div>
+            <div class="field half">
+              <label for="b-type">Business type <span class="req">*</span></label>
+              <select id="b-type">
+                <option value="">Select…</option>
+                <option>OTOP / Local producer</option>
+                <option>Sole proprietorship</option>
+                <option>Limited company</option>
+                <option>Community enterprise</option>
+              </select>
+              <div class="errmsg" id="e-type">Please select a business type.</div>
+            </div>
+            <div class="field half">
+              <label for="b-phone">Contact phone <span class="req">*</span></label>
+              <input id="b-phone" type="tel" placeholder="08X-XXX-XXXX" autocomplete="tel" />
+              <div class="errmsg" id="e-phone">Phone number is required.</div>
+            </div>
+            <div class="field">
+              <label for="b-addr">Shop address</label>
+              <input id="b-addr" type="text" placeholder="123 Mu 4, Tambon Bang Phli, Samut Prakan 10540" />
+            </div>
+          </div>
+
+          <!-- step 2 -->
+          <div id="step-2" style="display:none">
+            <div class="field" style="max-width:680px">
+              <label>Required documents <span class="req">*</span></label>
+              <div class="hint" style="margin-top:0;margin-bottom:14px">Upload clear photos or PDFs. Verified automatically against your Tax ID via the Identity service.</div>
+              <div id="doc-1" class="filecard" style="cursor:pointer" onclick="fakeUpload('doc-1','ID card / company registration','PorPor20.pdf')">
+                <div class="fic">+</div><div style="flex:1"><b>ID card / company registration</b><br><small>Tap to upload — PDF or image</small></div>
+              </div>
+              <div id="doc-2" class="filecard" style="cursor:pointer" onclick="fakeUpload('doc-2','Food production license','OTOP-license.jpg')">
+                <div class="fic">+</div><div style="flex:1"><b>Food production / OTOP license</b><br><small>Tap to upload — PDF or image</small></div>
+              </div>
+              <div class="errmsg" id="e-docs">Please upload both documents to continue.</div>
+            </div>
+          </div>
+
+          <!-- step 3 -->
+          <div id="step-3" style="display:none">
+            <p class="sub" style="margin-top:-12px">Where should ThaiMart send your sales payouts? Settled every 7 days.</p>
+            <div class="field half">
+              <label for="b-bank">Bank <span class="req">*</span></label>
+              <select id="b-bank">
+                <option value="">Select bank…</option>
+                <option>Kasikornbank (KBank)</option>
+                <option>Siam Commercial Bank (SCB)</option>
+                <option>Bangkok Bank</option>
+                <option>Krungthai Bank</option>
+                <option>TMBThanachart (ttb)</option>
+              </select>
+              <div class="errmsg" id="e-bank">Select a bank.</div>
+            </div>
+            <div class="field half">
+              <label for="b-acctname">Account name <span class="req">*</span></label>
+              <input id="b-acctname" type="text" placeholder="Baan Khanom Thai Sweets Co." />
+              <div class="errmsg" id="e-acctname">Account name is required.</div>
+            </div>
+            <div class="field">
+              <label for="b-acct">Account number <span class="req">*</span></label>
+              <input id="b-acct" type="text" inputmode="numeric" maxlength="12" placeholder="XXX-X-XXXXX-X" />
+              <div class="errmsg" id="e-acct">Enter a valid account number (10–12 digits).</div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn btn-ghost" id="wiz-back" onclick="wizPrev()" style="display:none">Back</button>
+            <div class="spacer"></div>
+            <span class="hint" style="margin:0">Saved automatically</span>
+            <button class="btn btn-primary" id="wiz-next" onclick="wizNext()">Continue</button>
+          </div>
+        </section>
+
+        <!-- SCREEN 2: UPLOAD -->
+        <section class="screen" id="screen-upload" role="region" aria-label="Catalog upload">
+          <h1 class="title">Bulk catalog upload</h1>
+          <p class="sub">Drop your existing product spreadsheet. VendorExpress auto-detects columns and AI-categorises every product — no manual data entry.</p>
+
+          <!-- stage A: dropzone -->
+          <div id="up-drop">
+            <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Upload CSV file"
+                 onclick="pickFile()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();pickFile()}">
+              <div class="ic">&#128196;</div>
+              <h3>Drag &amp; drop your CSV here</h3>
+              <p>or click to browse — we accept .csv and .xlsx exports from any POS</p>
+            </div>
+            <p class="hint" style="max-width:680px">Don't have a file ready? <button class="linkbtn" onclick="pickFile()">Use our sample (Baan Khanom — 6 products)</button></p>
+          </div>
+
+          <!-- stage B: processing -->
+          <div id="up-proc" style="display:none">
+            <div class="filecard"><div class="fic">CSV</div><div style="flex:1"><b id="up-fname">baan_khanom_products.csv</b><br><small id="up-fmeta">6 rows · 5 columns · 4.1 KB</small></div><span class="chip ready dot" id="up-fstatus">Uploaded</span></div>
+            <div class="progress"><i id="up-bar"></i></div>
+            <p class="hint" id="up-status" style="max-width:680px;margin-top:10px">Parsing rows…</p>
+          </div>
+
+          <!-- stage C: mapping -->
+          <div id="up-map" style="display:none">
+            <div class="card" style="max-width:780px;margin-top:6px">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+                <span class="chip ready dot">AI mapping complete</span>
+                <span class="hint" style="margin:0">5 of 5 columns auto-mapped · avg confidence 94%</span>
+              </div>
+              <p class="sub" style="margin:10px 0 18px">Review how your spreadsheet columns map to ThaiMart catalog fields. Adjust any that look off.</p>
+              <table>
+                <thead><tr><th>Your column</th><th></th><th>ThaiMart field</th><th>Confidence</th></tr></thead>
+                <tbody id="map-body"></tbody>
+              </table>
+              <div class="actions" style="margin-top:22px;max-width:none">
+                <div class="spacer"></div>
+                <button class="btn btn-ghost" onclick="resetUpload()">Re-upload</button>
+                <button class="btn btn-primary" id="map-confirm" onclick="confirmMapping()">Confirm mapping &amp; import</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SCREEN 3: REVIEW -->
+        <section class="screen" id="screen-review" role="region" aria-label="Catalog review">
+          <h1 class="title">Review imported catalog</h1>
+          <p class="sub">AI assigned a category and quality status to every product. Fix anything marked <span class="chip review dot" style="vertical-align:middle">Needs review</span> then publish in one click.</p>
+
+          <div class="toolbar">
+            <label class="selinfo" style="display:flex;align-items:center;gap:8px;font-weight:600">
+              <input type="checkbox" id="sel-all" style="width:auto;min-height:0" onclick="toggleAll(this.checked)" /> Select all
+            </label>
+            <span class="grow"></span>
+            <span class="selinfo" id="review-summary"></span>
+            <button class="btn btn-green" id="publish-btn" onclick="openPublish()">Publish selected</button>
+          </div>
+
+          <div class="card" style="padding:8px 0">
+            <table>
+              <thead><tr><th style="width:36px"></th><th>Product</th><th>Price</th><th>AI category</th><th>Status</th></tr></thead>
+              <tbody id="review-body"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- SCREEN 4: DASHBOARD -->
+        <section class="screen" id="screen-dashboard" role="region" aria-label="Go-live status">
+          <div class="banner">
+            <div class="vp">Onboarding time: <em>14 days</em> <span class="arrowbig">&#8594;</span> <em>48 hours</em></div>
+            <span class="grow" style="flex:1"></span>
+            <span class="chip ready dot">VendorExpress automated</span>
+          </div>
+
+          <h1 class="title">Baan Khanom Thai Sweets Co.</h1>
+          <p class="sub">Almost live on the ThaiMart marketplace. Here's where you stand.</p>
+
+          <div class="dash-grid">
+            <div class="card">
+              <div class="ring-wrap">
+                <div class="ring">
+                  <svg width="140" height="140" viewBox="0 0 140 140">
+                    <circle cx="70" cy="70" r="60" fill="none" stroke="#E9E1D8" stroke-width="12"/>
+                    <circle id="dash-ring" cx="70" cy="70" r="60" fill="none" stroke="#E84A27" stroke-width="12" stroke-linecap="round" stroke-dasharray="377" stroke-dashoffset="377" style="transition:stroke-dashoffset .8s ease"/>
+                  </svg>
+                  <div class="lbl"><b id="dash-pct">0%</b><span>onboarded</span></div>
+                </div>
+                <div>
+                  <div class="stat" style="border:none;padding:0;background:none">
+                    <span style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">Estimated time to live</span>
+                    <div class="big" id="ttl-counter" style="font-size:32px;font-weight:700;color:var(--green);font-variant-numeric:tabular-nums">41h 12m</div>
+                  </div>
+                  <div class="compare">
+                    <div class="pill old"><span>Old manual ops</span><b>14 days</b></div>
+                    <div class="pill new"><span>VendorExpress</span><b>48 hrs</b></div>
+                  </div>
+                </div>
+              </div>
+              <div class="stat-row">
+                <div class="stat"><b id="stat-total">6</b><span>products imported</span></div>
+                <div class="stat"><b id="stat-ready" style="color:var(--green)">5</b><span>ready to sell</span></div>
+                <div class="stat"><b id="stat-review" style="color:var(--gold)">1</b><span>need review</span></div>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3 style="font-size:13px;text-transform:uppercase;letter-spacing:.7px;color:var(--primary);margin:0 0 8px">Next steps</h3>
+              <ul class="steps-list" id="next-steps"></ul>
+              <button class="btn btn-primary" style="margin-top:16px;width:100%;justify-content:center" id="dash-cta" onclick="dashCta()">Finish remaining steps</button>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- ============ HOW IT WORKS VIEW ============ -->
+    <div class="how" id="view-how" style="display:none">
+      <h1>How VendorExpress works</h1>
+      <p class="lead">A PM case study. VendorExpress turns a 14-day, ops-heavy manual onboarding into a 48-hour self-service flow by reusing ThaiMart's existing identity &amp; catalog APIs and inserting an AI ingestion pipeline where humans used to copy-paste.</p>
+
+      <section>
+        <h3>The problem</h3>
+        <div class="note-card" style="max-width:820px">
+          Onboarding one local merchant takes the internal Ops team <b>14 days of manual data entry</b>: re-typing product names, guessing categories, chasing KYC documents over email, and keying bank details. It doesn't scale — Ops is the bottleneck blocking marketplace supply growth, and merchants drop off during the wait.
+        </div>
+      </section>
+
+      <section>
+        <h3>Who it's for</h3>
+        <div class="twocol">
+          <div class="persona">
+            <div class="av">PJ</div>
+            <div><b>Khun Ploy — OTOP merchant</b><p>Runs Baan Khanom Thai Sweets. Has a product spreadsheet from her POS but no time and limited tech confidence. Wants to start selling this week, not next month.</p></div>
+          </div>
+          <div class="persona">
+            <div class="av" style="background:rgba(232,74,39,.12);color:var(--primary-dark)">NA</div>
+            <div><b>Khun Nut — ThaiMart Ops lead</b><p>Manages vendor onboarding queue. Drowning in manual catalog entry. Needs throughput up and error rate down without growing headcount.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h3>Target KPIs — before &rarr; after</h3>
+        <div class="kpi-grid">
+          <div class="kpi"><div class="num"><span class="from">14 days</span> &rarr; <span class="to">48 hrs</span></div><div class="k">Time to onboard one vendor (−86%)</div></div>
+          <div class="kpi"><div class="num"><span class="from">~6 hrs</span> &rarr; <span class="to">12 min</span></div><div class="k">Ops touch-time per vendor</div></div>
+          <div class="kpi"><div class="num"><span class="from">42%</span> &rarr; <span class="to">85%</span></div><div class="k">Onboarding completion rate</div></div>
+        </div>
+      </section>
+
+      <section>
+        <h3>Platform architecture</h3>
+        <div class="mermaid" id="diagram">
+flowchart TB
+  V["🧑‍🍳 Vendor Dashboard<br/>(self-service)"]
+
+  subgraph LEGACY["❌ Legacy manual path — 14 days"]
+    OPS["Ops analyst"] --> XLS["Manual data entry<br/>+ guess categories"] --> EMAIL["KYC chased by email"]
+  end
+
+  subgraph VX["✅ VendorExpress automated path — 48 hrs"]
+    ONB["Onboarding Service<br/>KYC + field validation"]
+    ING["Catalog Ingestion Pipeline"]
+    PARSE["CSV parse"]
+    AI["AI auto-categorisation<br/>+ column mapping"]
+    RULES["Validation rules<br/>(price, dupes, fields)"]
+    APPR["Approval Workflow<br/>human review only on low-confidence"]
+    ONB --> ING --> PARSE --> AI --> RULES --> APPR
+  end
+
+  V --> ONB
+  V -. "old way" .-> OPS
+  APPR --> DB[("Marketplace Catalog DB")]
+  DB --> SEARCH["🔎 Search Index<br/>(live to shoppers)"]
+
+  ONB -. reuses .-> IDAPI["Identity / KYC API"]
+  DB -. reuses .-> CATAPI["Catalog API"]
+        </div>
+      </section>
+
+      <section>
+        <h3>MVP &amp; scope</h3>
+        <div class="twocol">
+          <div class="note-card">
+            <h4>Ship fast by reusing what exists</h4>
+            <ul>
+              <li><span class="tag reuse">REUSE</span> <b>Identity / KYC API</b> — Tax-ID verification &amp; document checks already power buyer KYC. No new compliance build.</li>
+              <li><span class="tag reuse">REUSE</span> <b>Catalog API</b> — same publish endpoint Ops uses today; the pipeline just calls it programmatically.</li>
+              <li><span class="tag reuse">REUSE</span> <b>Payout service</b> — bank verification &amp; settlement unchanged.</li>
+            </ul>
+          </div>
+          <div class="note-card">
+            <h4>Automated vs still human-reviewed</h4>
+            <ul>
+              <li><span class="tag auto">AUTO</span> CSV parsing, column mapping, AI category assignment, validation rules.</li>
+              <li><span class="tag auto">AUTO</span> Publishing rows with confidence ≥ 90% straight to the catalog.</li>
+              <li><span class="tag human">HUMAN</span> Only rows flagged <em>Needs review</em> (low confidence / restricted category) reach an Ops analyst — ~10% of volume vs 100% today.</li>
+              <li><span class="tag human">HUMAN</span> First-time vendor KYC edge cases.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="note-card" style="margin-top:18px;max-width:820px">
+          <h4>Out of scope for MVP</h4>
+          <p style="margin:0;font-size:13px;color:var(--muted)">Multi-language catalog translation, image auto-tagging, and POS live-sync are fast-follows. v1 proves the time-to-live win on a single CSV import.</p>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<!-- Toast + Modal -->
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal">
+    <div class="check">&#10003;</div>
+    <h3 id="modal-title">Publish to marketplace?</h3>
+    <p id="modal-body">5 ready products will go live on ThaiMart search within minutes. The 1 product needing review stays as a draft.</p>
+    <div class="row">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-green" id="modal-confirm" onclick="doPublish()">Publish now</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===================== STATE ===================== */
+const SCREENS = ['onboarding','upload','review','dashboard'];
+const KEY = 'tm_vx_state';
+const seedProducts = () => ([
+  {id:1, name:'Khanom chan (layered pandan)', price:45,  vendorCat:'desserts',    aiCat:'Thai Desserts',     conf:97, status:'ready'},
+  {id:2, name:'Thong yip (golden flower)',     price:60,  vendorCat:'sweets',      aiCat:'Thai Desserts',     conf:95, status:'ready'},
+  {id:3, name:'Dried mango (premium)',         price:120, vendorCat:'dried fruit', aiCat:'Dried Fruit & Snacks', conf:96, status:'ready'},
+  {id:4, name:'Coconut chips (lightly salted)',price:55,  vendorCat:'snack',       aiCat:'Dried Fruit & Snacks', conf:93, status:'ready'},
+  {id:5, name:'Khanom tan (palm cake)',        price:40,  vendorCat:'desserts',    aiCat:'Thai Desserts',     conf:98, status:'ready'},
+  {id:6, name:'Nam phrik kapi gift jar',       price:95,  vendorCat:'misc',        aiCat:'',                  conf:58, status:'review'},
+]);
+
+let state = {
+  currentView:'proto', currentScreen:'onboarding', wizardStep:1,
+  business:{name:'',taxId:'',type:'',phone:'',addr:'',bank:'',acctName:'',acct:''},
+  docs:{'doc-1':false,'doc-2':false},
+  kycDone:false, bankDone:false, uploadDone:false, published:false,
+  products:[], onboardingPct:0,
+};
+
+function load(){
+  try{ const s = JSON.parse(localStorage.getItem(KEY)); if(s) state = Object.assign(state,s); }catch(e){}
+  if(!state.products || !state.products.length) state.products = seedProducts();
+}
+function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+
+/* ===================== VIEW SWITCH ===================== */
+let mermaidInit = false;
+function setView(v){
+  state.currentView = v; save();
+  const proto = v==='proto';
+  document.getElementById('view-proto').style.display = proto ? 'flex':'none';
+  document.getElementById('view-how').style.display = proto ? 'none':'block';
+  document.getElementById('tab-proto').setAttribute('aria-selected', proto);
+  document.getElementById('tab-how').setAttribute('aria-selected', !proto);
+  if(!proto && !mermaidInit){
+    mermaidInit = true;
+    import('https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js').then(m=>{
+      const mermaid = m.default;
+      mermaid.initialize({startOnLoad:false, theme:'base', themeVariables:{
+        primaryColor:'#FFF6F2', primaryBorderColor:'#E84A27', primaryTextColor:'#1A1614',
+        lineColor:'#6B6460', fontFamily:'Inter, sans-serif', fontSize:'13px',
+        clusterBkg:'#F7F3EF', clusterBorder:'#E9E1D8'
+      }});
+      mermaid.run({nodes:[document.getElementById('diagram')]});
+    });
+  }
+}
+
+/* ===================== SCREEN NAV ===================== */
+function goScreen(s){
+  state.currentScreen = s; save();
+  SCREENS.forEach(x=>{
+    document.getElementById('screen-'+x).classList.toggle('active', x===s);
+    document.getElementById('nav-'+x).setAttribute('aria-current', x===s);
+  });
+  document.querySelector('.urlbar').lastElementChild.remove();
+  const u=document.createElement('span'); u.textContent='/'+s; // not styled-bold; keep path
+  // restore styled path
+  const bar=document.querySelector('.urlbar');
+  bar.innerHTML = '<span class="lock">&#128274;</span><b>vendor.thaimart.co</b>/'+s;
+  if(s==='review') renderReview();
+  if(s==='dashboard') renderDashboard();
+  if(s==='upload') restoreUploadStage();
+  document.querySelector('.main').scrollTop = 0;
+}
+
+/* ===================== WIZARD ===================== */
+const wizMeta = {
+  1:{title:'Business information', sub:'Step 1 of 3 — Tell us about your shop. Everything saves as you go.'},
+  2:{title:'Identity verification (KYC)', sub:'Step 2 of 3 — Upload your documents. Verified automatically.'},
+  3:{title:'Payout details', sub:'Step 3 of 3 — Where we send your sales earnings.'},
+};
+function showStep(n){
+  state.wizardStep = n; save();
+  for(let i=1;i<=3;i++) document.getElementById('step-'+i).style.display = i===n?'block':'none';
+  document.getElementById('wiz-title').textContent = wizMeta[n].title;
+  document.getElementById('wiz-sub').textContent = wizMeta[n].sub;
+  document.getElementById('wiz-back').style.display = n>1?'inline-flex':'none';
+  document.getElementById('wiz-next').innerHTML = n<3 ? 'Continue' : 'Finish &amp; start catalog';
+}
+function clearErr(){ document.querySelectorAll('.errmsg').forEach(e=>e.classList.remove('show')); document.querySelectorAll('input,select').forEach(e=>e.classList.remove('err')); }
+function fail(id,msgId){ document.getElementById(id).classList.add('err'); document.getElementById(msgId).classList.add('show'); }
+
+function validateStep(n){
+  clearErr(); let ok=true;
+  if(n===1){
+    const name=document.getElementById('b-name').value.trim();
+    const tax=document.getElementById('b-tax').value.replace(/\D/g,'');
+    const type=document.getElementById('b-type').value;
+    const phone=document.getElementById('b-phone').value.trim();
+    if(!name){fail('b-name','e-name');ok=false}
+    if(tax.length!==13){fail('b-tax','e-tax');ok=false}
+    if(!type){fail('b-type','e-type');ok=false}
+    if(!phone){fail('b-phone','e-phone');ok=false}
+    if(ok){ state.business.name=name; state.business.taxId=tax; state.business.type=type;
+            state.business.phone=phone; state.business.addr=document.getElementById('b-addr').value.trim(); }
+  }
+  if(n===2){
+    if(!state.docs['doc-1'] || !state.docs['doc-2']){ document.getElementById('e-docs').classList.add('show'); ok=false; }
+    else state.kycDone=true;
+  }
+  if(n===3){
+    const bank=document.getElementById('b-bank').value;
+    const an=document.getElementById('b-acctname').value.trim();
+    const ac=document.getElementById('b-acct').value.replace(/\D/g,'');
+    if(!bank){fail('b-bank','e-bank');ok=false}
+    if(!an){fail('b-acctname','e-acctname');ok=false}
+    if(ac.length<10||ac.length>12){fail('b-acct','e-acct');ok=false}
+    if(ok){ state.business.bank=bank; state.business.acctName=an; state.business.acct=ac; state.bankDone=true; }
+  }
+  save(); return ok;
+}
+
+function wizNext(){
+  const n=state.wizardStep;
+  if(!validateStep(n)) return;
+  const btn=document.getElementById('wiz-next');
+  const orig=btn.innerHTML;
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Saving…';
+  setTimeout(()=>{
+    btn.disabled=false; btn.innerHTML=orig;
+    if(n<3){ showStep(n+1); recalcPct(); }
+    else{ recalcPct(); toast('Profile complete — let\'s build your catalog','ok'); goScreen('upload'); }
+  },700);
+}
+function wizPrev(){ if(state.wizardStep>1){ clearErr(); showStep(state.wizardStep-1); } }
+
+function fakeUpload(slot,label,fname){
+  if(state.docs[slot]) return;
+  const el=document.getElementById(slot);
+  el.querySelector('.fic').innerHTML='<span class="spinner" style="border-color:rgba(19,138,94,.4);border-top-color:#138A5E"></span>';
+  el.querySelector('div b').nextSibling; // noop
+  setTimeout(()=>{
+    state.docs[slot]=true; save();
+    el.querySelector('.fic').textContent='✓';
+    el.innerHTML = '<div class="fic">✓</div><div style="flex:1"><b>'+label+'</b><br><small>'+fname+' · verified via Identity API</small></div><span class="chip ready dot">Verified</span>';
+    document.getElementById('e-docs').classList.remove('show');
+  },800);
+}
+
+/* ===================== UPLOAD ===================== */
+function pickFile(){ startProcessing(); }
+function startProcessing(){
+  document.getElementById('up-drop').style.display='none';
+  document.getElementById('up-map').style.display='none';
+  document.getElementById('up-proc').style.display='block';
+  const bar=document.getElementById('up-bar'); const status=document.getElementById('up-status');
+  const steps=[
+    [18,'Parsing 6 rows…'],
+    [42,'Detecting column structure…'],
+    [68,'AI categorising products…'],
+    [88,'Running validation rules…'],
+    [100,'Done — building mapping preview']
+  ];
+  let i=0;
+  const tick=()=>{
+    if(i>=steps.length){ setTimeout(showMapping,400); return; }
+    bar.style.width=steps[i][0]+'%'; status.textContent=steps[i][1]; i++; setTimeout(tick,560);
+  };
+  tick();
+}
+const mapping=[
+  {v:'product_name', f:'Product title', c:99},
+  {v:'price_thb',    f:'Price (฿)',     c:98},
+  {v:'category',     f:'Category',      c:88},
+  {v:'sku',          f:'SKU / code',    c:95},
+  {v:'description',  f:'Description',   c:90},
+];
+function showMapping(){
+  document.getElementById('up-proc').style.display='none';
+  document.getElementById('up-map').style.display='block';
+  const body=document.getElementById('map-body'); body.innerHTML='';
+  mapping.forEach(m=>{
+    const col = m.c>=90?'#138A5E':(m.c>=75?'#E8A33D':'#E84A27');
+    body.insertAdjacentHTML('beforeend',
+      `<tr><td><span class="vendcol">${m.v}</span></td><td class="arrow">&rarr;</td>`+
+      `<td class="tmfield">${m.f}</td>`+
+      `<td><div class="conf"><div class="bar"><i style="width:${m.c}%;background:${col}"></i></div><b>${m.c}%</b></div></td></tr>`);
+  });
+}
+function confirmMapping(){
+  const btn=document.getElementById('map-confirm');
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Importing…';
+  setTimeout(()=>{
+    state.uploadDone=true; save(); recalcPct();
+    toast('6 products imported — review &amp; publish','ok');
+    goScreen('review');
+  },700);
+}
+function resetUpload(){
+  state.uploadDone=false; save();
+  document.getElementById('up-map').style.display='none';
+  document.getElementById('up-proc').style.display='none';
+  document.getElementById('up-drop').style.display='block';
+}
+function restoreUploadStage(){
+  if(state.uploadDone){
+    document.getElementById('up-drop').style.display='none';
+    document.getElementById('up-proc').style.display='none';
+    document.getElementById('up-map').style.display='block';
+    document.getElementById('up-bar').style.width='100%';
+    showMapping();
+  }else{
+    document.getElementById('up-drop').style.display='block';
+    document.getElementById('up-proc').style.display='none';
+    document.getElementById('up-map').style.display='none';
+  }
+}
+
+/* ===================== REVIEW ===================== */
+const CATS=['Thai Desserts','Dried Fruit & Snacks','Sauces & Condiments','Gift Sets','Beverages'];
+let selected = new Set();
+function renderReview(){
+  const body=document.getElementById('review-body'); body.innerHTML='';
+  state.products.forEach(p=>{
+    const ready = p.status==='ready';
+    const checked = selected.has(p.id) ? 'checked' : '';
+    const catCell = ready
+      ? `<span>${p.aiCat}</span>`
+      : `<select class="inline" onchange="fixCategory(${p.id}, this.value)">
+           <option value="">Pick category…</option>
+           ${CATS.map(c=>`<option ${c===p.aiCat?'selected':''}>${c}</option>`).join('')}
+         </select>`;
+    const statusChip = ready
+      ? `<span class="chip ready dot">Ready</span>`
+      : `<span class="chip review dot">Needs review</span>`;
+    body.insertAdjacentHTML('beforeend',
+      `<tr data-id="${p.id}">
+        <td><input type="checkbox" style="width:auto;min-height:0" ${ready?'':'disabled'} ${checked} onclick="toggleOne(${p.id},this.checked)"></td>
+        <td><b>${p.name}</b></td>
+        <td class="price">฿${p.price}</td>
+        <td>${catCell}</td>
+        <td>${statusChip}</td>
+      </tr>`);
+  });
+  updateReviewSummary();
+}
+function fixCategory(id,val){
+  if(!val) return;
+  const p=state.products.find(x=>x.id===id);
+  p.aiCat=val; p.status='ready'; p.conf=92; save();
+  toast('Categorised — '+p.name+' is ready','ok');
+  renderReview();
+}
+function toggleOne(id,on){ if(on)selected.add(id); else selected.delete(id); updateReviewSummary(); }
+function toggleAll(on){
+  selected.clear();
+  if(on) state.products.filter(p=>p.status==='ready').forEach(p=>selected.add(p.id));
+  renderReview();
+}
+function updateReviewSummary(){
+  const ready=state.products.filter(p=>p.status==='ready').length;
+  const review=state.products.length-ready;
+  document.getElementById('review-summary').textContent =
+    `${selected.size} selected · ${ready} ready · ${review} need review`;
+  document.getElementById('publish-btn').disabled = selected.size===0;
+}
+
+/* ===================== PUBLISH MODAL ===================== */
+function openPublish(){
+  if(selected.size===0) return;
+  const review=state.products.filter(p=>p.status==='review').length;
+  document.getElementById('modal-body').textContent =
+    `${selected.size} selected product${selected.size>1?'s':''} will go live on ThaiMart search within minutes.`+
+    (review?` ${review} product needing review stays a draft.`:'');
+  document.getElementById('overlay').classList.add('show');
+  document.getElementById('modal-confirm').focus();
+}
+function closeModal(){ document.getElementById('overlay').classList.remove('show'); }
+function doPublish(){
+  const btn=document.getElementById('modal-confirm');
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Publishing…';
+  setTimeout(()=>{
+    btn.disabled=false; btn.innerHTML='Publish now';
+    state.published=true; save(); recalcPct();
+    closeModal();
+    toast('Published! '+selected.size+' products are live 🎉','ok');
+    goScreen('dashboard');
+  },700);
+}
+
+/* ===================== DASHBOARD ===================== */
+let ttlTimer=null;
+function renderDashboard(){
+  const total=state.products.length;
+  const ready=state.products.filter(p=>p.status==='ready').length;
+  const review=total-ready;
+  document.getElementById('stat-total').textContent=total;
+  document.getElementById('stat-ready').textContent=ready;
+  document.getElementById('stat-review').textContent=review;
+
+  const pct=state.onboardingPct;
+  document.getElementById('dash-pct').textContent=pct+'%';
+  const circ=377; document.getElementById('dash-ring').style.strokeDashoffset = circ*(1-pct/100);
+
+  // next steps
+  const steps=[
+    {label:'Business profile submitted', done: !!state.business.name && state.bankDone},
+    {label:'Identity verified (KYC)', done: state.kycDone},
+    {label:'Catalog imported & mapped', done: state.uploadDone},
+    {label:'Products published to marketplace', done: state.published},
+    {label:'Final compliance review (ThaiMart Ops — '+review+' item)', done:false},
+  ];
+  const ul=document.getElementById('next-steps'); ul.innerHTML='';
+  steps.forEach(s=>{
+    ul.insertAdjacentHTML('beforeend',
+      `<li class="${s.done?'':'pend'}"><span class="tick ${s.done?'ok':'pend'}">${s.done?'✓':'○'}</span>${s.label}</li>`);
+  });
+
+  // CTA depends on progress
+  const cta=document.getElementById('dash-cta');
+  if(!state.uploadDone){ cta.textContent='Upload your catalog'; }
+  else if(!state.published){ cta.textContent='Review & publish products'; }
+  else{ cta.textContent='View live marketplace listing'; }
+
+  startTtl();
+}
+function dashCta(){
+  if(!state.uploadDone) goScreen('upload');
+  else if(!state.published) goScreen('review');
+  else toast('Your store is live at thaimart.co/baan-khanom','ok');
+}
+function startTtl(){
+  if(ttlTimer) clearInterval(ttlTimer);
+  // base ~41h12m, tick down slowly for liveliness
+  let totalMin = state.published ? 41*60+12 : 47*60+30;
+  const el=document.getElementById('ttl-counter');
+  const draw=()=>{ const h=Math.floor(totalMin/60), m=totalMin%60; el.textContent=h+'h '+String(m).padStart(2,'0')+'m'; };
+  draw();
+  ttlTimer=setInterval(()=>{ totalMin=Math.max(0,totalMin-1); draw(); if(totalMin<=0)clearInterval(ttlTimer); },4000);
+}
+
+/* ===================== PROGRESS ===================== */
+function recalcPct(){
+  let p=0;
+  if(state.business.name) p+=25;     // step1
+  if(state.kycDone) p+=20;           // step2
+  if(state.bankDone) p+=15;          // step3
+  if(state.uploadDone) p+=20;        // catalog
+  if(state.published) p+=20;         // published
+  state.onboardingPct=Math.min(100,p); save();
+  // rail mini-ring
+  const C=144.5;
+  document.getElementById('mini-ring').style.strokeDashoffset = C*(1-state.onboardingPct/100);
+  document.getElementById('mini-pct').textContent=state.onboardingPct+'%';
+  document.getElementById('rail-pct').textContent=state.onboardingPct+'%';
+  // mark nav done
+  document.getElementById('nav-onboarding').classList.toggle('done', state.bankDone);
+  document.getElementById('nav-upload').classList.toggle('done', state.uploadDone);
+  document.getElementById('nav-review').classList.toggle('done', state.published);
+}
+
+/* ===================== TOAST ===================== */
+let toastTimer=null;
+function toast(msg,kind){
+  const t=document.getElementById('toast');
+  t.innerHTML=(kind==='ok'?'<span>✓</span> ':'')+msg;
+  t.className='toast show'+(kind==='ok'?' ok':'');
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),2600);
+}
+
+/* ===================== INPUT RESTORE / FORMATTING ===================== */
+function restoreForm(){
+  const b=state.business;
+  if(b.name) document.getElementById('b-name').value=b.name;
+  if(b.taxId) document.getElementById('b-tax').value=b.taxId;
+  if(b.type) document.getElementById('b-type').value=b.type;
+  if(b.phone) document.getElementById('b-phone').value=b.phone;
+  if(b.addr) document.getElementById('b-addr').value=b.addr;
+  if(b.bank) document.getElementById('b-bank').value=b.bank;
+  if(b.acctName) document.getElementById('b-acctname').value=b.acctName;
+  if(b.acct) document.getElementById('b-acct').value=b.acct;
+  ['doc-1','doc-2'].forEach(slot=>{
+    if(state.docs[slot]){
+      const lbl = slot==='doc-1'?['ID card / company registration','PorPor20.pdf']:['Food production / OTOP license','OTOP-license.jpg'];
+      document.getElementById(slot).innerHTML =
+        '<div class="fic">✓</div><div style="flex:1"><b>'+lbl[0]+'</b><br><small>'+lbl[1]+' · verified via Identity API</small></div><span class="chip ready dot">Verified</span>';
+    }
+  });
+}
+
+/* ===================== INIT ===================== */
+function init(){
+  load();
+  restoreForm();
+  showStep(state.wizardStep);
+  recalcPct();
+  goScreen(state.currentScreen);
+  setView(state.currentView);
+
+  // Escape closes modal
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
+
+  // dropzone drag visuals (faked drop -> process)
+  const dz=document.getElementById('dropzone');
+  ['dragenter','dragover'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add('drag')}));
+  ['dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove('drag')}));
+  dz.addEventListener('drop',()=>startProcessing());
+}
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ThaiMart SmartRewards &amp; ตะกร้าอัจฉริยะ</title>
+<!--
+================================================================================
+ThaiMart — SmartRewards & Predictive Cart  (PM case-study prototype)
+================================================================================
+SCREENS (single-file, JS show/hide):
+  S1 rewards-home   : points balance, Silver->Gold progress, persona toggle,
+                      "Smart picks for you" carousel (persona-reactive).
+  S2 predictive-cart: pre-filled reorders + AI add-ons, qty steppers,
+                      live AOV + savings recompute on every change.
+  S3 redeem-modal   : (overlay) redeem points -> ฿ discount, fake-async + toast.
+  S4 checkout-success: points earned, new AOV, next-best-action.
+
+VIEWS (top tab bar): "Prototype" (the flow) | "How it works" (PM context + Mermaid).
+
+STATE (persisted to localStorage key tm_state):
+  currentView   : 'proto' | 'how'
+  currentScreen : 'home' | 'cart' | 'success'
+  persona       : 'bargain' | 'convenience'
+  cartItems[]   : [{id, qty}]
+  points        : number (loyalty points)
+  pointsRedeemed: ฿ discount applied from redeemed points
+  aov           : derived display value (computed, also stored)
+
+INTERACTIONS WIRED:
+  persona toggle -> swaps recs + messaging + which add-ons surface.
+  add/remove/step qty -> live AOV + savings, button states.
+  redeem -> validation (min 100 pts), loading spinner, success toast, balance update.
+  checkout -> loading, awards points (10/฿100... see calc), routes to success.
+  back nav everywhere, Escape closes modal, restore on load.
+================================================================================
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+@font-face{font-family:sukhumvit;src:url(fonts/sukhumvit-400.woff2) format("woff2");font-weight:400;font-display:swap}@font-face{font-family:sukhumvit;src:url(fonts/sukhumvit-500.woff2) format("woff2");font-weight:500;font-display:swap}@font-face{font-family:sukhumvit;src:url(fonts/sukhumvit-700.woff2) format("woff2");font-weight:600;font-display:swap}@font-face{font-family:sukhumvit;src:url(fonts/sukhumvit-700.woff2) format("woff2");font-weight:700;font-display:swap}
+  :root {
+    --primary: #e32321;
+    --primary-dark: #b91c1c;
+    --green: #00a63e;
+    --gold: #f59e0b;
+    --ink: #171717;
+    --muted: #72757e;
+    --surface: #FFFFFF;
+    --canvas: #f5f5f7;
+    --hairline: #e5e5e7;
+    --radius-card: 12px;
+    --radius-input: 5px;
+    --radius-pill: 999px;
+    --shadow-sm: 0 1px 3px rgba(23,23,23,.08);
+    --shadow-lg: 0 8px 24px rgba(23,23,23,.06);
+    --shadow-modal: 0 18px 50px rgba(23,23,23,.28);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    font-family: sukhumvit, 'Inter', 'Noto Sans Thai', system-ui, sans-serif;
+    background: #ebebeb;
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+  }
+  button { font-family: inherit; cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--green); outline-offset: 2px; border-radius: 4px; }
+
+  /* ---------- App page scaffold ---------- */
+  .page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 18px 12px 40px;
+    gap: 16px;
+  }
+  .topbar {
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .brand {
+    display: flex; align-items: center; gap: 9px;
+    font-weight: 700; font-size: 17px; letter-spacing: -0.2px;
+  }
+  .brand .logo {
+    width: 28px; height: 28px; border-radius: 8px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 15px;
+    box-shadow: var(--shadow-sm);
+  }
+  .brand small { color: var(--muted); font-weight: 500; font-size: 12px; }
+
+  .tabbar {
+    display: inline-flex; background: var(--surface); padding: 4px;
+    border-radius: var(--radius-pill); box-shadow: var(--shadow-sm);
+    border: 1px solid var(--hairline);
+  }
+  .tabbar button {
+    border: 0; background: transparent; color: var(--muted);
+    font-weight: 600; font-size: 13px; padding: 9px 18px; min-height: 38px;
+    border-radius: var(--radius-pill); transition: .15s;
+  }
+  .tabbar button[aria-selected="true"] {
+    background: var(--ink); color: #fff;
+  }
+
+  /* ---------- iOS device frame ---------- */
+  .device {
+    width: 100%; max-width: 390px;
+    background: var(--canvas);
+    border-radius: 44px;
+    border: 11px solid #0a0a0a;
+    box-shadow: var(--shadow-modal);
+    overflow: hidden;
+    position: relative;
+    height: 800px;
+    display: flex; flex-direction: column;
+  }
+  .statusbar {
+    height: 46px; flex: 0 0 46px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 26px; font-size: 13px; font-weight: 600; color: var(--ink);
+    position: relative; background: var(--canvas); z-index: 5;
+  }
+  .statusbar .notch {
+    position: absolute; left: 50%; transform: translateX(-50%); top: 9px;
+    width: 108px; height: 27px; background: #0a0a0a; border-radius: 16px;
+  }
+  .statusbar .sig { display: flex; gap: 5px; align-items: center; }
+  .statusbar .sig span { display:inline-block; }
+  .bars { width: 17px; height: 11px;
+    background:
+      linear-gradient(var(--ink),var(--ink)) 0 100%/3px 4px no-repeat,
+      linear-gradient(var(--ink),var(--ink)) 5px 100%/3px 7px no-repeat,
+      linear-gradient(var(--ink),var(--ink)) 10px 100%/3px 9px no-repeat,
+      linear-gradient(var(--ink),var(--ink)) 15px 100%/3px 11px no-repeat;
+  }
+  .batt { width: 24px; height: 12px; border: 1.5px solid var(--ink); border-radius: 3px; position: relative; padding: 1.5px; }
+  .batt::after { content:""; position:absolute; right:-3px; top:3.5px; width:2px; height:4px; background: var(--ink); border-radius: 0 2px 2px 0; }
+  .batt i { display:block; height:100%; width:72%; background: var(--ink); border-radius:1px; }
+
+  .screenwrap { flex: 1 1 auto; overflow-y: auto; position: relative; -webkit-overflow-scrolling: touch; }
+  .screenwrap::-webkit-scrollbar { width: 0; }
+
+  .screen { display: none; padding: 4px 18px 28px; animation: fade .28s ease; }
+  .screen.active { display: block; }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px);} to { opacity:1; transform:none; } }
+
+  /* ---------- Generic UI ---------- */
+  .h-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .scr-title { font-size: 21px; font-weight: 700; letter-spacing: -0.4px; margin: 4px 0 2px; }
+  .scr-sub { color: var(--muted); font-size: 13px; margin: 0 0 16px; line-height: 1.45; }
+  .iconbtn {
+    width: 40px; height: 40px; min-width:40px; border-radius: var(--radius-pill);
+    border: 1px solid var(--hairline); background: var(--surface);
+    display: grid; place-items: center; color: var(--ink); font-size: 17px;
+    box-shadow: var(--shadow-sm);
+  }
+  .card {
+    background: var(--surface); border-radius: var(--radius-card);
+    box-shadow: var(--shadow-sm); border: 1px solid var(--hairline);
+    padding: 16px;
+  }
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 12px; border-radius: var(--radius-pill);
+    font-size: 12px; font-weight: 600;
+  }
+
+  /* Points / tier card */
+  .points-card {
+    background: linear-gradient(135deg, #262626 0%, #404040 60%, #422006 100%);
+    color: #fff; border: 0; position: relative; overflow: hidden;
+    box-shadow: var(--shadow-lg);
+  }
+  .points-card::after {
+    content:""; position:absolute; right:-40px; top:-40px; width:160px; height:160px;
+    background: radial-gradient(circle, rgba(245,158,11,.35), transparent 70%);
+  }
+  .points-card .lbl { font-size: 12px; color: rgba(255,255,255,.7); font-weight: 500; }
+  .points-card .pts { font-size: 34px; font-weight: 700; letter-spacing: -1px; margin: 2px 0 0; }
+  .points-card .pts span { font-size: 15px; font-weight: 500; color: rgba(255,255,255,.75); }
+  .tier-chip {
+    background: linear-gradient(135deg, var(--gold), #b45309); color: #422006;
+    font-weight: 700;
+  }
+  .progress {
+    height: 8px; background: rgba(255,255,255,.16); border-radius: var(--radius-pill);
+    overflow: hidden; margin: 14px 0 8px;
+  }
+  .progress i { display:block; height:100%; background: linear-gradient(90deg, var(--gold), #fcd34d); border-radius: inherit; transition: width .5s; }
+  .tier-meta { display:flex; justify-content: space-between; font-size: 11.5px; color: rgba(255,255,255,.7); }
+
+  /* persona toggle */
+  .persona-block { margin: 18px 0 8px; }
+  .persona-block .cap { font-size: 11px; font-weight: 700; letter-spacing: .6px; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; }
+  .persona-toggle { display: flex; gap: 8px; background: var(--surface); padding: 5px; border-radius: var(--radius-pill); border:1px solid var(--hairline); box-shadow: var(--shadow-sm); }
+  .persona-toggle button {
+    flex: 1; border: 0; background: transparent; border-radius: var(--radius-pill);
+    padding: 9px 8px; min-height: 44px; font-weight: 600; font-size: 12.5px; color: var(--muted);
+    display: flex; flex-direction: column; align-items: center; gap: 2px; line-height: 1.2; transition: .15s;
+  }
+  .persona-toggle button small { font-weight: 500; font-size: 10.5px; opacity:.85; }
+  .persona-toggle button[aria-pressed="true"] { background: var(--primary); color: #fff; box-shadow: var(--shadow-sm); }
+  .persona-toggle button[aria-pressed="true"] small { color: rgba(255,255,255,.85); }
+
+  .persona-note {
+    font-size: 12.5px; color: var(--ink); background: #FBF0E8; border: 1px solid #fecaca;
+    border-radius: var(--radius-input); padding: 10px 12px; margin-top: 10px; line-height: 1.45;
+  }
+  .persona-note b { color: var(--primary-dark); }
+
+  /* carousel */
+  .sec-head { display:flex; align-items:center; justify-content: space-between; margin: 22px 0 10px; }
+  .sec-head h3 { font-size: 15px; font-weight: 700; margin: 0; }
+  .sec-head .why { font-size: 11.5px; color: var(--green); font-weight: 600; }
+  .carousel { display: flex; gap: 12px; overflow-x: auto; padding: 2px 0 8px; margin: 0 -18px; padding-left: 18px; padding-right: 18px; scroll-snap-type: x mandatory; }
+  .carousel::-webkit-scrollbar { height: 0; }
+  .pcard {
+    flex: 0 0 152px; scroll-snap-align: start;
+    background: var(--surface); border:1px solid var(--hairline); border-radius: var(--radius-card);
+    box-shadow: var(--shadow-sm); padding: 12px; display:flex; flex-direction: column;
+  }
+  .pcard .thumb {
+    height: 78px; border-radius: 10px; margin-bottom: 10px; display:grid; place-items:center;
+    font-size: 32px; background: var(--canvas);
+  }
+  .pcard .tag {
+    align-self: flex-start; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: var(--radius-pill);
+    margin-bottom: 8px; letter-spacing: .2px;
+  }
+  .tag-deal { background: #fef2f2; color: var(--primary-dark); }
+  .tag-fast { background: #dcfce7; color: var(--green); }
+  .tag-points { background: #fef3c7; color: #b45309; }
+  .pcard .nm { font-size: 13px; font-weight: 600; line-height: 1.25; min-height: 32px; }
+  .pcard .pr { margin-top: 6px; font-weight: 700; font-size: 14px; }
+  .pcard .pr s { color: var(--muted); font-weight: 500; font-size: 11.5px; margin-left: 5px; }
+  .pcard button {
+    margin-top: 10px; border: 0; background: var(--primary); color: #fff;
+    border-radius: var(--radius-pill); min-height: 38px; font-weight: 600; font-size: 12.5px;
+    transition: .15s;
+  }
+  .pcard button:active { transform: scale(.97); }
+  .pcard button.added { background: var(--green); }
+
+  /* KPI mini dashboard */
+  .kpi-card { margin-top: 22px; }
+  .kpi-card h4 { margin: 0 0 4px; font-size: 14px; font-weight: 700; }
+  .kpi-card .sub { font-size: 11.5px; color: var(--muted); margin: 0 0 14px; }
+  .kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .kpi {
+    background: var(--canvas); border-radius: 12px; padding: 12px;
+  }
+  .kpi .k { font-size: 11px; color: var(--muted); font-weight: 600; }
+  .kpi .v { font-size: 19px; font-weight: 700; margin-top: 4px; display:flex; align-items: baseline; gap: 6px; }
+  .kpi .v .from { color: var(--muted); font-size: 12px; font-weight: 500; text-decoration: line-through; }
+  .kpi .delta { font-size: 11px; font-weight: 700; color: var(--green); margin-top: 3px; }
+
+  /* sticky CTA bottom bar inside screen */
+  .cta-bar {
+    position: sticky; bottom: 0; margin: 18px -18px -28px; padding: 14px 18px 20px;
+    background: linear-gradient(to top, var(--canvas) 70%, rgba(245,245,247,0));
+    display: flex; gap: 12px; align-items: center;
+  }
+  .btn-primary {
+    flex: 1; border: 0; background: var(--primary); color: #fff;
+    min-height: 52px; border-radius: var(--radius-pill); font-weight: 700; font-size: 15px;
+    box-shadow: 0 6px 16px rgba(227,35,33,.32); transition: .15s; display:flex; align-items:center; justify-content:center; gap:8px;
+  }
+  .btn-primary:active { transform: translateY(1px); }
+  .btn-primary:disabled { background: #fca5a5; box-shadow:none; cursor: not-allowed; }
+  .btn-ghost {
+    border: 1px solid var(--hairline); background: var(--surface); color: var(--ink);
+    min-height: 52px; padding: 0 18px; border-radius: var(--radius-pill); font-weight: 600; font-size: 14px;
+  }
+
+  /* cart */
+  .cart-item { display:flex; gap: 12px; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--hairline); }
+  .cart-item:last-child { border-bottom: 0; }
+  .cart-item .thumb { width: 50px; height: 50px; min-width:50px; border-radius: 12px; background: var(--canvas); display:grid; place-items:center; font-size: 24px; }
+  .cart-item .meta { flex: 1; min-width: 0; }
+  .cart-item .meta .nm { font-size: 13.5px; font-weight: 600; }
+  .cart-item .meta .sub { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+  .cart-item .price { font-weight: 700; font-size: 14px; white-space: nowrap; }
+  .stepper { display:flex; align-items:center; gap:0; border:1px solid var(--hairline); border-radius: var(--radius-pill); overflow:hidden; background:var(--surface); }
+  .stepper button { width: 32px; height: 34px; border:0; background: var(--surface); font-size: 17px; font-weight: 600; color: var(--primary); display:grid; place-items:center; }
+  .stepper button:disabled { color: var(--hairline); }
+  .stepper .qn { min-width: 26px; text-align: center; font-size: 13.5px; font-weight: 700; }
+
+  .ai-banner {
+    background: linear-gradient(135deg, #FBF0E8, #fef2f2); border: 1px solid #fecaca;
+    border-radius: var(--radius-card); padding: 13px 14px; margin: 18px 0 10px; display:flex; gap:11px; align-items:flex-start;
+  }
+  .ai-banner .ic { width: 30px; height:30px; min-width:30px; border-radius: 9px; background: var(--primary); color:#fff; display:grid; place-items:center; font-size:15px; }
+  .ai-banner .tx { font-size: 12.5px; line-height: 1.45; }
+  .ai-banner .tx b { color: var(--primary-dark); }
+
+  .addon { display:flex; gap:12px; align-items:center; padding: 12px; border:1px dashed var(--hairline); border-radius: 12px; margin-bottom: 10px; background: var(--surface); }
+  .addon .thumb { width: 44px; height: 44px; min-width:44px; border-radius: 10px; background: var(--canvas); display:grid; place-items:center; font-size: 22px; }
+  .addon .meta { flex:1; min-width:0; }
+  .addon .meta .nm { font-size: 13px; font-weight: 600; }
+  .addon .meta .sub { font-size: 11px; color: var(--green); font-weight: 600; margin-top: 2px; }
+  .addon button { border:0; background: var(--ink); color:#fff; border-radius: var(--radius-pill); min-height:40px; padding: 0 16px; font-weight:600; font-size:12.5px; white-space:nowrap; }
+  .addon button:active { transform: scale(.97); }
+
+  .summary { margin-top: 18px; }
+  .summary .ln { display:flex; justify-content: space-between; font-size: 13px; padding: 6px 0; color: var(--muted); }
+  .summary .ln.total { color: var(--ink); font-weight: 700; font-size: 17px; border-top: 1px solid var(--hairline); margin-top: 6px; padding-top: 12px; }
+  .summary .ln .sv { color: var(--green); font-weight: 600; }
+  .aov-chip { display:inline-flex; align-items:center; gap:6px; font-size:11.5px; font-weight:600; color: var(--green); background:#dcfce7; padding:4px 10px; border-radius: var(--radius-pill); }
+
+  /* redeem button row */
+  .redeem-row { display:flex; align-items:center; justify-content: space-between; gap:10px; margin-top: 16px; padding: 13px 14px; border:1px solid var(--hairline); border-radius: var(--radius-card); background: var(--surface); }
+  .redeem-row .tx .nm { font-size:13px; font-weight:700; }
+  .redeem-row .tx .sub { font-size:11.5px; color: var(--muted); margin-top:2px; }
+  .redeem-row button { border:0; background: var(--gold); color:#422006; border-radius: var(--radius-pill); min-height:44px; padding:0 18px; font-weight:700; font-size:13px; }
+  .redeem-row button:disabled { background:#fef3c7; color:#b45309; }
+  .redeem-applied { background:#dcfce7; border-color:#bbf7d0; }
+
+  /* ---------- Modal ---------- */
+  .modal-scrim {
+    position: absolute; inset: 0; background: rgba(23,23,23,.5);
+    display: none; align-items: flex-end; justify-content: center; z-index: 30;
+    animation: scrim .2s ease;
+  }
+  @keyframes scrim { from { opacity: 0;} to {opacity:1;} }
+  .modal-scrim.open { display: flex; }
+  .sheet {
+    width: 100%; background: var(--surface); border-radius: 22px 22px 0 0;
+    padding: 8px 20px 26px; box-shadow: var(--shadow-modal); animation: rise .28s cubic-bezier(.2,.8,.2,1);
+  }
+  @keyframes rise { from { transform: translateY(100%);} to { transform:none; } }
+  .sheet .grab { width: 40px; height: 4px; background: var(--hairline); border-radius: 99px; margin: 6px auto 14px; }
+  .sheet h3 { margin: 0 0 4px; font-size: 18px; font-weight: 700; }
+  .sheet .desc { font-size: 12.5px; color: var(--muted); margin: 0 0 16px; line-height: 1.45; }
+  .field { margin-bottom: 14px; }
+  .field label { display:block; font-size: 12px; font-weight: 600; margin-bottom: 6px; }
+  .field input {
+    width: 100%; min-height: 48px; border: 1px solid var(--hairline); border-radius: var(--radius-input);
+    padding: 0 14px; font-size: 15px; font-family: inherit; color: var(--ink); background: var(--canvas);
+  }
+  .field input:focus { background: #fff; border-color: var(--primary); }
+  .field .err { color: var(--primary-dark); font-size: 11.5px; margin-top: 6px; display:none; }
+  .field.invalid input { border-color: var(--primary-dark); }
+  .field.invalid .err { display: block; }
+  .redeem-presets { display:flex; gap:8px; margin: 4px 0 16px; flex-wrap: wrap; }
+  .redeem-presets button { border:1px solid var(--hairline); background: var(--canvas); border-radius: var(--radius-pill); min-height:40px; padding:0 14px; font-weight:600; font-size:12.5px; color: var(--ink); }
+  .redeem-presets button[aria-pressed="true"] { background: var(--ink); color:#fff; border-color: var(--ink); }
+  .redeem-preview { background: var(--canvas); border-radius: 12px; padding: 12px 14px; margin-bottom: 16px; display:flex; justify-content: space-between; align-items:center; }
+  .redeem-preview .k { font-size: 12px; color: var(--muted); }
+  .redeem-preview .v { font-size: 20px; font-weight: 700; color: var(--green); }
+
+  .spinner { width: 17px; height: 17px; border: 2.5px solid rgba(255,255,255,.45); border-top-color:#fff; border-radius:50%; animation: spin .7s linear infinite; display:inline-block; }
+  @keyframes spin { to { transform: rotate(360deg);} }
+
+  /* toast */
+  .toast {
+    position: absolute; left: 50%; transform: translateX(-50%) translateY(20px); bottom: 26px;
+    background: var(--ink); color: #fff; padding: 13px 18px; border-radius: var(--radius-pill);
+    font-size: 13px; font-weight: 600; box-shadow: var(--shadow-modal); z-index: 40;
+    opacity: 0; pointer-events: none; transition: .3s; display:flex; align-items:center; gap:9px; max-width: 88%;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast .dot { width:8px; height:8px; border-radius:50%; background: var(--green); }
+
+  /* ---------- Success screen ---------- */
+  .success-hero { text-align:center; padding: 30px 0 8px; }
+  .checkmark {
+    width: 78px; height: 78px; border-radius: 50%; margin: 0 auto 16px;
+    background: linear-gradient(135deg, var(--green), #15803d); color:#fff;
+    display:grid; place-items:center; font-size: 38px; box-shadow: 0 8px 22px rgba(0,166,62,.35);
+    animation: pop .4s cubic-bezier(.2,1.4,.4,1);
+  }
+  @keyframes pop { from { transform: scale(.3); opacity:0;} to {transform:scale(1); opacity:1;} }
+  .success-hero h2 { font-size: 22px; margin: 0 0 6px; font-weight:700; }
+  .success-hero p { color: var(--muted); font-size: 13px; margin: 0; }
+  .earn-card { margin-top: 22px; display:flex; align-items:center; justify-content:space-between; background: linear-gradient(135deg, #fef3c7, #fef3c7); border:1px solid #fde68a; }
+  .earn-card .lbl { font-size:12px; color:#b45309; font-weight:600; }
+  .earn-card .big { font-size: 26px; font-weight:700; color:#b45309; }
+  .nba {
+    margin-top: 16px; background: var(--surface); border:1px solid var(--hairline); border-radius: var(--radius-card);
+    padding: 16px; box-shadow: var(--shadow-sm);
+  }
+  .nba .head { display:flex; align-items:center; gap:9px; font-weight:700; font-size:14px; margin-bottom:6px; }
+  .nba .head .badge { background:#dcfce7; color: var(--green); font-size:10px; font-weight:700; padding:3px 8px; border-radius: var(--radius-pill); }
+  .nba p { font-size:12.5px; color: var(--muted); margin:0 0 12px; line-height:1.45; }
+  .nba .barwrap { height: 8px; background: var(--canvas); border-radius: 99px; overflow:hidden; margin-bottom: 10px; }
+  .nba .barwrap i { display:block; height:100%; background: linear-gradient(90deg, var(--primary), var(--gold)); border-radius:inherit; transition: width .5s; }
+  .nba button { width:100%; border:0; background: var(--ink); color:#fff; min-height:48px; border-radius: var(--radius-pill); font-weight:700; font-size:14px; }
+
+  /* ---------- How it works view ---------- */
+  .howview { width: 100%; max-width: 720px; display: none; }
+  .howview.active { display: block; }
+  .how-card { background: var(--surface); border:1px solid var(--hairline); border-radius: var(--radius-card); box-shadow: var(--shadow-sm); padding: 22px; margin-bottom: 16px; }
+  .how-card h2 { font-size: 18px; margin: 0 0 4px; font-weight: 700; }
+  .how-card .eyebrow { font-size: 11px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: var(--primary); margin-bottom: 10px; }
+  .how-card p { font-size: 14px; line-height: 1.6; color: #525252; margin: 0 0 12px; }
+  .how-card p:last-child { margin-bottom: 0; }
+  .persona-cards { display:grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 560px){ .persona-cards { grid-template-columns: 1fr; } }
+  .pc { background: var(--canvas); border-radius: 12px; padding: 16px; }
+  .pc h4 { margin: 0 0 4px; font-size: 14px; }
+  .pc .role { font-size: 11px; color: var(--muted); font-weight: 600; margin-bottom: 8px; }
+  .pc ul { margin: 0; padding-left: 18px; font-size: 12.5px; color: #525252; line-height: 1.55; }
+  .kpi-row { display:grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 560px){ .kpi-row { grid-template-columns: 1fr; } }
+  .kpi-big { background: var(--canvas); border-radius: 12px; padding: 16px; }
+  .kpi-big .k { font-size: 12px; color: var(--muted); font-weight: 600; }
+  .kpi-big .nums { display:flex; align-items: baseline; gap: 10px; margin-top: 8px; }
+  .kpi-big .before { font-size: 18px; color: var(--muted); font-weight: 600; text-decoration: line-through; }
+  .kpi-big .arrow { color: var(--green); font-weight: 700; }
+  .kpi-big .after { font-size: 28px; color: var(--ink); font-weight: 700; }
+  .kpi-big .rel { display:inline-block; margin-top: 8px; font-size: 11.5px; font-weight: 700; color: var(--green); background:#dcfce7; padding: 3px 10px; border-radius: 99px; }
+  .scope li { font-size: 13.5px; line-height: 1.6; color: #525252; margin-bottom: 6px; }
+  .scope .out { color: var(--muted); }
+  .mermaid { background: var(--canvas); border-radius: 12px; padding: 16px; overflow-x: auto; }
+  .legend { font-size: 12px; color: var(--muted); margin-top: 12px; line-height: 1.55; }
+  .legend b { color: var(--ink); }
+  .foot { text-align:center; font-size:11.5px; color: var(--muted); padding: 6px 0 20px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ===== Persistent top bar ===== -->
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">T</span>
+      <span>ThaiMart <small>SmartRewards</small></span>
+    </div>
+    <nav class="tabbar" role="tablist" aria-label="View switch">
+      <button id="tab-proto" role="tab" aria-selected="true" onclick="setView('proto')">ตัวอย่างการใช้งาน</button>
+      <button id="tab-how" role="tab" aria-selected="false" onclick="setView('how')">วิธีการทำงาน</button>
+    </nav>
+  </header>
+
+  <!-- ===== PROTOTYPE VIEW (device) ===== -->
+  <div id="protoview">
+  <div class="device" role="application" aria-label="ตัวอย่างแอป ThaiMart">
+    <div class="statusbar">
+      <span>9:41</span>
+      <div class="notch"></div>
+      <div class="sig">
+        <span class="bars"></span>
+        <span style="font-size:11px;font-weight:700;">5G</span>
+        <span class="batt"><i></i></span>
+      </div>
+    </div>
+
+    <div class="screenwrap" id="screenwrap">
+
+      <!-- ===== S1: Rewards Home ===== -->
+      <section class="screen active" id="screen-home" aria-label="หน้าแต้มสะสม">
+        <div class="h-row" style="padding-top:8px;">
+          <div>
+            <div class="scr-title" style="margin:0;">สวัสดี, คุณ! 👋</div>
+            <p class="scr-sub" style="margin:2px 0 0;">แต้มและสินค้าแนะนำสำหรับคุณ</p>
+          </div>
+          <button class="iconbtn" aria-label="การแจ้งเตือน">🔔</button>
+        </div>
+
+        <div class="card points-card" style="margin-top:16px;">
+          <div class="h-row">
+            <div>
+              <div class="lbl">แต้มสะสม SmartRewards</div>
+              <div class="pts"><span id="pts-display">2,480</span> <span>แต้ม</span></div>
+            </div>
+            <span class="pill tier-chip">⭐ Silver</span>
+          </div>
+          <div class="progress"><i id="tier-bar" style="width:62%"></i></div>
+          <div class="tier-meta">
+            <span>Silver</span>
+            <span id="tier-togo">อีก 520 แต้มถึง <b style="color:var(--gold)">Gold</b></span>
+            <span>Gold</span>
+          </div>
+        </div>
+
+        <div class="persona-block">
+          <div class="cap">กำลังช้อปแบบ</div>
+          <div class="persona-toggle" role="group" aria-label="กลุ่มผู้ใช้">
+            <button id="p-bargain" aria-pressed="true" onclick="setPersona('bargain')">
+              💸 นักช้อปสายคุ้ม<small>น้อง · เน้นราคา</small>
+            </button>
+            <button id="p-convenience" aria-pressed="false" onclick="setPersona('convenience')">
+              ⏱️ สายสะดวก<small>คุณพลอย · เน้นเวลา</small>
+            </button>
+          </div>
+          <div class="persona-note" id="persona-note"></div>
+        </div>
+
+        <div class="sec-head">
+          <h3>สินค้าแนะนำสำหรับคุณ</h3>
+          <span class="why" id="recs-why">เลือกตามดีล</span>
+        </div>
+        <div class="carousel" id="recs-carousel" aria-label="สินค้าแนะนำ"></div>
+
+        <div class="card kpi-card">
+          <h4>ทำไมต้องมีฟีเจอร์นี้ 📈</h4>
+          <p class="sub">ผลลัพธ์จริงของโปรแกรม เทียบกับการลดราคาแบบหว่าน</p>
+          <div class="kpi-grid">
+            <div class="kpi">
+              <div class="k">อัตราการซื้อซ้ำ</div>
+              <div class="v">48% <span class="from">42%</span></div>
+              <div class="delta">▲ +15% เทียบกับเดิม</div>
+            </div>
+            <div class="kpi">
+              <div class="k">ยอดสั่งซื้อเฉลี่ย</div>
+              <div class="v">฿352 <span class="from">฿320</span></div>
+              <div class="delta">▲ +10%</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cta-bar">
+          <button class="btn-primary" onclick="goScreen('cart')">ดูตะกร้าอัจฉริยะ 🛒</button>
+        </div>
+      </section>
+
+      <!-- ===== S2: Predictive Cart ===== -->
+      <section class="screen" id="screen-cart" aria-label="ตะกร้าอัจฉริยะ">
+        <div class="h-row" style="padding-top:8px;">
+          <button class="iconbtn" aria-label="ย้อนกลับไปหน้าแรก" onclick="goScreen('home')">←</button>
+          <div style="text-align:center;flex:1;">
+            <div style="font-size:15px;font-weight:700;">ตะกร้าอัจฉริยะ</div>
+          </div>
+          <span style="width:40px;"></span>
+        </div>
+
+        <h2 class="scr-title">เตรียมไว้ให้คุณแล้ว</h2>
+        <p class="scr-sub" id="cart-intro"></p>
+
+        <div class="card" id="cart-list" aria-label="รายการในตะกร้า"></div>
+
+        <div class="ai-banner">
+          <div class="ic">✨</div>
+          <div class="tx" id="addon-pitch"></div>
+        </div>
+        <div id="addon-list"></div>
+
+        <div class="redeem-row" id="redeem-row">
+          <div class="tx">
+            <div class="nm" id="redeem-row-nm">ใช้แต้มของคุณ 💰</div>
+            <div class="sub" id="redeem-row-sub">มี 2,480 แต้ม · 100 แต้ม = ฿10</div>
+          </div>
+          <button id="redeem-open-btn" onclick="openRedeem()">แลกแต้ม</button>
+        </div>
+
+        <div class="card summary">
+          <div class="ln"><span>ยอดรวมสินค้า</span><span id="sum-subtotal">฿0</span></div>
+          <div class="ln" id="sum-savings-ln"><span>ส่วนลดสมาชิก</span><span class="sv" id="sum-savings">−฿0</span></div>
+          <div class="ln" id="sum-redeem-ln" style="display:none;"><span>ส่วนลดจากแต้ม</span><span class="sv" id="sum-redeem">−฿0</span></div>
+          <div class="ln total"><span>ยอดสุทธิ</span><span id="sum-total">฿0</span></div>
+          <div style="margin-top:10px;"><span class="aov-chip">🛒 ออเดอร์นี้: <b id="aov-chip-val">฿0</b> · เทียบเฉลี่ย ฿320</span></div>
+        </div>
+
+        <div class="cta-bar">
+          <button class="btn-ghost" onclick="goScreen('home')">ย้อนกลับ</button>
+          <button class="btn-primary" id="checkout-btn" onclick="doCheckout()">ชำระเงิน · <span id="checkout-total">฿0</span></button>
+        </div>
+      </section>
+
+      <!-- ===== S4: Checkout Success ===== -->
+      <section class="screen" id="screen-success" aria-label="ชำระเงินสำเร็จ">
+        <div class="success-hero">
+          <div class="checkmark">✓</div>
+          <h2>ยืนยันคำสั่งซื้อแล้ว!</h2>
+          <p>จัดส่งไปสุขุมวิท 31 · ถึงภายในประมาณ 45 นาที</p>
+        </div>
+
+        <div class="card earn-card">
+          <div>
+            <div class="lbl">แต้มที่ได้รับจาก SmartRewards</div>
+            <div class="big">+<span id="earned-pts">0</span> แต้ม</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="lbl">แต้มสะสมล่าสุด</div>
+            <div style="font-size:18px;font-weight:700;color:#b45309;"><span id="new-balance">0</span> แต้ม</div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:14px;">
+          <div class="ln" style="display:flex;justify-content:space-between;font-size:13px;color:var(--muted);padding:4px 0;"><span>ยอดสั่งซื้อ</span><span id="success-aov" style="font-weight:700;color:var(--ink);">฿0</span></div>
+          <div class="ln" style="display:flex;justify-content:space-between;font-size:13px;color:var(--muted);padding:4px 0;"><span>เทียบยอดเฉลี่ยของคุณ ฿320</span><span id="success-delta" style="font-weight:700;color:var(--green);">+฿0</span></div>
+        </div>
+
+        <div class="nba">
+          <div class="head">🚚 สิ่งที่ควรทำต่อ <span class="badge">ปลดล็อก</span></div>
+          <p id="nba-text"></p>
+          <div class="barwrap"><i id="nba-bar" style="width:0%"></i></div>
+          <button onclick="goScreen('home')" id="nba-btn">เพิ่มอีก 1 ชิ้น — กลับไปดูสินค้าแนะนำ</button>
+        </div>
+
+        <div style="text-align:center;margin-top:16px;">
+          <button class="btn-ghost" style="width:100%;" onclick="goScreen('home')">เสร็จสิ้น — กลับหน้าแต้มสะสม</button>
+        </div>
+      </section>
+
+    </div><!-- /screenwrap -->
+
+    <!-- ===== S3: Redeem modal (overlay) ===== -->
+    <div class="modal-scrim" id="redeem-modal" role="dialog" aria-modal="true" aria-labelledby="redeem-title">
+      <div class="sheet">
+        <div class="grab"></div>
+        <h3 id="redeem-title">แลกแต้มเป็นส่วนลด 💰</h3>
+        <p class="desc">100 แต้ม = ลด ฿10 คุณมี <b id="modal-pts">2,480</b> แต้ม (มูลค่าประมาณ ฿248)</p>
+        <div class="redeem-presets" id="redeem-presets" role="group" aria-label="จำนวนแบบด่วน">
+          <button onclick="setPreset(500)" data-amt="500">500 แต้ม</button>
+          <button onclick="setPreset(1000)" data-amt="1000">1,000 แต้ม</button>
+          <button onclick="setPreset(2000)" data-amt="2000">2,000 แต้ม</button>
+        </div>
+        <div class="field" id="redeem-field">
+          <label for="redeem-input">จำนวนแต้มที่ต้องการแลก</label>
+          <input id="redeem-input" type="number" inputmode="numeric" min="100" step="100" placeholder="เช่น 1000" oninput="updateRedeemPreview()" />
+          <div class="err" id="redeem-err">กรอกอย่างน้อย 100 แต้ม เพิ่มทีละ 100 แต้ม ไม่เกินแต้มที่มี</div>
+        </div>
+        <div class="redeem-preview">
+          <span class="k">ส่วนลดที่ได้รับ</span>
+          <span class="v" id="redeem-preview-val">฿0</span>
+        </div>
+        <button class="btn-primary" id="redeem-confirm" onclick="confirmRedeem()" style="width:100%;">แลกแต้ม</button>
+        <button class="btn-ghost" style="width:100%;margin-top:10px;border:0;background:transparent;color:var(--muted);" onclick="closeRedeem()">ยกเลิก</button>
+      </div>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"><span class="dot"></span><span id="toast-msg"></span></div>
+
+  </div><!-- /device -->
+  </div><!-- /protoview -->
+
+  <!-- ===== HOW IT WORKS VIEW ===== -->
+  <div class="howview" id="howview">
+    <div class="how-card">
+      <div class="eyebrow">ปัญหา</div>
+      <h2>ลูกค้าซื้อครั้งเดียวจบ ส่วนลดกัดกินกำไร</h2>
+      <p>ลูกค้าบนแอป ThaiMart ถึง 58% ไม่เคยกลับมาสั่งซื้อครั้งที่สอง และเครื่องมือรักษาลูกค้าเดียวที่มีอยู่ตอนนี้คือ <b>คูปองลด 10% แบบหว่านให้ทุกคน</b> รวมถึงลูกค้าที่ยังไงก็ซื้ออยู่แล้ว วิธีนี้สอนให้ลูกค้าเทียบราคา กัดกินกำไรขั้นต้น และไม่ช่วยอะไรเลยกับกลุ่มสายสะดวกที่ไม่ได้สนใจราคา</p>
+      <p><b>SmartRewards และตะกร้าอัจฉริยะ</b> เปลี่ยนจากคูปองแบบหว่าน มาเป็นระบบสะสมแต้มและสั่งซื้อซ้ำเฉพาะบุคคล ที่ปรับตาม <i>เหตุผล</i> ที่ลูกค้าแต่ละคนช้อป เพิ่มทั้งอัตราการซื้อซ้ำและขนาดตะกร้า โดยไม่ต้องลดราคาแบบไม่เจาะจง</p>
+    </div>
+
+    <div class="how-card">
+      <div class="eyebrow">กลุ่มผู้ใช้ — สลับดูได้สดในตัวอย่าง</div>
+      <h2>เหตุผลสองแบบที่คนช้อป ThaiMart</h2>
+      <div class="persona-cards">
+        <div class="pc">
+          <h4>💸 น้อง — นักช้อปสายคุ้ม</h4>
+          <div class="role">อ่อนไหวเรื่องราคา · นักเรียนและครอบครัวรุ่นใหม่</div>
+          <ul>
+            <li>แนะนำ <b>ดีล แพ็กคุ้ม และตัวเลือกราคาถูกที่สุด</b></li>
+            <li>นำเสนอแต้มในรูปแบบ <b>ส่วนลดเป็นเงินสด</b> (100 แต้ม = ฿10)</li>
+            <li>สินค้าแนะนำเพิ่มเลือกมาเพื่อเพิ่มยอดตะกร้า <i>และ</i> ให้รู้สึกประหยัด</li>
+          </ul>
+        </div>
+        <div class="pc">
+          <h4>⏱️ คุณพลอย — สายสะดวก</h4>
+          <div class="role">อ่อนไหวเรื่องเวลา · คนทำงานที่ยุ่ง</div>
+          <ul>
+            <li>แนะนำ <b>สั่งซื้อซ้ำของใช้ประจำในแตะเดียว</b></li>
+            <li>เน้นข้อความเรื่อง <b>รอบจัดส่งด่วนและสินค้าระดับพรีเมียม</b></li>
+            <li>ตะกร้าอัจฉริยะเติมของในตะกร้าประจำสัปดาห์ให้อัตโนมัติ</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="how-card">
+      <div class="eyebrow">ตัวชี้วัดเป้าหมาย — ก่อน → หลัง</div>
+      <h2>ความสำเร็จหน้าตาเป็นอย่างไร</h2>
+      <div class="kpi-row">
+        <div class="kpi-big">
+          <div class="k">อัตราการซื้อซ้ำ</div>
+          <div class="nums"><span class="before">42%</span><span class="arrow">→</span><span class="after">48%</span></div>
+          <span class="rel">+15% เทียบกับเดิม</span>
+        </div>
+        <div class="kpi-big">
+          <div class="k">ยอดสั่งซื้อเฉลี่ย (AOV)</div>
+          <div class="nums"><span class="before">฿320</span><span class="arrow">→</span><span class="after">฿352</span></div>
+          <span class="rel">+10%</span>
+        </div>
+      </div>
+      <p class="legend" style="margin-top:14px;"><b>เกณฑ์ควบคุม:</b> กำไรขั้นต้นรวมต้องไม่ลดลง — การเจาะกลุ่มเฉพาะบุคคลหมายความว่าเราใช้งบรางวัลกับลูกค้าที่ต้องการแรงกระตุ้นจริง ๆ ไม่ใช่ทุกคน</p>
+    </div>
+
+    <div class="how-card">
+      <div class="eyebrow">สถาปัตยกรรมระบบ</div>
+      <h2>สินค้าแนะนำหนึ่งรายการเกิดขึ้นได้อย่างไร</h2>
+      <div class="mermaid" id="arch-diagram">
+flowchart TB
+  subgraph client[" "]
+    APP["📱 วิดเจ็ตบนแอปมือถือ<br/>SmartRewards + ตะกร้าอัจฉริยะ"]
+  end
+  RE["⚡ เครื่องมือแนะนำสินค้า<br/>ประมวลผลแบบเรียลไทม์"]
+  UPDB[("👤 ฐานข้อมูลโปรไฟล์ผู้ใช้<br/>ประวัติการซื้อ · คุณลักษณะกลุ่มผู้ใช้")]
+  ES["🔀 สตรีมเหตุการณ์<br/>คลิก · เพิ่มสินค้า · สั่งซื้อ"]
+  FS[("🧮 คลังคุณลักษณะ")]
+  TRAIN["🛠️ เทรนโมเดลแบบออฟไลน์<br/>เทรนซ้ำทุกคืน"]
+
+  APP -->|"ขอสินค้าแนะนำ (ผู้ใช้, กลุ่มผู้ใช้)"| RE
+  RE -->|"สินค้าจัดอันดับ + ข้อเสนอรางวัล"| APP
+  RE <-->|"อ่านโปรไฟล์ / เขียนความชอบ"| UPDB
+  APP -->|"ส่งเหตุการณ์การโต้ตอบ"| ES
+  ES --> FS
+  ES --> UPDB
+  FS -->|"คุณลักษณะแบบเรียลไทม์"| RE
+  FS --> TRAIN
+  UPDB --> TRAIN
+  TRAIN -->|"ปรับใช้โมเดลจัดอันดับ"| RE
+
+  classDef widget fill:#e32321,stroke:#b91c1c,color:#fff;
+  classDef engine fill:#00a63e,stroke:#15803d,color:#fff;
+  classDef store fill:#fef3c7,stroke:#f59e0b,color:#171717;
+  classDef stream fill:#fef2f2,stroke:#e32321,color:#171717;
+  classDef train fill:#171717,stroke:#000,color:#fff;
+  class APP widget;
+  class RE engine;
+  class UPDB,FS store;
+  class ES stream;
+  class TRAIN train;
+      </div>
+      <p class="legend"><b>วงจรหลักที่ขับเคลื่อนระบบ (ระบุไว้ในโจทย์):</b> เครื่องมือแนะนำสินค้าและฐานข้อมูลโปรไฟล์ผู้ใช้แลกเปลี่ยนข้อมูลกัน <b>สองทิศทาง</b> — เครื่องมือ <b>อ่าน</b> ประวัติการซื้อและคุณลักษณะกลุ่มผู้ใช้เพื่อจัดอันดับสินค้า และ <b>เขียนกลับ</b> ความชอบล่าสุดที่สังเกตได้ เพื่อให้คำขอครั้งถัดไปแม่นยำขึ้น คลิกและคำสั่งซื้อแบบเรียลไทม์ไหลผ่านสตรีมเหตุการณ์เข้าสู่ทั้งคลังคุณลักษณะแบบเรียลไทม์ (สำหรับการประมวลผลทันที) และวงจรเทรนแบบออฟไลน์ (เทรนซ้ำทุกคืน) ซึ่งจะปรับใช้โมเดลจัดอันดับกลับเข้าสู่เครื่องมืออีกครั้ง</p>
+    </div>
+
+    <div class="how-card">
+      <div class="eyebrow">MVP / ขอบเขต</div>
+      <h2>สิ่งที่จะปล่อยก่อน</h2>
+      <ul class="scope">
+        <li><b>อยู่ในขอบเขต (v1):</b> วิเคราะห์กลุ่มผู้ใช้จากประวัติการซื้อ (2 กลุ่ม), คาดการณ์การสั่งซื้อซ้ำสำหรับสินค้าหลัก 50 อันดับแรก, แลกแต้มเป็นส่วนลด, วิดเจ็ตในแอปบนหน้าแต้มสะสมและตะกร้าอัจฉริยะ</li>
+        <li><b>อยู่ในขอบเขต:</b> การเก็บตัวชี้วัด (อัตราการซื้อซ้ำ, ยอดสั่งซื้อเฉลี่ย, เกณฑ์ควบคุมกำไร) เชื่อมกับสตรีมเหตุการณ์ตั้งแต่วันแรก</li>
+        <li class="out"><b>นอกขอบเขต (ทำตามทีหลัง):</b> กลุ่มผู้ใช้มากกว่า 2 กลุ่ม / การแบ่งกลุ่มแบบต่อเนื่อง, การตั้งราคาแบบไดนามิกรายสินค้า, ML จัดแพ็กข้ามหมวด, ระบบสะสมต่อเนื่องแบบเกม, แคตตาล็อกเฉพาะระดับสมาชิก</li>
+        <li class="out"><b>นอกขอบเขต:</b> ตรรกะหาสินค้าทดแทนกรณีของหมด และการจัดรอบจัดส่งวันเดียวกันให้เหมาะสมที่สุด</li>
+      </ul>
+    </div>
+    <div class="foot">ThaiMart SmartRewards · ตัวอย่างกรณีศึกษาสำหรับ PM · ตัวเลขทั้งหมดเป็นเพียงตัวอย่าง</div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script>
+/* ============================================================
+   DATA
+   ============================================================ */
+const PRODUCTS = {
+  mama:   { name: "MAMA บะหมี่ต้มยำ",      emoji: "🍜", price: 6,   unit: "ซอง" },
+  rice:   { name: "ข้าวหอมมะลิ 5 กก.",     emoji: "🍚", price: 245, unit: "ถุง" },
+  singha: { name: "น้ำดื่ม Singha 1.5 ล.",  emoji: "💧", price: 14,  unit: "ขวด" },
+  chang:  { name: "เบียร์ Chang 620 มล.",   emoji: "🍺", price: 42,  unit: "ขวด" },
+  nescafe:{ name: "Nescafé 3-in-1",        emoji: "☕", price: 89,  unit: "กล่อง" },
+  fishsauce:{ name: "น้ำปลาตราปลาหมึก",   emoji: "🐟", price: 38, unit: "ขวด" },
+  lays:   { name: "Lay's สาหร่ายโนริ",      emoji: "🥔", price: 20,  unit: "ถุง" },
+  mango:  { name: "มะม่วงสด",             emoji: "🥭", price: 55,  unit: "กก." }
+};
+
+// persona-specific recommendation carousels
+const RECS = {
+  bargain: [
+    { id:"mama",   tag:"deal",   tagText:"แพ็ก x10", priceNote:"฿54 /10", was:60 },
+    { id:"lays",   tag:"deal",   tagText:"2 ชิ้น ฿35",  priceNote:"฿35 /2",  was:40 },
+    { id:"chang",  tag:"points", tagText:"จ่ายด้วยแต้ม", priceNote:"หรือ 420 แต้ม", was:null },
+    { id:"singha", tag:"deal",   tagText:"แพ็ก 6 ฿78", priceNote:"฿78 /6", was:84 },
+    { id:"rice",   tag:"deal",   tagText:"ราคาถูกที่สุด", priceNote:"฿245", was:265 }
+  ],
+  convenience: [
+    { id:"rice",   tag:"fast", tagText:"สั่งซ้ำ · 45 นาที", priceNote:"฿245", was:null },
+    { id:"nescafe",tag:"fast", tagText:"ประจำ · แตะเดียว",   priceNote:"฿89",  was:null },
+    { id:"fishsauce",tag:"fast",tagText:"ใกล้หมด",    priceNote:"฿38",  was:null },
+    { id:"mango",  tag:"points", tagText:"พรีเมียม",  priceNote:"฿55 /กก.", was:null },
+    { id:"singha", tag:"fast", tagText:"ของประจำสัปดาห์",   priceNote:"฿14",  was:null }
+  ]
+};
+
+const PERSONA_NOTE = {
+  bargain: "สวัสดี <b>น้อง</b> — เราหาวิธีเติมตะกร้าให้คุ้มที่สุดแล้ว ใช้ <b>ดีล + แต้ม</b> รวมกันเพื่อจ่ายน้อยลงทุกออเดอร์",
+  convenience: "สวัสดี <b>คุณพลอย</b> — ของใช้ประจำสัปดาห์พร้อมสั่งซื้อซ้ำในแตะเดียว พร้อมเลือก <b>รอบจัดส่งที่เร็วที่สุด</b> ไว้ให้แล้ว"
+};
+const RECS_WHY = { bargain: "เลือกตามดีล 💸", convenience: "เลือกตามความเร็ว ⏱️" };
+const CART_INTRO = {
+  bargain: "รายการที่คุณน่าจะสั่งซ้ำ พร้อมดีลสมาชิกที่ใส่ไว้ให้แล้ว สินค้าแนะนำเพิ่มคัดมาเพื่อให้คุณประหยัดที่สุด",
+  convenience: "ของใช้ประจำสัปดาห์ของคุณ เติมไว้ให้แล้ว สินค้าแนะนำเพิ่มคือของที่คุณมักหยิบติดมือก่อนออกไป"
+};
+const ADDON_PITCH = {
+  bargain: "<b>คุณมักซื้อคู่กับ…</b> จัดรวมกันแล้วปลดล็อกส่วนลดสมาชิกเพิ่ม",
+  convenience: "<b>คุณมักซื้อคู่กับ…</b> แตะเดียวเพิ่มเข้าไปในรอบจัดส่งด่วนเดียวกัน"
+};
+
+// persona-specific add-on suggestions ("bought with")
+const ADDONS = {
+  bargain:     ["lays", "nescafe", "chang"],
+  convenience: ["fishsauce", "mango", "singha"]
+};
+
+// default predictive cart per persona
+const DEFAULT_CART = {
+  bargain:     [ {id:"mama", qty:10}, {id:"rice", qty:1}, {id:"singha", qty:6} ],
+  convenience: [ {id:"rice", qty:1}, {id:"nescafe", qty:1}, {id:"mango", qty:2} ]
+};
+
+const MEMBER_DISCOUNT = 0.05; // 5% member savings on subtotal (vs blanket 10% to everyone)
+const POINTS_PER_BAHT_VALUE = 0.10; // 100 pts = ฿10
+const POINTS_EARN_RATE = 0.20; // earn ~20 pts per ฿100... actually pts = total*0.2
+const FREE_DELIVERY_THRESHOLD = 350;
+
+/* ============================================================
+   STATE
+   ============================================================ */
+const DEFAULT_STATE = {
+  currentView: "proto",
+  currentScreen: "home",
+  persona: "bargain",
+  cartItems: JSON.parse(JSON.stringify(DEFAULT_CART.bargain)),
+  points: 2480,
+  pointsRedeemed: 0,    // ฿ discount currently applied
+  redeemedPts: 0,       // pts spent
+  aov: 0
+};
+let state = loadState();
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem("tm_state");
+    if (raw) return Object.assign({}, DEFAULT_STATE, JSON.parse(raw));
+  } catch(e){}
+  return JSON.parse(JSON.stringify(DEFAULT_STATE));
+}
+function saveState() {
+  try { localStorage.setItem("tm_state", JSON.stringify(state)); } catch(e){}
+}
+
+/* ============================================================
+   VIEW SWITCH (Prototype / How it works)
+   ============================================================ */
+let mermaidInit = false;
+function setView(v) {
+  state.currentView = v;
+  saveState();
+  document.getElementById("tab-proto").setAttribute("aria-selected", v==="proto");
+  document.getElementById("tab-how").setAttribute("aria-selected", v==="how");
+  document.getElementById("protoview").style.display = v==="proto" ? "block" : "none";
+  document.getElementById("howview").classList.toggle("active", v==="how");
+  if (v === "how" && !mermaidInit) {
+    mermaidInit = true;
+    try {
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: "base",
+        themeVariables: {
+          fontFamily: "sukhumvit, Inter, sans-serif",
+          primaryColor: "#FBF0E8",
+          primaryTextColor: "#171717",
+          primaryBorderColor: "#e32321",
+          lineColor: "#72757e",
+          fontSize: "13px"
+        }
+      });
+      mermaid.run({ nodes: [document.getElementById("arch-diagram")] });
+    } catch(e){ console.warn("mermaid", e); }
+  }
+}
+
+/* ============================================================
+   SCREEN NAV
+   ============================================================ */
+function goScreen(name) {
+  state.currentScreen = name;
+  saveState();
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById("screen-" + name).classList.add("active");
+  document.getElementById("screenwrap").scrollTop = 0;
+  if (name === "home") renderHome();
+  if (name === "cart") renderCart();
+}
+
+/* ============================================================
+   PERSONA
+   ============================================================ */
+function setPersona(p) {
+  if (state.persona === p) return;
+  state.persona = p;
+  // reset cart to the persona's predictive basket + clear redemption
+  state.cartItems = JSON.parse(JSON.stringify(DEFAULT_CART[p]));
+  state.pointsRedeemed = 0;
+  state.redeemedPts = 0;
+  saveState();
+  document.getElementById("p-bargain").setAttribute("aria-pressed", p==="bargain");
+  document.getElementById("p-convenience").setAttribute("aria-pressed", p==="convenience");
+  renderHome();
+  showToast(p==="bargain" ? "เปลี่ยนเป็นนักช้อปสายคุ้ม — แสดงดีลให้แล้ว" : "เปลี่ยนเป็นสายสะดวก — ของประจำพร้อมแล้ว");
+}
+
+/* ============================================================
+   RENDER: HOME
+   ============================================================ */
+function renderHome() {
+  document.getElementById("pts-display").textContent = state.points.toLocaleString();
+  // tier progress: Gold at 3000
+  const goldAt = 3000;
+  const pct = Math.min(100, Math.round(state.points / goldAt * 100));
+  document.getElementById("tier-bar").style.width = pct + "%";
+  const togo = Math.max(0, goldAt - state.points);
+  document.getElementById("tier-togo").innerHTML = togo > 0
+    ? togo.toLocaleString() + ' pts to <b style="color:var(--gold)">Gold</b>'
+    : '🎉 Gold unlocked!';
+
+  document.getElementById("p-bargain").setAttribute("aria-pressed", state.persona==="bargain");
+  document.getElementById("p-convenience").setAttribute("aria-pressed", state.persona==="convenience");
+  document.getElementById("persona-note").innerHTML = PERSONA_NOTE[state.persona];
+  document.getElementById("recs-why").textContent = RECS_WHY[state.persona];
+
+  // carousel
+  const car = document.getElementById("recs-carousel");
+  car.innerHTML = "";
+  RECS[state.persona].forEach((r, i) => {
+    const p = PRODUCTS[r.id];
+    const tagClass = r.tag==="deal" ? "tag-deal" : r.tag==="fast" ? "tag-fast" : "tag-points";
+    const el = document.createElement("div");
+    el.className = "pcard";
+    el.innerHTML = `
+      <div class="thumb">${p.emoji}</div>
+      <span class="tag ${tagClass}">${r.tagText}</span>
+      <div class="nm">${p.name}</div>
+      <div class="pr">${r.priceNote.startsWith("฿")||r.priceNote.startsWith("or")?r.priceNote:"฿"+r.priceNote}${r.was?` <s>฿${r.was}</s>`:""}</div>
+      <button data-id="${r.id}">+ เพิ่มลงตะกร้า</button>`;
+    el.querySelector("button").addEventListener("click", function(){
+      addToCart(r.id, 1);
+      this.textContent = "✓ เพิ่มแล้ว";
+      this.classList.add("added");
+      setTimeout(()=>{ this.textContent="+ เพิ่มลงตะกร้า"; this.classList.remove("added"); }, 1200);
+    });
+    car.appendChild(el);
+  });
+}
+
+/* ============================================================
+   CART LOGIC
+   ============================================================ */
+function cartSubtotal() {
+  return state.cartItems.reduce((s, it) => s + PRODUCTS[it.id].price * it.qty, 0);
+}
+function addToCart(id, qty) {
+  const found = state.cartItems.find(it => it.id === id);
+  if (found) found.qty += qty;
+  else state.cartItems.push({ id, qty });
+  saveState();
+  if (state.currentScreen === "cart") renderCart();
+}
+function changeQty(id, delta) {
+  const it = state.cartItems.find(x => x.id === id);
+  if (!it) return;
+  it.qty += delta;
+  if (it.qty <= 0) state.cartItems = state.cartItems.filter(x => x.id !== id);
+  // if redeemed discount now exceeds subtotal, cap it
+  reconcileRedemption();
+  saveState();
+  renderCart();
+}
+function reconcileRedemption() {
+  const sub = cartSubtotal();
+  const afterMember = sub * (1 - MEMBER_DISCOUNT);
+  if (state.pointsRedeemed > afterMember) {
+    // cap discount, refund excess pts
+    const newDisc = Math.floor(afterMember / 10) * 10;
+    const refundPts = (state.pointsRedeemed - newDisc) / POINTS_PER_BAHT_VALUE;
+    state.points += Math.round(refundPts);
+    state.redeemedPts = Math.round(newDisc / POINTS_PER_BAHT_VALUE);
+    state.pointsRedeemed = newDisc;
+  }
+}
+
+function renderCart() {
+  document.getElementById("cart-intro").textContent = CART_INTRO[state.persona];
+  document.getElementById("addon-pitch").innerHTML = ADDON_PITCH[state.persona];
+  document.getElementById("redeem-row-sub").textContent =
+    "มี " + state.points.toLocaleString() + " แต้ม · 100 แต้ม = ฿10";
+
+  // items
+  const list = document.getElementById("cart-list");
+  list.innerHTML = "";
+  if (state.cartItems.length === 0) {
+    list.innerHTML = '<p style="color:var(--muted);font-size:13px;text-align:center;padding:18px 0;margin:0;">ตะกร้าว่าง — เพิ่มสินค้าแนะนำจากหน้าแรก</p>';
+  }
+  state.cartItems.forEach(it => {
+    const p = PRODUCTS[it.id];
+    const row = document.createElement("div");
+    row.className = "cart-item";
+    row.innerHTML = `
+      <div class="thumb">${p.emoji}</div>
+      <div class="meta">
+        <div class="nm">${p.name}</div>
+        <div class="sub">฿${p.price} / ${p.unit} · ฿${(p.price*it.qty).toLocaleString()}</div>
+      </div>
+      <div class="stepper" aria-label="จำนวนของ ${p.name}">
+        <button aria-label="ลดจำนวน" data-d="-1">−</button>
+        <span class="qn">${it.qty}</span>
+        <button aria-label="เพิ่มจำนวน" data-d="1">+</button>
+      </div>`;
+    row.querySelectorAll(".stepper button").forEach(b => {
+      b.addEventListener("click", () => changeQty(it.id, parseInt(b.dataset.d,10)));
+    });
+    list.appendChild(row);
+  });
+
+  // add-ons: only those not already in cart
+  const addonWrap = document.getElementById("addon-list");
+  addonWrap.innerHTML = "";
+  const inCart = new Set(state.cartItems.map(i => i.id));
+  const suggestions = ADDONS[state.persona].filter(id => !inCart.has(id));
+  if (suggestions.length === 0) {
+    addonWrap.innerHTML = '<p style="color:var(--green);font-size:12px;font-weight:600;margin:0 0 6px;">✓ สินค้าแนะนำเพิ่มอยู่ในตะกร้าครบแล้ว</p>';
+  }
+  suggestions.forEach(id => {
+    const p = PRODUCTS[id];
+    const subtext = state.persona === "bargain"
+      ? `ซื้อคู่กัน · ประหยัด ฿${Math.round(p.price*0.1) || 1}`
+      : "รอบจัดส่งด่วนเดียวกัน";
+    const el = document.createElement("div");
+    el.className = "addon";
+    el.innerHTML = `
+      <div class="thumb">${p.emoji}</div>
+      <div class="meta">
+        <div class="nm">${p.name}</div>
+        <div class="sub">+฿${p.price} · ${subtext}</div>
+      </div>
+      <button>＋ เพิ่ม</button>`;
+    el.querySelector("button").addEventListener("click", () => {
+      addToCart(id, 1);
+      showToast(`เพิ่ม ${p.name} แล้ว · อัปเดตออเดอร์`);
+    });
+    addonWrap.appendChild(el);
+  });
+
+  // summary math
+  const sub = cartSubtotal();
+  const memberSave = Math.round(sub * MEMBER_DISCOUNT);
+  const total = Math.max(0, sub - memberSave - state.pointsRedeemed);
+  state.aov = total;
+  saveState();
+
+  document.getElementById("sum-subtotal").textContent = "฿" + sub.toLocaleString();
+  document.getElementById("sum-savings").textContent = "−฿" + memberSave.toLocaleString();
+  const redeemLn = document.getElementById("sum-redeem-ln");
+  if (state.pointsRedeemed > 0) {
+    redeemLn.style.display = "flex";
+    document.getElementById("sum-redeem").textContent = "−฿" + state.pointsRedeemed.toLocaleString();
+  } else {
+    redeemLn.style.display = "none";
+  }
+  document.getElementById("sum-total").textContent = "฿" + total.toLocaleString();
+  document.getElementById("checkout-total").textContent = "฿" + total.toLocaleString();
+  document.getElementById("aov-chip-val").textContent = "฿" + total.toLocaleString();
+
+  // redeem row state
+  const redeemBtn = document.getElementById("redeem-open-btn");
+  const redeemRow = document.getElementById("redeem-row");
+  if (state.pointsRedeemed > 0) {
+    redeemRow.classList.add("redeem-applied");
+    document.getElementById("redeem-row-nm").textContent = `✓ ใช้ส่วนลด ฿${state.pointsRedeemed} แล้ว`;
+    document.getElementById("redeem-row-sub").textContent = `ใช้ไป ${state.redeemedPts.toLocaleString()} แต้ม · แตะเพื่อแก้ไข`;
+    redeemBtn.textContent = "แก้ไข";
+  } else {
+    redeemRow.classList.remove("redeem-applied");
+    document.getElementById("redeem-row-nm").textContent = "ใช้แต้มของคุณ 💰";
+    redeemBtn.textContent = "แลกแต้ม";
+  }
+  redeemBtn.disabled = state.points < 100 && state.pointsRedeemed === 0;
+
+  document.getElementById("checkout-btn").disabled = state.cartItems.length === 0;
+}
+
+/* ============================================================
+   REDEEM MODAL
+   ============================================================ */
+let selectedPreset = null;
+function openRedeem() {
+  const m = document.getElementById("redeem-modal");
+  document.getElementById("modal-pts").textContent = state.points.toLocaleString();
+  const input = document.getElementById("redeem-input");
+  input.value = state.redeemedPts > 0 ? state.redeemedPts : "";
+  document.getElementById("redeem-field").classList.remove("invalid");
+  clearPresets();
+  updateRedeemPreview();
+  m.classList.add("open");
+  setTimeout(()=> input.focus(), 100);
+}
+function closeRedeem() {
+  document.getElementById("redeem-modal").classList.remove("open");
+}
+function clearPresets(){
+  selectedPreset = null;
+  document.querySelectorAll("#redeem-presets button").forEach(b => b.setAttribute("aria-pressed","false"));
+}
+function setPreset(amt) {
+  selectedPreset = amt;
+  document.querySelectorAll("#redeem-presets button").forEach(b =>
+    b.setAttribute("aria-pressed", parseInt(b.dataset.amt,10)===amt));
+  document.getElementById("redeem-input").value = amt;
+  updateRedeemPreview();
+}
+function updateRedeemPreview() {
+  const v = parseInt(document.getElementById("redeem-input").value, 10) || 0;
+  // sync preset highlight
+  if (selectedPreset !== v) clearPresets();
+  const disc = Math.floor(v / 100) * 10;
+  document.getElementById("redeem-preview-val").textContent = "฿" + disc.toLocaleString();
+}
+function validateRedeem(v) {
+  if (!v || v < 100) return false;
+  if (v % 100 !== 0) return false;
+  if (v > state.points) return false;
+  return true;
+}
+function confirmRedeem() {
+  const v = parseInt(document.getElementById("redeem-input").value, 10) || 0;
+  const field = document.getElementById("redeem-field");
+  if (!validateRedeem(v)) {
+    field.classList.add("invalid");
+    document.getElementById("redeem-input").focus();
+    return;
+  }
+  field.classList.remove("invalid");
+  const btn = document.getElementById("redeem-confirm");
+  const orig = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> กำลังใช้ส่วนลด…';
+
+  setTimeout(() => {
+    // if previously redeemed, refund old pts before applying new
+    if (state.redeemedPts > 0) state.points += state.redeemedPts;
+    state.redeemedPts = v;
+    state.points -= v;
+    state.pointsRedeemed = Math.floor(v / 100) * 10;
+    saveState();
+    btn.disabled = false;
+    btn.innerHTML = orig;
+    closeRedeem();
+    renderCart();
+    showToast(`แลกแต้มแล้ว · ส่วนลด ฿${state.pointsRedeemed} 🎉`);
+  }, 700);
+}
+
+/* ============================================================
+   CHECKOUT
+   ============================================================ */
+function doCheckout() {
+  const btn = document.getElementById("checkout-btn");
+  const orig = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> กำลังสั่งซื้อ…';
+  setTimeout(() => {
+    const total = state.aov;
+    const earned = Math.round(total * POINTS_EARN_RATE); // ~20 pts per ฿100 spent
+    state.points += earned;
+    saveState();
+
+    // success screen fill
+    document.getElementById("earned-pts").textContent = earned.toLocaleString();
+    document.getElementById("new-balance").textContent = state.points.toLocaleString();
+    document.getElementById("success-aov").textContent = "฿" + total.toLocaleString();
+    const delta = total - 320;
+    const dEl = document.getElementById("success-delta");
+    dEl.textContent = (delta>=0?"+":"−") + "฿" + Math.abs(delta).toLocaleString();
+    dEl.style.color = delta>=0 ? "var(--green)" : "var(--primary-dark)";
+
+    // next best action
+    const togo = FREE_DELIVERY_THRESHOLD - total;
+    const nbaText = document.getElementById("nba-text");
+    const nbaBar = document.getElementById("nba-bar");
+    const nbaBtn = document.getElementById("nba-btn");
+    if (togo > 0) {
+      nbaText.innerHTML = `อีก <b>฿${togo}</b> ก็ <b>ส่งฟรี</b> เพิ่มอีกหนึ่งรายการ — น้ำดื่ม Singha แพ็ก 6 (฿78) ก็ถึงแล้ว`;
+      nbaBtn.textContent = "เพิ่มอีก 1 ชิ้น — กลับไปดูสินค้าแนะนำ";
+    } else {
+      nbaText.innerHTML = `🎉 ออเดอร์นี้ปลดล็อก <b>ส่งฟรี</b> แล้ว! รักษาสถิติไว้ — สั่งซื้อซ้ำสัปดาห์หน้าในแตะเดียว`;
+      nbaBtn.textContent = "ดูสินค้าแนะนำเพิ่ม";
+    }
+    nbaBar.style.width = Math.min(100, Math.round(total / FREE_DELIVERY_THRESHOLD * 100)) + "%";
+
+    // reset cart/redemption for a fresh next order
+    state.cartItems = JSON.parse(JSON.stringify(DEFAULT_CART[state.persona]));
+    state.pointsRedeemed = 0;
+    state.redeemedPts = 0;
+    saveState();
+
+    btn.disabled = false;
+    btn.innerHTML = orig;
+    goScreen("success");
+  }, 700);
+}
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+let toastTimer = null;
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  document.getElementById("toast-msg").textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 2400);
+}
+
+/* ============================================================
+   KEYBOARD: Escape closes modal
+   ============================================================ */
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    if (document.getElementById("redeem-modal").classList.contains("open")) closeRedeem();
+  }
+});
+document.getElementById("redeem-modal").addEventListener("click", (e) => {
+  if (e.target.id === "redeem-modal") closeRedeem();
+});
+
+/* ============================================================
+   BOOT — restore persisted state
+   ============================================================ */
+(function boot(){
+  // restore screen
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  const sc = document.getElementById("screen-" + state.currentScreen) || document.getElementById("screen-home");
+  sc.classList.add("active");
+  renderHome();
+  renderCart();
+  setView(state.currentView);
+})();
+</script>
+</body>
+</html>

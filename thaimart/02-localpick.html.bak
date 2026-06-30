@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ThaiMart LocalPick</title>
+<!--
+============================================================================
+ThaiMart LocalPick — interactive prototype
+============================================================================
+SCREENS (single-file, JS show/hide):
+  Shopper flow:
+    s_product   — Product page: stock at 3 nearby stores, pick store
+    s_reserve   — Reserve sheet: 2-hour pickup window, curbside info, reserve
+    s_confirmed — Reservation confirmed: pickup code, live countdown, "I'm here"
+  Staff app (visually distinct utility UI, toggled via Staff mode):
+    s_staff     — Pick list: incoming reservation, shelf/bin, pick -> ready
+  Views (top tab bar):
+    prototype   — the clickable device flow
+    howitworks  — Mermaid service blueprint + PM context
+
+STATE (persisted in localStorage under key "tm_localpick"):
+  view             prototype | howitworks
+  currentScreen    s_product | s_reserve | s_confirmed | s_staff
+  selectedStore    store id (s39 | tl | pp)
+  reservationStatus none | reserved | picking | ready | collected
+  mode             shopper | staff
+  pickupCode       6-char code generated at reservation
+  deadline         epoch ms for 2h window (drives countdown)
+  pickedItems      [bool,...] staff checklist state
+
+Reactive sub-state: shopper confirmed screen reflects staff progress
+(reserved -> picking -> ready) via shared state + storage event.
+============================================================================
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --primary:#E84A27; --primary-dark:#C13A1C;
+    --green:#138A5E; --gold:#E8A33D;
+    --ink:#1A1614; --muted:#6B6460; --surface:#FFFFFF; --canvas:#F7F3EF; --hair:#E9E1D8;
+    --r-card:14px; --r-input:10px; --r-pill:999px;
+    --sh-sm:0 1px 3px rgba(26,22,20,.08); --sh-lg:0 8px 24px rgba(26,22,20,.06);
+    --font:'Inter','Noto Sans Thai',system-ui,-apple-system,sans-serif;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html,body { height:100%; }
+  body {
+    font-family:var(--font); color:var(--ink);
+    background:
+      radial-gradient(1200px 600px at 80% -10%, #FBEAE2 0%, transparent 60%),
+      radial-gradient(900px 500px at -10% 110%, #E8F2EC 0%, transparent 55%),
+      var(--canvas);
+    -webkit-font-smoothing:antialiased; min-height:100%;
+    display:flex; flex-direction:column; align-items:center;
+  }
+  button { font-family:inherit; cursor:pointer; }
+  :focus-visible { outline:2px solid var(--green); outline-offset:2px; border-radius:6px; }
+
+  /* ---- top tab bar ---- */
+  .topbar {
+    width:100%; display:flex; justify-content:center; align-items:center; gap:16px;
+    padding:14px 20px; position:sticky; top:0; z-index:50;
+    background:rgba(247,243,239,.82); backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--hair);
+  }
+  .brand { display:flex; align-items:center; gap:9px; font-weight:700; font-size:15px; letter-spacing:-.01em; margin-right:auto; }
+  .brand .logo {
+    width:30px; height:30px; border-radius:9px; display:grid; place-items:center;
+    background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:#fff; font-weight:700; font-size:15px;
+    box-shadow:var(--sh-sm);
+  }
+  .brand small { display:block; font-weight:500; font-size:11px; color:var(--muted); letter-spacing:.02em; }
+  .tabs { display:flex; background:#fff; border:1px solid var(--hair); border-radius:var(--r-pill); padding:4px; box-shadow:var(--sh-sm); }
+  .tabs button {
+    border:0; background:transparent; color:var(--muted); font-weight:600; font-size:13px;
+    padding:9px 18px; border-radius:var(--r-pill); min-height:40px; transition:.18s;
+  }
+  .tabs button.active { background:var(--ink); color:#fff; }
+  .ghost-link { margin-left:6px; font-size:12px; color:var(--muted); font-weight:500; }
+
+  .stage { width:100%; flex:1; display:flex; justify-content:center; padding:28px 16px 56px; }
+
+  /* ================= VIEW: PROTOTYPE (device) ================= */
+  #view-prototype { display:flex; flex-direction:column; align-items:center; gap:18px; }
+  .mode-toggle { display:flex; align-items:center; gap:10px; background:#fff; border:1px solid var(--hair); border-radius:var(--r-pill); padding:5px; box-shadow:var(--sh-sm); }
+  .mode-toggle button {
+    border:0; background:transparent; padding:8px 16px; border-radius:var(--r-pill); min-height:38px;
+    font-weight:600; font-size:13px; color:var(--muted); display:flex; align-items:center; gap:7px; transition:.18s;
+  }
+  .mode-toggle button.active.shop { background:var(--primary); color:#fff; }
+  .mode-toggle button.active.staff { background:var(--ink); color:#fff; }
+  .mode-dot { width:8px; height:8px; border-radius:50%; background:currentColor; }
+
+  .device {
+    width:390px; max-width:94vw; height:780px; max-height:84vh;
+    background:#000; border-radius:46px; padding:11px;
+    box-shadow:0 30px 70px rgba(26,22,20,.28), 0 0 0 2px rgba(0,0,0,.6), inset 0 0 0 2px #2a2a2a;
+    position:relative;
+  }
+  .device .notch {
+    position:absolute; top:11px; left:50%; transform:translateX(-50%);
+    width:130px; height:30px; background:#000; border-radius:0 0 18px 18px; z-index:20;
+  }
+  .screen-host {
+    width:100%; height:100%; background:var(--surface); border-radius:36px; overflow:hidden;
+    position:relative; display:flex; flex-direction:column;
+  }
+  .statusbar { height:46px; flex:none; display:flex; align-items:flex-end; justify-content:space-between; padding:0 26px 6px; font-size:13px; font-weight:600; }
+  .statusbar.dark { background:#15110F; color:#fff; }
+  .scroll { flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+  .scroll::-webkit-scrollbar { width:0; }
+
+  /* screens */
+  .screen { display:none; flex-direction:column; min-height:100%; }
+  .screen.active { display:flex; }
+
+  /* nav header */
+  .navhdr { display:flex; align-items:center; gap:12px; padding:8px 18px 14px; }
+  .iconbtn {
+    width:40px; height:40px; min-width:40px; border-radius:12px; border:1px solid var(--hair);
+    background:#fff; display:grid; place-items:center; font-size:18px; color:var(--ink);
+  }
+  .navhdr h1 { font-size:16px; font-weight:600; }
+  .navhdr .sub { font-size:12px; color:var(--muted); }
+
+  /* product page */
+  .hero {
+    margin:0 18px; height:200px; border-radius:18px; position:relative; overflow:hidden;
+    background:linear-gradient(135deg,#FBE3D8,#F5D7C8); display:grid; place-items:center;
+  }
+  .hero .can {
+    width:96px; height:150px; border-radius:14px; position:relative;
+    background:linear-gradient(180deg,#2E7D32 0%,#1B5E20 70%,#14471a 100%);
+    box-shadow:0 14px 30px rgba(20,71,26,.35), inset 0 0 0 2px rgba(255,255,255,.06);
+  }
+  .hero .can::before { content:"CHANG"; position:absolute; top:46px; left:0; right:0; text-align:center; color:#FFE08A; font-weight:700; font-size:15px; letter-spacing:.5px; }
+  .hero .can::after { content:"BEER"; position:absolute; top:66px; left:0; right:0; text-align:center; color:#fff; font-weight:600; font-size:9px; letter-spacing:3px; opacity:.85; }
+  .hero .six { position:absolute; bottom:14px; left:14px; background:rgba(26,22,20,.78); color:#fff; font-size:11px; font-weight:600; padding:5px 10px; border-radius:var(--r-pill); }
+  .badge-now {
+    display:inline-flex; align-items:center; gap:6px; background:#E8F2EC; color:var(--green);
+    font-weight:600; font-size:12px; padding:6px 12px; border-radius:var(--r-pill); border:1px solid #cce6da;
+  }
+  .pulse { width:8px; height:8px; border-radius:50%; background:var(--green); box-shadow:0 0 0 0 rgba(19,138,94,.5); animation:pulse 1.8s infinite; }
+  @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(19,138,94,.5)} 70%{box-shadow:0 0 0 8px rgba(19,138,94,0)} 100%{box-shadow:0 0 0 0 rgba(19,138,94,0)} }
+
+  .pinfo { padding:16px 18px 6px; }
+  .pinfo .brandline { font-size:12px; color:var(--muted); font-weight:500; letter-spacing:.02em; }
+  .pinfo h2 { font-size:21px; font-weight:700; letter-spacing:-.01em; margin:3px 0 8px; }
+  .price { font-size:24px; font-weight:700; color:var(--primary); }
+  .price s { font-size:14px; color:var(--muted); font-weight:500; margin-left:8px; }
+
+  .section-label { padding:18px 18px 8px; font-size:13px; font-weight:600; color:var(--muted); display:flex; justify-content:space-between; align-items:center; }
+  .section-label .live { font-size:11px; color:var(--green); display:inline-flex; align-items:center; gap:5px; }
+
+  .store {
+    margin:0 18px 10px; padding:14px; border:1.5px solid var(--hair); border-radius:var(--r-card);
+    background:#fff; display:flex; gap:12px; align-items:center; text-align:left; width:calc(100% - 36px);
+    transition:.16s;
+  }
+  .store:hover { border-color:#d9cfc3; }
+  .store.sel { border-color:var(--primary); background:#FEF6F2; box-shadow:0 0 0 3px rgba(232,74,39,.08); }
+  .store .pin { width:42px; height:42px; min-width:42px; border-radius:12px; background:var(--canvas); display:grid; place-items:center; font-size:18px; }
+  .store .meta { flex:1; min-width:0; }
+  .store .meta .nm { font-weight:600; font-size:14px; }
+  .store .meta .dist { font-size:12px; color:var(--muted); margin-top:2px; }
+  .stock { text-align:right; min-width:64px; }
+  .stock .n { font-weight:700; font-size:15px; }
+  .stock .lbl { font-size:11px; color:var(--muted); }
+  .stock.ok .n { color:var(--green); }
+  .stock.low .n { color:var(--gold); }
+  .stock.out .n { color:var(--muted); }
+  .store.disabled { opacity:.55; }
+  .pill-tag { font-size:10px; font-weight:600; padding:3px 8px; border-radius:var(--r-pill); margin-top:5px; display:inline-block; }
+  .pill-tag.low { background:#FBF0DC; color:#A6731B; }
+  .pill-tag.out { background:#F0EBE5; color:var(--muted); }
+
+  /* sticky footer CTA */
+  .footer-cta { flex:none; padding:14px 18px calc(14px + env(safe-area-inset-bottom)); border-top:1px solid var(--hair); background:#fff; }
+  .btn {
+    width:100%; min-height:52px; border:0; border-radius:14px; font-weight:600; font-size:15px;
+    background:var(--primary); color:#fff; box-shadow:var(--sh-sm); transition:.16s; display:flex; align-items:center; justify-content:center; gap:8px;
+  }
+  .btn:hover:not(:disabled) { background:var(--primary-dark); }
+  .btn:disabled { opacity:.55; cursor:not-allowed; }
+  .btn.secondary { background:#fff; color:var(--ink); border:1.5px solid var(--hair); box-shadow:none; }
+  .btn.green { background:var(--green); }
+  .btn.green:hover:not(:disabled) { background:#0f6f4b; }
+  .btn.dark { background:var(--ink); }
+  .btn .spin { width:16px; height:16px; border:2px solid rgba(255,255,255,.4); border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+
+  /* reserve sheet */
+  .sheet-grab { width:40px; height:5px; border-radius:3px; background:var(--hair); margin:10px auto 4px; }
+  .infocard { margin:14px 18px; padding:16px; border:1px solid var(--hair); border-radius:var(--r-card); background:#fff; }
+  .row { display:flex; align-items:center; gap:12px; padding:11px 0; border-bottom:1px solid var(--hair); }
+  .row:last-child { border-bottom:0; }
+  .row .ic { width:38px; height:38px; min-width:38px; border-radius:11px; background:var(--canvas); display:grid; place-items:center; font-size:17px; }
+  .row .t { font-size:13px; color:var(--muted); }
+  .row .v { font-weight:600; font-size:14px; margin-top:1px; }
+  .windowbox { margin:14px 18px; padding:16px; border-radius:var(--r-card); background:linear-gradient(135deg,#FEF6F2,#fff); border:1px solid #f3ddd0; }
+  .windowbox .big { font-size:30px; font-weight:700; color:var(--primary); letter-spacing:-.02em; font-variant-numeric:tabular-nums; }
+  .windowbox .cap { font-size:12px; color:var(--muted); margin-top:2px; }
+  .field { margin:6px 18px 0; }
+  .field label { font-size:13px; font-weight:600; display:block; margin-bottom:6px; }
+  .field textarea, .field input {
+    width:100%; border:1.5px solid var(--hair); border-radius:var(--r-input); padding:12px 13px;
+    font-family:inherit; font-size:14px; color:var(--ink); resize:none; min-height:46px;
+  }
+  .field textarea:focus, .field input:focus { border-color:var(--green); outline:none; }
+  .field .err-input { border-color:#d6492b; }
+  .err { color:#C13A1C; font-size:12px; margin-top:6px; display:none; }
+  .err.show { display:block; }
+
+  /* confirmed */
+  .confirm-top { padding:24px 18px 6px; text-align:center; }
+  .check-ring {
+    width:72px; height:72px; border-radius:50%; margin:0 auto 14px; display:grid; place-items:center;
+    background:#E8F2EC; color:var(--green); font-size:34px; animation:pop .4s ease;
+  }
+  @keyframes pop { 0%{transform:scale(.5);opacity:0} 100%{transform:scale(1);opacity:1} }
+  .confirm-top h2 { font-size:20px; font-weight:700; }
+  .confirm-top p { color:var(--muted); font-size:13px; margin-top:5px; }
+  .codecard {
+    margin:18px; padding:18px; border-radius:var(--r-card); text-align:center;
+    background:var(--ink); color:#fff; box-shadow:var(--sh-lg);
+  }
+  .codecard .lbl { font-size:11px; letter-spacing:.18em; text-transform:uppercase; opacity:.7; }
+  .codecard .code { font-size:38px; font-weight:700; letter-spacing:.18em; margin:6px 0; font-variant-numeric:tabular-nums; }
+  .timer {
+    margin:0 18px 16px; padding:16px; border-radius:var(--r-card); text-align:center;
+    background:linear-gradient(135deg,#FEF6F2,#fff); border:1px solid #f3ddd0;
+  }
+  .timer .countdown { font-size:34px; font-weight:700; color:var(--primary); font-variant-numeric:tabular-nums; letter-spacing:.01em; }
+  .timer.warn .countdown { color:#C13A1C; }
+  .timer .lbl { font-size:12px; color:var(--muted); margin-top:2px; }
+  .statuspill {
+    display:inline-flex; align-items:center; gap:7px; font-size:12px; font-weight:600;
+    padding:7px 13px; border-radius:var(--r-pill); margin:0 18px;
+  }
+  .statuspill.reserved { background:#FBF0DC; color:#A6731B; }
+  .statuspill.picking { background:#E6EEF6; color:#2563A6; }
+  .statuspill.ready { background:#E8F2EC; color:var(--green); }
+  .statuspill.collected { background:#F0EBE5; color:var(--muted); }
+  .mapbox {
+    margin:6px 18px 14px; height:130px; border-radius:var(--r-card); overflow:hidden; position:relative;
+    background:
+      linear-gradient(135deg,#EAF0EA,#dde8e0);
+    border:1px solid var(--hair);
+  }
+  .mapbox .grid { position:absolute; inset:0; background-image:linear-gradient(rgba(26,22,20,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(26,22,20,.05) 1px,transparent 1px); background-size:26px 26px; }
+  .mapbox .road { position:absolute; height:9px; background:#fff; border-radius:5px; opacity:.85; }
+  .mapbox .marker { position:absolute; top:50%; left:50%; transform:translate(-50%,-100%); font-size:30px; filter:drop-shadow(0 4px 6px rgba(0,0,0,.2)); }
+  .mapbox .addr { position:absolute; left:0; right:0; bottom:0; background:rgba(255,255,255,.92); padding:8px 12px; font-size:12px; font-weight:600; }
+
+  /* ================= STAFF APP ================= */
+  .staff { background:#15110F; color:#EDE7E2; }
+  .staff .scroll { background:#15110F; }
+  .staff-hdr { padding:10px 18px 12px; border-bottom:1px solid #2a2320; display:flex; align-items:center; gap:10px; }
+  .staff-hdr .logo { width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:#2a2320;color:var(--gold);font-weight:700;font-size:13px; }
+  .staff-hdr h1 { font-size:15px; font-weight:700; }
+  .staff-hdr .sub { font-size:11px; color:#9b918a; }
+  .staff-hdr .net { margin-left:auto; font-size:11px; color:var(--green); display:flex; align-items:center; gap:5px; }
+  .staff-empty { text-align:center; padding:60px 24px; color:#9b918a; }
+  .staff-empty .em { font-size:40px; margin-bottom:10px; }
+  .ticket {
+    margin:14px 14px 0; border-radius:12px; background:#1F1A17; border:1px solid #2f2824; overflow:hidden;
+  }
+  .ticket.flash { animation:flashin .6s ease; }
+  @keyframes flashin { 0%{background:#3a2a1a;transform:translateY(-6px);opacity:0} 100%{background:#1F1A17;transform:none;opacity:1} }
+  .ticket-top { padding:13px 15px; display:flex; align-items:center; gap:10px; border-bottom:1px solid #2f2824; }
+  .ticket-top .code { font-weight:700; font-size:16px; letter-spacing:.08em; color:#fff; }
+  .ticket-top .due { margin-left:auto; font-size:11px; padding:4px 9px; border-radius:var(--r-pill); background:#3a2417; color:var(--gold); font-weight:600; }
+  .ticket-top .new-tag { font-size:10px; font-weight:700; padding:3px 8px; border-radius:var(--r-pill); background:var(--primary); color:#fff; }
+  .item {
+    display:flex; align-items:center; gap:12px; padding:13px 15px; border-bottom:1px solid #2f2824;
+  }
+  .item:last-child { border-bottom:0; }
+  .item .chk {
+    width:28px; height:28px; min-width:28px; border-radius:8px; border:2px solid #4a423d;
+    display:grid; place-items:center; font-size:15px; color:transparent; background:transparent; transition:.15s;
+  }
+  .item .chk.done { background:var(--green); border-color:var(--green); color:#fff; }
+  .item .info .nm { font-weight:600; font-size:14px; color:#fff; }
+  .item .info .loc { font-size:12px; color:#9b918a; margin-top:2px; }
+  .item .qty { margin-left:auto; font-size:13px; font-weight:600; color:#cabfb7; }
+  .item.checked .info .nm { color:#9b918a; text-decoration:line-through; }
+  .shelf-tag { font-family:'Inter'; font-weight:700; font-size:11px; color:var(--gold); background:#2a2017; padding:2px 7px; border-radius:5px; margin-left:6px; }
+  .staff-footer { flex:none; padding:14px; border-top:1px solid #2a2320; background:#15110F; }
+  .staff-progress { font-size:12px; color:#9b918a; text-align:center; margin-bottom:10px; }
+  .staff-btn { width:100%; min-height:52px; border:0; border-radius:12px; font-weight:700; font-size:15px; background:var(--gold); color:#1A1614; transition:.15s; }
+  .staff-btn:disabled { opacity:.4; cursor:not-allowed; }
+  .staff-btn.green { background:var(--green); color:#fff; }
+  .staff-btn.green:disabled { opacity:.4; }
+
+  /* ================= VIEW: HOW IT WORKS ================= */
+  #view-howitworks { display:none; width:100%; max-width:940px; }
+  #view-howitworks.active { display:block; }
+  .hw-card { background:#fff; border:1px solid var(--hair); border-radius:var(--r-card); padding:24px; box-shadow:var(--sh-sm); margin-bottom:18px; }
+  .hw-card h2 { font-size:18px; font-weight:700; margin-bottom:6px; display:flex; align-items:center; gap:9px; }
+  .hw-card h2 .em { font-size:20px; }
+  .hw-card p { color:var(--muted); font-size:14px; line-height:1.6; }
+  .hw-eyebrow { font-size:12px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--primary); margin-bottom:4px; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .grid3 { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+  @media (max-width:720px){ .grid2,.grid3 { grid-template-columns:1fr; } }
+  .persona { background:var(--canvas); border:1px solid var(--hair); border-radius:12px; padding:16px; }
+  .persona .nm { font-weight:700; font-size:15px; }
+  .persona .role { font-size:12px; color:var(--primary); font-weight:600; margin:2px 0 8px; }
+  .persona .quote { font-size:13px; color:var(--ink); font-style:italic; line-height:1.5; }
+  .kpi { background:var(--canvas); border:1px solid var(--hair); border-radius:12px; padding:16px; text-align:center; }
+  .kpi .lbl { font-size:12px; color:var(--muted); font-weight:500; }
+  .kpi .nums { display:flex; align-items:baseline; justify-content:center; gap:8px; margin-top:8px; }
+  .kpi .before { font-size:15px; color:var(--muted); text-decoration:line-through; }
+  .kpi .arrow { color:var(--green); font-weight:700; }
+  .kpi .after { font-size:24px; font-weight:700; color:var(--green); }
+  .kpi .sub { font-size:11px; color:var(--muted); margin-top:4px; }
+  .scope { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:720px){ .scope { grid-template-columns:1fr; } }
+  .scopebox { border-radius:12px; padding:16px; }
+  .scopebox.in { background:#E8F2EC; border:1px solid #cce6da; }
+  .scopebox.out { background:#F4EFEA; border:1px solid var(--hair); }
+  .scopebox h3 { font-size:14px; font-weight:700; margin-bottom:10px; display:flex; align-items:center; gap:7px; }
+  .scopebox.in h3 { color:var(--green); }
+  .scopebox.out h3 { color:var(--muted); }
+  .scopebox ul { list-style:none; }
+  .scopebox li { font-size:13px; padding:6px 0 6px 22px; position:relative; line-height:1.45; }
+  .scopebox.in li::before { content:"✓"; position:absolute; left:0; color:var(--green); font-weight:700; }
+  .scopebox.out li::before { content:"–"; position:absolute; left:0; color:var(--muted); font-weight:700; }
+  .mermaid-wrap { overflow-x:auto; padding:8px 0; }
+  .mermaid { font-family:var(--font)!important; min-width:680px; }
+  .legend { display:flex; flex-wrap:wrap; gap:14px; margin-top:14px; font-size:12px; color:var(--muted); }
+  .legend span { display:inline-flex; align-items:center; gap:6px; }
+  .legend i { width:13px; height:13px; border-radius:4px; display:inline-block; }
+  .flow-steps { display:flex; gap:10px; flex-wrap:wrap; margin-top:6px; }
+  .flow-steps .step { flex:1; min-width:120px; background:var(--canvas); border:1px solid var(--hair); border-radius:10px; padding:12px; }
+  .flow-steps .step .n { font-size:11px; font-weight:700; color:var(--primary); }
+  .flow-steps .step .t { font-size:13px; font-weight:600; margin-top:3px; }
+  .flow-steps .step .d { font-size:12px; color:var(--muted); margin-top:3px; line-height:1.4; }
+
+  .toast {
+    position:fixed; bottom:26px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--ink); color:#fff; padding:13px 20px; border-radius:var(--r-pill); font-size:13px; font-weight:600;
+    box-shadow:var(--sh-lg); opacity:0; pointer-events:none; transition:.28s; z-index:100; display:flex; align-items:center; gap:8px;
+  }
+  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+  .toast .dot { width:8px; height:8px; border-radius:50%; background:var(--green); }
+
+  .hint { text-align:center; font-size:12px; color:var(--muted); max-width:390px; }
+</style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">ก</span>
+      <span>ThaiMart<small>LocalPick · pilot</small></span>
+    </div>
+    <nav class="tabs" role="tablist" aria-label="Views">
+      <button id="tab-prototype" class="active" role="tab" aria-selected="true" onclick="setView('prototype')">Prototype</button>
+      <button id="tab-howitworks" role="tab" aria-selected="false" onclick="setView('howitworks')">How it works</button>
+    </nav>
+  </header>
+
+  <main class="stage">
+    <!-- ===================== PROTOTYPE VIEW ===================== -->
+    <section id="view-prototype">
+      <div class="mode-toggle" role="group" aria-label="App mode">
+        <button id="m-shop" class="shop active" onclick="setMode('shopper')"><span class="mode-dot"></span>Shopper</button>
+        <button id="m-staff" class="staff-toggle" onclick="setMode('staff')"><span class="mode-dot"></span>Staff mode</button>
+      </div>
+
+      <div class="device">
+        <div class="notch"></div>
+        <div class="screen-host" id="host">
+
+          <!-- ============ S_PRODUCT ============ -->
+          <div class="screen" id="s_product">
+            <div class="statusbar"><span>9:41</span><span>LocalPick ●</span></div>
+            <div class="scroll">
+              <div class="navhdr">
+                <button class="iconbtn" aria-label="Back to store" onclick="toast('Back to ThaiMart store')">‹</button>
+                <div><h1>Product</h1><div class="sub">Beverages · Beer</div></div>
+              </div>
+              <div class="hero">
+                <div class="can"></div>
+                <span class="six">6 × 320ml cans</span>
+              </div>
+              <div class="pinfo">
+                <div class="brandline">CHANG · Thai Beverage</div>
+                <h2>Chang Classic Beer 6-Pack</h2>
+                <div style="margin:8px 0 12px;"><span class="badge-now"><span class="pulse"></span>Available now near you</span></div>
+                <div class="price">฿252 <s>฿279</s></div>
+              </div>
+              <div class="section-label">
+                <span>Reserve at a store near you</span>
+                <span class="live"><span class="pulse"></span>Live stock</span>
+              </div>
+              <div id="store-list"></div>
+              <p class="hint" style="margin:6px 18px 14px;text-align:left;">Soft-hold for 2 hours · pay on pickup · no delivery fee</p>
+            </div>
+            <div class="footer-cta">
+              <button class="btn" id="reserve-cta" onclick="goReserve()" disabled>Select a store to reserve</button>
+            </div>
+          </div>
+
+          <!-- ============ S_RESERVE ============ -->
+          <div class="screen" id="s_reserve">
+            <div class="statusbar"><span>9:41</span><span>LocalPick ●</span></div>
+            <div class="scroll">
+              <div class="sheet-grab"></div>
+              <div class="navhdr" style="padding-top:2px;">
+                <button class="iconbtn" aria-label="Back" onclick="show('s_product')">‹</button>
+                <div><h1>Reserve for pickup</h1><div class="sub" id="reserve-store-sub">—</div></div>
+              </div>
+              <div class="windowbox">
+                <div class="cap">Your pickup window opens immediately and lasts</div>
+                <div class="big">2:00:00</div>
+                <div class="cap">Reserve now · collect before <strong id="window-end">—</strong> today</div>
+              </div>
+              <div class="infocard">
+                <div class="row">
+                  <div class="ic">🛒</div>
+                  <div style="flex:1;"><div class="t">Item</div><div class="v">Chang Classic Beer 6-Pack × 1</div></div>
+                  <div class="v">฿252</div>
+                </div>
+                <div class="row">
+                  <div class="ic">📍</div>
+                  <div style="flex:1;"><div class="t">Pickup store</div><div class="v" id="reserve-store-name">—</div></div>
+                </div>
+                <div class="row">
+                  <div class="ic">🚗</div>
+                  <div style="flex:1;"><div class="t">Method</div><div class="v">Curbside · stay in your car</div></div>
+                </div>
+                <div class="row">
+                  <div class="ic">💳</div>
+                  <div style="flex:1;"><div class="t">Payment</div><div class="v">Pay on pickup (cash / QR)</div></div>
+                </div>
+              </div>
+              <div class="field">
+                <label for="car">Car / curbside note <span style="color:var(--muted);font-weight:400;">(staff find you faster)</span></label>
+                <input id="car" type="text" placeholder="e.g. White Honda City, plate 4กก 1234" oninput="clearErr('car')" />
+                <div class="err" id="err-car">Please add a car description so staff can find you.</div>
+              </div>
+              <div style="height:14px;"></div>
+            </div>
+            <div class="footer-cta">
+              <button class="btn" id="reserve-confirm" onclick="confirmReserve()">Reserve for 2-hour pickup · ฿252</button>
+            </div>
+          </div>
+
+          <!-- ============ S_CONFIRMED ============ -->
+          <div class="screen" id="s_confirmed">
+            <div class="statusbar"><span>9:41</span><span>LocalPick ●</span></div>
+            <div class="scroll">
+              <div class="confirm-top">
+                <div class="check-ring">✓</div>
+                <h2>Reserved!</h2>
+                <p>Show your code at <span id="conf-store">the store</span></p>
+              </div>
+              <div style="text-align:center;margin-bottom:4px;">
+                <span class="statuspill reserved" id="conf-status">⏳ Reserved · staff notified</span>
+              </div>
+              <div class="codecard">
+                <div class="lbl">Pickup code</div>
+                <div class="code" id="conf-code">— — —</div>
+                <div style="font-size:12px;opacity:.7;">Chang Classic Beer 6-Pack × 1</div>
+              </div>
+              <div class="timer" id="conf-timer">
+                <div class="countdown" id="conf-countdown">2:00:00</div>
+                <div class="lbl">left in your pickup window</div>
+              </div>
+              <div class="mapbox">
+                <div class="grid"></div>
+                <div class="road" style="top:42%;left:-10px;right:-10px;transform:rotate(-4deg);"></div>
+                <div class="road" style="top:18%;left:60%;width:14px;height:80%;transform:rotate(8deg);"></div>
+                <div class="marker">📍</div>
+                <div class="addr" id="conf-addr">—</div>
+              </div>
+            </div>
+            <div class="footer-cta">
+              <button class="btn green" id="imhere-btn" onclick="imHere()">🚗 I'm here — start curbside</button>
+              <button class="btn secondary" style="margin-top:10px;" onclick="cancelReservation()">Cancel reservation</button>
+            </div>
+          </div>
+
+          <!-- ============ S_STAFF ============ -->
+          <div class="screen staff" id="s_staff">
+            <div class="statusbar dark"><span>9:41</span><span>Staff App ●</span></div>
+            <div class="staff-hdr">
+              <div class="logo">ก</div>
+              <div><h1>LocalPick · Picker</h1><div class="sub" id="staff-store-name">ThaiMart pilot</div></div>
+              <div class="net"><span class="pulse"></span>Synced</div>
+            </div>
+            <div class="scroll" id="staff-scroll">
+              <!-- ticket injected by JS -->
+            </div>
+            <div class="staff-footer" id="staff-footer" style="display:none;">
+              <div class="staff-progress" id="staff-progress">0 of 1 items picked</div>
+              <button class="staff-btn" id="staff-action" onclick="staffAction()">Start picking</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <p class="hint">Tip — reserve as a shopper, then switch to <strong>Staff mode</strong> to pick the order. The shopper screen updates live.</p>
+    </section>
+
+    <!-- ===================== HOW IT WORKS VIEW ===================== -->
+    <section id="view-howitworks">
+      <div class="hw-card">
+        <div class="hw-eyebrow">Case study</div>
+        <h2><span class="em">🛵</span>ThaiMart LocalPick</h2>
+        <p>Online shoppers see <strong>real-time local store inventory</strong> and reserve items for <strong>2-hour curbside pickup</strong> — turning idle shelf stock into instant-gratification orders without delivery riders.</p>
+      </div>
+
+      <div class="hw-card">
+        <h2>The problem</h2>
+        <p>ThaiMart's delivery promise is "same-day," but Bangkok shoppers who want a 6-pack <em>now</em> won't wait 4–6 hours — they walk to 7-Eleven instead. Meanwhile every pilot store holds thousands of SKUs of physical stock that the e-commerce app treats as invisible. <strong>Demand for speed and idle supply sit one kilometre apart and never meet.</strong></p>
+      </div>
+
+      <div class="hw-card">
+        <h2>Personas</h2>
+        <div class="grid2" style="margin-top:12px;">
+          <div class="persona">
+            <div class="nm">Ploy · 29 · condo resident, Thonglor</div>
+            <div class="role">Shopper — "instant-gratification"</div>
+            <div class="quote">"Friends arrive in an hour. If I can grab beer and snacks on my walk home without queuing, I'll pick ThaiMart over the convenience store every time."</div>
+          </div>
+          <div class="persona">
+            <div class="nm">Khun Somchai · 41 · store associate</div>
+            <div class="role">Store staff — picker/runner</div>
+            <div class="quote">"Give me a clear list with shelf and bin, one tap to mark ready. I'm already on the floor — I just need to know what to grab and where the customer is parked."</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hw-card">
+        <h2>Service blueprint</h2>
+        <p>The headline deliverable — shopper journey (frontstage) mapped in parallel with store-staff actions (backstage), split by the line of visibility, supported by the inventory system underneath.</p>
+        <div class="mermaid-wrap"><pre class="mermaid" id="blueprint">
+flowchart TB
+  classDef front fill:#FEF6F2,stroke:#E84A27,color:#1A1614,rx:8,ry:8;
+  classDef back fill:#15110F,stroke:#E8A33D,color:#EDE7E2,rx:8,ry:8;
+  classDef sys fill:#E8F2EC,stroke:#138A5E,color:#1A1614,rx:8,ry:8;
+  classDef line fill:#F7F3EF,stroke:#6B6460,stroke-dasharray:5 4,color:#6B6460;
+
+  subgraph FRONT["🛍️ FRONTSTAGE · Customer (Ploy)"]
+    direction LR
+    F1["Browse product<br/>in app"] --> F2["See live stock<br/>at 3 nearby stores"] --> F3["Reserve ·<br/>2-hr soft hold"] --> F4["Drive to store"] --> F5["Tap 'I'm here'<br/>curbside"] --> F6["Collect & pay"]
+  end
+
+  LV["— — — — —  LINE OF VISIBILITY  — — — — —"]:::line
+
+  subgraph BACK["🧑‍🏭 BACKSTAGE · Store staff (Somchai)"]
+    direction LR
+    B1["Receive pick task<br/>on tablet"] --> B2["Locate on shelf<br/>aisle + bin"] --> B3["Pick item"] --> B4["Stage at<br/>curbside bay"] --> B5["Handover &<br/>confirm payment"]
+  end
+
+  subgraph SYS["⚙️ SYSTEMS · Inventory & orders"]
+    direction LR
+    S1["Inventory API<br/>read live stock"] --> S2["Place soft-hold<br/>(2-hr TTL)"] --> S3["Order status<br/>reserved→picking→ready"] --> S4["Release hold /<br/>close order"]
+  end
+
+  F2 -.->|stock query| S1
+  F3 -.->|create hold| S2
+  S2 -.->|notify tablet| B1
+  B3 -.->|decrement / confirm| S3
+  S3 -.->|"Ready for pickup" push| F5
+  F6 -.->|complete| S4
+
+  class F1,F2,F3,F4,F5,F6 front;
+  class B1,B2,B3,B4,B5 back;
+  class S1,S2,S3,S4 sys;
+        </pre></div>
+        <div class="legend">
+          <span><i style="background:#FEF6F2;border:1px solid #E84A27;"></i>Frontstage (customer-visible)</span>
+          <span><i style="background:#15110F;border:1px solid #E8A33D;"></i>Backstage (store staff)</span>
+          <span><i style="background:#E8F2EC;border:1px solid #138A5E;"></i>Supporting systems</span>
+          <span><i style="background:#fff;border:1px dashed #6B6460;"></i>Line of visibility</span>
+        </div>
+      </div>
+
+      <div class="hw-card">
+        <h2>Target KPIs · before → after pilot</h2>
+        <div class="grid3" style="margin-top:14px;">
+          <div class="kpi">
+            <div class="lbl">Pickup orders / day (per store)</div>
+            <div class="nums"><span class="before">0</span><span class="arrow">→</span><span class="after">35</span></div>
+            <div class="sub">pilot target by week 6</div>
+          </div>
+          <div class="kpi">
+            <div class="lbl">Fulfilment time to "ready"</div>
+            <div class="nums"><span class="before">4–6 hr</span><span class="arrow">→</span><span class="after">&lt; 12 min</span></div>
+            <div class="sub">SLA: collect within 2 hr</div>
+          </div>
+          <div class="kpi">
+            <div class="lbl">Local-stock conversion</div>
+            <div class="nums"><span class="before">~1.5%</span><span class="arrow">→</span><span class="after">6%</span></div>
+            <div class="sub">add-to-cart → reservation</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hw-card">
+        <h2>MVP / scope — agile prioritization</h2>
+        <p>Launch in <strong>one pilot store</strong>, reuse what exists, prove the loop, then scale store-by-store.</p>
+        <div class="scope" style="margin-top:14px;">
+          <div class="scopebox in">
+            <h3>✅ In scope (MVP)</h3>
+            <ul>
+              <li>One pilot store (ThaiMart Sukhumvit 39)</li>
+              <li>Reuse existing inventory API — read stock + place soft-hold (2-hr TTL)</li>
+              <li>Manual staff picker app on an existing tablet</li>
+              <li>Single-item / small-basket reservations</li>
+              <li>Curbside handover, pay on pickup</li>
+              <li>Order states: reserved → picking → ready → collected</li>
+            </ul>
+          </div>
+          <div class="scopebox out">
+            <h3>⛔ Out of scope (later)</h3>
+            <ul>
+              <li>New hardware (lockers, scanners, dedicated devices)</li>
+              <li>In-app prepayment & refunds</li>
+              <li>Multi-store basket / stock balancing</li>
+              <li>Live driver-style ETA & GPS geofencing</li>
+              <li>Automated staff routing / batch picking</li>
+              <li>Nationwide rollout before pilot KPIs are hit</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="hw-card">
+        <h2>Why this sequencing</h2>
+        <div class="flow-steps">
+          <div class="step"><div class="n">PHASE 1</div><div class="t">Prove the loop</div><div class="d">1 store, manual tablet, soft-hold. Measure orders/day + SLA.</div></div>
+          <div class="step"><div class="n">PHASE 2</div><div class="t">Harden ops</div><div class="d">In-app pay, batch picking, staffing playbook. 5 stores.</div></div>
+          <div class="step"><div class="n">PHASE 3</div><div class="t">Scale</div><div class="d">Roll out store-by-store where stock data is reliable.</div></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast"><span class="dot"></span><span id="toast-text">Saved</span></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+  <script>
+  // ---------------- data ----------------
+  const STORES = {
+    s39: { name:"ThaiMart Sukhumvit 39", dist:"0.4 km · 5 min walk", stock:12, addr:"Soi Sukhumvit 39, Klongton Nua", shelf:"Aisle 4 · Beverages", bin:"Bin B12" },
+    tl:  { name:"ThaiMart Thonglor",      dist:"1.2 km · 4 min drive", stock:3,  addr:"Thonglor Soi 10, Khlong Tan Nuea", shelf:"Aisle 3 · Chilled", bin:"Bin C07" },
+    pp:  { name:"ThaiMart Phrom Phong",   dist:"1.8 km · 7 min drive", stock:0,  addr:"Sukhumvit 24, Phrom Phong", shelf:"—", bin:"—" },
+  };
+  const PRICE = 252;
+
+  // ---------------- state ----------------
+  const KEY = "tm_localpick";
+  const defaults = { view:"prototype", currentScreen:"s_product", selectedStore:null,
+    reservationStatus:"none", mode:"shopper", pickupCode:null, deadline:null, car:"", pickedItems:[false] };
+  let S = load();
+  function load(){ try { return Object.assign({}, defaults, JSON.parse(localStorage.getItem(KEY)||"{}")); } catch(e){ return {...defaults}; } }
+  function save(){ localStorage.setItem(KEY, JSON.stringify(S)); }
+
+  // ---------------- view / mode ----------------
+  function setView(v){
+    S.view = v; save();
+    document.getElementById("view-prototype").style.display = v==="prototype" ? "flex" : "none";
+    document.getElementById("view-howitworks").classList.toggle("active", v==="howitworks");
+    document.getElementById("tab-prototype").classList.toggle("active", v==="prototype");
+    document.getElementById("tab-howitworks").classList.toggle("active", v==="howitworks");
+    document.getElementById("tab-prototype").setAttribute("aria-selected", v==="prototype");
+    document.getElementById("tab-howitworks").setAttribute("aria-selected", v==="howitworks");
+    if (v==="howitworks") initMermaid();
+  }
+
+  function setMode(m){
+    S.mode = m; save();
+    document.getElementById("m-shop").classList.toggle("active", m==="shopper");
+    document.getElementById("m-staff").classList.toggle("active", m==="staff");
+    if (m==="staff"){ renderStaff(); show("s_staff"); }
+    else { show(S.reservationStatus==="none" ? "s_product" : (S.currentScreen==="s_staff" ? "s_confirmed" : S.currentScreen)); }
+  }
+
+  // ---------------- screens ----------------
+  function show(id){
+    S.currentScreen = id; save();
+    document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("active", s.id===id));
+    const host = document.getElementById("host");
+    const staff = id==="s_staff";
+    host.style.background = staff ? "#15110F" : "var(--surface)";
+    if (id==="s_confirmed") refreshConfirmed();
+    if (id==="s_staff") renderStaff();
+    const sc = document.querySelector("#"+id+" .scroll"); if (sc) sc.scrollTop = 0;
+  }
+
+  // ---------------- product screen ----------------
+  function renderStores(){
+    const list = document.getElementById("store-list");
+    list.innerHTML = "";
+    Object.entries(STORES).forEach(([id,st])=>{
+      const out = st.stock===0, low = st.stock>0 && st.stock<=4;
+      const b = document.createElement("button");
+      b.className = "store" + (out?" disabled":"") + (S.selectedStore===id?" sel":"");
+      b.setAttribute("aria-pressed", S.selectedStore===id);
+      if (out) b.disabled = true;
+      b.onclick = ()=> selectStore(id);
+      const stockCls = out?"out":(low?"low":"ok");
+      b.innerHTML = `
+        <div class="pin">🏪</div>
+        <div class="meta">
+          <div class="nm">${st.name}</div>
+          <div class="dist">${st.dist}</div>
+          ${low?'<span class="pill-tag low">Low stock</span>':''}
+          ${out?'<span class="pill-tag out">Out of stock</span>':''}
+        </div>
+        <div class="stock ${stockCls}">
+          <div class="n">${out?"0":st.stock}</div>
+          <div class="lbl">${out?"none left":"left"}</div>
+        </div>`;
+      list.appendChild(b);
+    });
+  }
+  function selectStore(id){
+    S.selectedStore = id; save();
+    renderStores();
+    const cta = document.getElementById("reserve-cta");
+    cta.disabled = false;
+    cta.textContent = "Reserve at " + STORES[id].name.replace("ThaiMart ","");
+  }
+
+  function goReserve(){
+    if (!S.selectedStore) return;
+    const st = STORES[S.selectedStore];
+    document.getElementById("reserve-store-sub").textContent = st.name + " · " + st.dist;
+    document.getElementById("reserve-store-name").textContent = st.name;
+    const end = new Date(Date.now()+2*3600*1000);
+    document.getElementById("window-end").textContent = end.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+    document.getElementById("car").value = S.car || "";
+    show("s_reserve");
+  }
+
+  // ---------------- reserve ----------------
+  function clearErr(field){
+    document.getElementById("err-"+field).classList.remove("show");
+    document.getElementById(field).classList.remove("err-input");
+  }
+  function confirmReserve(){
+    const car = document.getElementById("car").value.trim();
+    if (car.length < 4){
+      document.getElementById("err-car").classList.add("show");
+      document.getElementById("car").classList.add("err-input");
+      document.getElementById("car").focus();
+      return;
+    }
+    S.car = car; save();
+    const btn = document.getElementById("reserve-confirm");
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spin"></span>Placing soft-hold…';
+    setTimeout(()=>{
+      S.pickupCode = genCode();
+      S.deadline = Date.now() + 2*3600*1000;
+      S.reservationStatus = "reserved";
+      S.pickedItems = [false];
+      save();
+      btn.disabled = false;
+      btn.innerHTML = "Reserve for 2-hour pickup · ฿252";
+      show("s_confirmed");
+      toast("Reserved · staff notified");
+    }, 750);
+  }
+  function genCode(){
+    const a = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    let c=""; for(let i=0;i<2;i++) c+=a[Math.floor(Math.random()*a.length)];
+    c+="-"; for(let i=0;i<3;i++) c+=Math.floor(Math.random()*10);
+    return c;
+  }
+
+  // ---------------- confirmed ----------------
+  function refreshConfirmed(){
+    const st = STORES[S.selectedStore] || {};
+    document.getElementById("conf-store").textContent = st.name || "the store";
+    document.getElementById("conf-code").textContent = S.pickupCode || "— — —";
+    document.getElementById("conf-addr").textContent = st.addr || "—";
+    updateStatusPill();
+  }
+  function updateStatusPill(){
+    const pill = document.getElementById("conf-status");
+    const btn = document.getElementById("imhere-btn");
+    const map = {
+      reserved:  { cls:"reserved", txt:"⏳ Reserved · staff notified" },
+      picking:   { cls:"picking",  txt:"🧺 Staff is picking your order" },
+      ready:     { cls:"ready",    txt:"✅ Ready for pickup!" },
+      collected: { cls:"collected",txt:"📦 Collected — thank you!" },
+    };
+    const m = map[S.reservationStatus] || map.reserved;
+    pill.className = "statuspill " + m.cls;
+    pill.textContent = m.txt;
+    if (S.reservationStatus==="ready"){ btn.textContent = "🚗 I'm here — staff bringing it out"; btn.disabled=false; }
+    else if (S.reservationStatus==="collected"){ btn.textContent = "✓ Order collected"; btn.disabled=true; }
+    else { btn.textContent = "🚗 I'm here — start curbside"; btn.disabled=false; }
+  }
+  function imHere(){
+    if (S.reservationStatus==="collected") return;
+    if (S.reservationStatus==="ready"){
+      S.reservationStatus="collected"; save();
+      updateStatusPill();
+      toast("Handover confirmed — enjoy! 🍺");
+    } else {
+      toast("Staff alerted you've arrived 🚗");
+    }
+  }
+  function cancelReservation(){
+    S.reservationStatus="none"; S.pickupCode=null; S.deadline=null; S.pickedItems=[false]; save();
+    toast("Reservation cancelled · hold released");
+    show("s_product");
+    document.getElementById("reserve-cta").disabled = !S.selectedStore;
+  }
+
+  // ---------------- countdown ----------------
+  function fmt(ms){
+    if (ms<0) ms=0;
+    const t=Math.floor(ms/1000), h=Math.floor(t/3600), m=Math.floor((t%3600)/60), s=t%60;
+    return `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  }
+  setInterval(()=>{
+    if (!S.deadline || S.reservationStatus==="none" || S.reservationStatus==="collected") return;
+    const left = S.deadline - Date.now();
+    const el = document.getElementById("conf-countdown");
+    if (el){ el.textContent = fmt(left); document.getElementById("conf-timer").classList.toggle("warn", left < 15*60*1000); }
+    const due = document.getElementById("ticket-due");
+    if (due) due.textContent = "due " + fmt(left);
+  }, 1000);
+
+  // ---------------- staff app ----------------
+  function renderStaff(){
+    const st = STORES[S.selectedStore] || STORES.s39;
+    document.getElementById("staff-store-name").textContent = st.name;
+    const scroll = document.getElementById("staff-scroll");
+    const footer = document.getElementById("staff-footer");
+
+    if (S.reservationStatus==="none" || S.reservationStatus==="collected"){
+      footer.style.display="none";
+      scroll.innerHTML = `<div class="staff-empty"><div class="em">📭</div>
+        <div style="font-weight:600;color:#cabfb7;">${S.reservationStatus==="collected"?"Order handed over":"No incoming reservations"}</div>
+        <div style="font-size:12px;margin-top:6px;">${S.reservationStatus==="collected"?"Pick list clear. Nice work.":"Reserve an order in Shopper mode, then come back here."}</div></div>`;
+      return;
+    }
+
+    const isNew = S.reservationStatus==="reserved";
+    const picking = S.reservationStatus==="picking";
+    const ready = S.reservationStatus==="ready";
+    scroll.innerHTML = `
+      <div class="ticket flash">
+        <div class="ticket-top">
+          <span class="code">${S.pickupCode}</span>
+          ${isNew?'<span class="new-tag">NEW</span>':''}
+          <span class="due" id="ticket-due">due 2:00:00</span>
+        </div>
+        <div class="item ${S.pickedItems[0]?'checked':''}" id="item-0" ${picking?'onclick="toggleItem(0)"':''} ${picking?'role="button" tabindex="0" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();toggleItem(0)}"':''}>
+          <div class="chk ${S.pickedItems[0]?'done':''}">✓</div>
+          <div class="info">
+            <div class="nm">Chang Classic Beer 6-Pack<span class="shelf-tag">${STORES[S.selectedStore]?.bin || 'B12'}</span></div>
+            <div class="loc">${STORES[S.selectedStore]?.shelf || 'Aisle 4 · Beverages'}</div>
+          </div>
+          <div class="qty">× 1</div>
+        </div>
+        <div style="padding:11px 15px;font-size:12px;color:#9b918a;">🚗 Curbside · <span style="color:#cabfb7;">${S.car||'see app'}</span></div>
+      </div>`;
+
+    footer.style.display="block";
+    const action = document.getElementById("staff-action");
+    const prog = document.getElementById("staff-progress");
+    const pickedCount = S.pickedItems.filter(Boolean).length;
+    prog.textContent = `${pickedCount} of 1 items picked`;
+
+    if (isNew){
+      action.className="staff-btn"; action.textContent="▶ Start picking"; action.disabled=false;
+    } else if (picking){
+      action.className="staff-btn green"; action.textContent="✓ Mark ready for pickup";
+      action.disabled = pickedCount < 1;
+    } else if (ready){
+      action.className="staff-btn green"; action.textContent="✓ Marked ready — synced to shopper"; action.disabled=true;
+    }
+    document.getElementById("ticket-due").textContent = "due " + fmt(S.deadline - Date.now());
+  }
+
+  function toggleItem(i){
+    if (S.reservationStatus!=="picking") return;
+    S.pickedItems[i] = !S.pickedItems[i]; save();
+    renderStaff();
+  }
+
+  function staffAction(){
+    if (S.reservationStatus==="reserved"){
+      S.reservationStatus="picking"; save();
+      renderStaff();
+      toast("Picking started · shopper notified");
+    } else if (S.reservationStatus==="picking"){
+      if (S.pickedItems.filter(Boolean).length < 1) return;
+      const btn = document.getElementById("staff-action");
+      btn.disabled=true; btn.textContent="Syncing…";
+      setTimeout(()=>{
+        S.reservationStatus="ready"; save();
+        renderStaff();
+        toast("Marked ready · shopper sees 'Ready for pickup'");
+      }, 700);
+    }
+  }
+
+  // ---------------- toast ----------------
+  let toastT;
+  function toast(msg){
+    const t=document.getElementById("toast");
+    document.getElementById("toast-text").textContent=msg;
+    t.classList.add("show"); clearTimeout(toastT);
+    toastT=setTimeout(()=>t.classList.remove("show"), 2400);
+  }
+
+  // ---------------- mermaid ----------------
+  let mermaidDone=false;
+  function initMermaid(){
+    if (mermaidDone || !window.mermaid) return;
+    mermaidDone=true;
+    mermaid.initialize({ startOnLoad:false, theme:"base", themeVariables:{
+      fontFamily:"Inter, 'Noto Sans Thai', sans-serif", fontSize:"13px",
+      primaryColor:"#FEF6F2", primaryBorderColor:"#E84A27", primaryTextColor:"#1A1614",
+      lineColor:"#6B6460", clusterBkg:"#F7F3EF", clusterBorder:"#E9E1D8"
+    }});
+    mermaid.run({ querySelector:".mermaid" });
+  }
+
+  // ---------------- cross-tab sync ----------------
+  window.addEventListener("storage", (e)=>{
+    if (e.key!==KEY) return;
+    S = load();
+    if (S.currentScreen==="s_confirmed") refreshConfirmed();
+    if (S.currentScreen==="s_staff") renderStaff();
+  });
+
+  // keyboard: Escape returns shopper to product from sheet
+  document.addEventListener("keydown",(e)=>{
+    if (e.key==="Escape" && S.mode==="shopper" && S.currentScreen==="s_reserve") show("s_product");
+  });
+
+  // ---------------- boot ----------------
+  function boot(){
+    renderStores();
+    if (S.selectedStore){
+      const cta=document.getElementById("reserve-cta");
+      cta.disabled=false; cta.textContent="Reserve at "+STORES[S.selectedStore].name.replace("ThaiMart ","");
+    }
+    setView(S.view);
+    document.getElementById("m-shop").classList.toggle("active", S.mode==="shopper");
+    document.getElementById("m-staff").classList.toggle("active", S.mode==="staff");
+    show(S.currentScreen || "s_product");
+  }
+  boot();
+  </script>
+</body>
+</html>
