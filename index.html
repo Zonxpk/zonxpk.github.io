@@ -1,515 +1,2487 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pakawat Smutkun — Full-Stack Developer</title>
-<meta name="description" content="Full-Stack Developer with 5+ years building scalable, business-oriented enterprise systems: ERP, floorplan visualization, and reporting automation at scale.">
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700&family=Source+Sans+3:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --bg:#f7f8fc; --ink:#0f1115; --muted:#5b6270; --line:rgba(15,17,21,.08);
-    --accent:#6366f1; --accent-ink:#4338ca; --indigo:#6366f1; --fuchsia:#d946ef; --cyan:#22d3ee;
-    --grad:linear-gradient(110deg,#4f46e5,#c026d3);
-    --glass:rgba(255,255,255,.58); --glass-strong:rgba(255,255,255,.72);
-    --glass-border:rgba(255,255,255,.85);
-    --display:'Bricolage Grotesque',sans-serif; --body:'Source Sans 3',sans-serif; --mono:'JetBrains Mono',monospace;
-    --space-1:.25rem; --space-2:.5rem; --space-3:.75rem; --space-4:1rem;
-    --space-5:1.25rem; --space-6:1.5rem; --space-7:1.75rem; --space-8:2rem;
-    --space-10:2.5rem; --space-12:3rem;
-    --space-section-y:clamp(4.5rem,9vw,8rem);
-    --space-hero-top:clamp(3rem,6vw,5rem);
-    --wrap:min(1140px,92vw);
-  }
-  *{box-sizing:border-box}
-  html{scroll-behavior:smooth}
-  body{
-    margin:0; font-family:var(--body); color:var(--ink); background:var(--bg);
-    -webkit-font-smoothing:antialiased; overflow-x:hidden;
-  }
-  /* ---- Ambient background: gradient orbs + floorplan grid (the signature) ---- */
-  .bg-field{position:fixed; inset:0; z-index:-1; overflow:hidden; background:var(--bg)}
-  .orb{position:absolute; border-radius:50%; filter:blur(80px); opacity:.55; will-change:transform}
-  .orb-1{width:46vw; height:46vw; background:var(--indigo); top:-10vw; left:-8vw; animation:drift1 26s ease-in-out infinite}
-  .orb-2{width:40vw; height:40vw; background:var(--fuchsia); top:18vh; right:-10vw; animation:drift2 32s ease-in-out infinite}
-  .orb-3{width:38vw; height:38vw; background:var(--cyan); bottom:-12vw; left:20vw; animation:drift3 30s ease-in-out infinite}
-  .floorplan{position:absolute; inset:0; opacity:.5;
-    background-image:
-      linear-gradient(var(--line) 1px,transparent 1px),
-      linear-gradient(90deg,var(--line) 1px,transparent 1px),
-      linear-gradient(var(--line) 1px,transparent 1px),
-      linear-gradient(90deg,var(--line) 1px,transparent 1px);
-    background-size:120px 120px,120px 120px,24px 24px,24px 24px;
-    -webkit-mask-image:radial-gradient(ellipse 90% 70% at 50% 30%,#000,transparent 80%);
-    mask-image:radial-gradient(ellipse 90% 70% at 50% 30%,#000,transparent 80%);
-  }
-  @keyframes drift1{50%{transform:translate(8vw,6vh) scale(1.1)}}
-  @keyframes drift2{50%{transform:translate(-7vw,5vh) scale(.92)}}
-  @keyframes drift3{50%{transform:translate(5vw,-7vh) scale(1.08)}}
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pakawat Smutkun - Full-Stack Developer</title>
+    <meta
+      name="description"
+      content="Full-Stack Developer with 5+ years building scalable, business-oriented enterprise systems: ERP, floorplan visualization, and reporting automation at scale."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@82..125,500;82..125,650;82..125,750&family=Source+Sans+3:wght@400;500;600;700&family=Azeret+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        document.documentElement.classList.add("motion-ok");
+      }
+    </script>
+    <style>
+      :root {
+        --ink: #101216;
+        --ink-2: #171b20;
+        --ink-3: #20262c;
+        --draft: #2f6f9f;
+        --draft-light: #75b4d5;
+        --signal: #7bd88f;
+        --signal-dark: #2f8f54;
+        --paper: #f4f7f2;
+        --paper-dim: #dce5dd;
+        --steel: #a9b1b8;
+        --steel-2: #79848c;
+        --coral: #ff6b5f;
+        --line: rgba(244, 247, 242, 0.14);
+        --line-strong: rgba(244, 247, 242, 0.26);
+        --surface: rgba(244, 247, 242, 0.045);
+        --surface-2: rgba(244, 247, 242, 0.075);
+        --font-display: "Archivo", system-ui, sans-serif;
+        --font-body: "Source Sans 3", system-ui, sans-serif;
+        --font-mono: "Azeret Mono", ui-monospace, monospace;
+        --wrap: min(1160px, calc(100vw - 40px));
+        --radius: 8px;
+        --section: clamp(72px, 10vw, 132px);
+        --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+        --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+        --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+      }
 
-  /* ---- Glass primitives ---- */
-  .glass{background:var(--glass); backdrop-filter:blur(20px) saturate(160%); -webkit-backdrop-filter:blur(20px) saturate(160%);
-    border:1px solid var(--glass-border); box-shadow:0 8px 32px rgba(15,17,21,.06), inset 0 1px 0 rgba(255,255,255,.6)}
-  .glass-card{border-radius:22px; transition:transform .3s cubic-bezier(.2,.7,.2,1), box-shadow .3s}
-  .glass-card:hover{transform:translateY(-6px); box-shadow:0 18px 50px rgba(15,17,21,.10), inset 0 1px 0 rgba(255,255,255,.7)}
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+        scroll-padding-top: 112px;
+        background: var(--ink);
+      }
+      body {
+        margin: 0;
+        min-width: 320px;
+        font-family: var(--font-body);
+        color: var(--paper);
+        background:
+          radial-gradient(
+            circle at 14% 8%,
+            rgba(47, 111, 159, 0.22),
+            transparent 28rem
+          ),
+          linear-gradient(
+            90deg,
+            rgba(244, 247, 242, 0.045) 1px,
+            transparent 1px
+          ),
+          linear-gradient(rgba(244, 247, 242, 0.04) 1px, transparent 1px),
+          var(--ink);
+        background-size:
+          auto,
+          42px 42px,
+          42px 42px,
+          auto;
+        -webkit-font-smoothing: antialiased;
+        overflow-x: hidden;
+        animation: grid-breathe 18s var(--ease-out-quart) both;
+      }
 
-  /* ---- Type system ---- */
-  .display{font-family:var(--display); letter-spacing:-.03em; line-height:.96}
-  .mono{font-family:var(--mono)}
-  .eyebrow{font-family:var(--mono); font-size:.72rem; letter-spacing:.22em; text-transform:uppercase; color:var(--accent-ink)}
-  .grad-text{background:var(--grad); -webkit-background-clip:text; background-clip:text; color:transparent}
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background:
+          linear-gradient(
+            90deg,
+            var(--ink) 0,
+            transparent 22%,
+            transparent 78%,
+            var(--ink) 100%
+          ),
+          linear-gradient(
+            180deg,
+            transparent 0,
+            transparent 62%,
+            var(--ink) 100%
+          );
+        z-index: -1;
+      }
 
-  .section{padding:var(--space-section-y) 0}
-  .section--hero{padding-top:var(--space-hero-top)}
-  .section--footer{padding-top:var(--space-8); padding-bottom:var(--space-12)}
-  .wrap{width:var(--wrap); margin:0 auto}
-  .section-head{margin-bottom:var(--space-10)}
-  .section-head .h2{margin:var(--space-2) 0 0}
-  .section-intro{color:var(--muted); max-width:60ch; margin:0 0 var(--space-10)}
-  .flex-row{display:flex; flex-wrap:wrap; align-items:center; gap:var(--space-4)}
-  .flex-row--between{display:flex; flex-wrap:wrap; justify-content:space-between; align-items:baseline; gap:var(--space-2)}
-  .grid-stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:var(--space-4); margin-top:var(--space-12)}
-  .grid-cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:var(--space-4)}
-  .grid-cards--wide{display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:var(--space-4)}
-  .grid-modules{display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:var(--space-4)}
-  .card-pad{padding:var(--space-6)}
-  .card-pad-lg{padding:var(--space-7)}
-  .card-pad-xl{padding:clamp(var(--space-6),4vw,var(--space-10))}
-  .tag-row{display:flex; flex-wrap:wrap; gap:var(--space-2); align-items:center}
-  .hero-name{font-size:clamp(3.2rem,11vw,6rem); font-weight:700; text-wrap:balance}
-  .hero-title{margin:var(--space-5) 0 var(--space-2)}
-  .hero-subtitle{font-size:clamp(1.1rem,2.4vw,1.6rem); font-weight:500; color:var(--muted); margin:0 0 var(--space-6)}
-  .hero-lead{max-width:60ch; font-size:1.05rem; line-height:1.7; color:var(--muted); margin:0 0 var(--space-8)}
-  .hero-actions{margin-bottom:var(--space-8)}
-  .role-list{list-style:none; padding:0; margin:var(--space-5) 0 0; display:grid; gap:var(--space-3)}
-  .module-card{border-radius:14px; padding:var(--space-5)}
-  .module-card h4{margin:0 0 var(--space-2); font-size:1.02rem}
-  .module-card p{margin:0 0 var(--space-3); font-size:.85rem; color:var(--muted)}
-  .skill-label{font-size:.8rem; letter-spacing:.12em; color:var(--accent-ink); margin:0 0 var(--space-4)}
-  .also-row{border-radius:18px; padding:var(--space-5) var(--space-6); margin-top:var(--space-4); display:flex; flex-wrap:wrap; align-items:center; gap:var(--space-3) var(--space-4)}
-  .also-label{font-size:.78rem; color:var(--muted); flex:none}
-  .featured-case{margin-bottom:var(--space-5)}
-  .case-lead{color:var(--muted); max-width:65ch; margin:var(--space-3) 0 var(--space-7)}
-  .project-card h3{font-size:1.2rem; font-weight:600; margin:0 0 var(--space-2)}
-  .project-card p{font-size:.9rem; color:var(--muted); margin:0 0 var(--space-3)}
-  .edu-meta{font-size:.82rem; color:var(--muted); margin:var(--space-2) 0 var(--space-5)}
-  .edu-list{margin:0; padding-left:var(--space-5); color:var(--muted); font-size:.9rem; line-height:1.7}
-  .lang-block{margin-bottom:var(--space-5)}
-  .lang-block:last-child{margin-bottom:0}
-  .lang-bar-label{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:var(--space-2)}
-  .lang-note{font-size:.74rem; color:var(--muted); margin:var(--space-2) 0 0}
-  .footer-cta{text-align:center; border-radius:22px; padding:var(--space-10)}
-  .footer-cta h2{font-size:clamp(1.6rem,4vw,2.4rem); font-weight:700; margin:0 0 var(--space-3); text-wrap:balance}
-  .footer-cta p{color:var(--muted); margin:0 0 var(--space-6)}
-  .footer-copy{font-size:.78rem; color:var(--muted); margin:var(--space-8) 0 0}
-  .role-title{font-size:1.4rem; font-weight:600; margin:0}
-  .role-date{font-size:.8rem; color:var(--muted)}
-  .stat-value{font-size:2.8rem; font-weight:700}
-  .stat-label{font-size:.78rem; color:var(--muted); letter-spacing:.05em; margin-top:var(--space-2)}
-  .h2{font-size:clamp(2rem,5vw,3.4rem); font-weight:700; text-wrap:balance}
-  .h3-lg{font-size:1.3rem; font-weight:600; margin:0}
-  .lang-heading{margin-bottom:var(--space-5)}
-  .h3-case{font-size:clamp(1.5rem,3.5vw,2.2rem); font-weight:700; margin:0}
-  .nav-logo{font-size:1.15rem; font-weight:700; text-decoration:none; color:var(--ink)}
-  .nav-cta{padding:var(--space-2) var(--space-5); min-height:auto}
+      a {
+        color: inherit;
+      }
+      p {
+        text-wrap: pretty;
+      }
+      h1,
+      h2,
+      h3 {
+        text-wrap: balance;
+      }
+      strong {
+        color: var(--paper);
+        font-weight: 700;
+      }
 
-  .pill{display:inline-flex; align-items:center; gap:var(--space-2); font-family:var(--mono); font-size:.78rem;
-    padding:var(--space-2) var(--space-4); border-radius:999px; background:var(--glass-strong); border:1px solid var(--glass-border)}
-  .tag{font-family:var(--mono); font-size:.7rem; padding:var(--space-1) var(--space-3); border-radius:8px;
-    background:rgba(99,102,241,.09); color:#4338ca; border:1px solid rgba(99,102,241,.16)}
-  .dot{width:7px; height:7px; border-radius:50%; background:#22c55e; box-shadow:0 0 0 4px rgba(34,197,94,.18)}
+      @keyframes grid-breathe {
+        from {
+          background-position:
+            0 0,
+            -20px 0,
+            0 -20px,
+            0 0;
+        }
+        to {
+          background-position:
+            0 0,
+            0 0,
+            0 0,
+            0 0;
+        }
+      }
 
-  .btn{display:inline-flex; align-items:center; justify-content:center; gap:var(--space-2); font-weight:600; font-size:.92rem; padding:.8rem 1.3rem; min-height:44px;
-    border-radius:14px; transition:transform .2s, box-shadow .2s, background .2s, color .2s; cursor:pointer; text-decoration:none}
-  .btn-primary{background:var(--grad); color:#fff; box-shadow:0 8px 24px rgba(15,17,21,.12)}
-  .btn-primary:hover{transform:translateY(-2px); box-shadow:0 12px 30px rgba(15,17,21,.16)}
-  .btn-ghost{background:var(--glass-strong); border:1px solid var(--glass-border); color:var(--ink)}
-  .btn-ghost:hover{transform:translateY(-2px); color:var(--accent-ink)}
-  .btn:active{transform:translateY(0) scale(.97)}
-  .contact-row{display:flex; flex-wrap:wrap; gap:var(--space-5); font-size:.85rem; color:var(--muted)}
-  .contact-row a,.contact-row span{display:inline-flex; align-items:center; gap:var(--space-2); color:inherit; text-decoration:none; padding:var(--space-2) 0}
-  .contact-row a{transition:color .2s}
-  .contact-row a:hover,.contact-row a:focus-visible{color:var(--accent-ink); text-decoration:underline; text-underline-offset:3px}
-  .contact-row svg{flex:none}
+      @keyframes enter-panel {
+        from {
+          opacity: 0;
+          transform: translateY(18px);
+          filter: blur(8px);
+          clip-path: inset(0 0 18% 0);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+          filter: blur(0);
+          clip-path: inset(0);
+        }
+      }
 
-  /* ---- Nav ---- */
-  .nav{position:sticky; top:0; z-index:50; }
-  .nav-inner{display:flex; align-items:center; justify-content:space-between; margin-top:var(--space-4); padding:var(--space-3) var(--space-3) var(--space-3) var(--space-5); border-radius:18px}
-  .nav-links{display:flex; align-items:center; gap:var(--space-6)}
-  .nav-links a{font-size:.9rem; color:var(--muted); text-decoration:none; transition:color .2s}
-  .nav-links a:hover,.nav-links a:focus-visible{color:var(--ink)}
-  .nav-toggle{display:none; align-items:center; justify-content:center; width:44px; height:44px; background:none; border:0; cursor:pointer; border-radius:12px; transition:background .2s; color:var(--ink)}
-  .nav-toggle:hover{background:rgba(99,102,241,.10)}
+      @keyframes draw-line {
+        to {
+          stroke-dashoffset: 0;
+        }
+      }
 
-  /* ---- Timeline ---- */
-  .timeline{position:relative; padding-left:0}
-  .role{position:relative; padding-left:var(--space-8); margin-bottom:var(--space-6)}
-  .role::before{content:""; position:absolute; left:7px; top:var(--space-4); bottom:calc(-1 * var(--space-6)); width:2px; background:linear-gradient(var(--indigo),transparent)}
-  .role:last-child{margin-bottom:0}
-  .role:last-child::before{display:none}
-  .role-node{position:absolute; left:0; top:var(--space-3); width:16px; height:16px; border-radius:50%;
-    background:#fff; border:3px solid var(--accent); box-shadow:0 0 0 4px rgba(99,102,241,.14)}
+      @keyframes node-online {
+        0% {
+          opacity: 0.28;
+          transform: scale(0.72);
+        }
+        55% {
+          opacity: 1;
+          transform: scale(1.12);
+        }
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
 
-  /* ---- Reveal animation ---- */
-  .reveal{opacity:0; transform:translateY(28px); transition:opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1)}
-  .reveal.in{opacity:1; transform:none}
+      @keyframes soft-pulse {
+        0%,
+        100% {
+          opacity: 0.68;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
 
-  @media (max-width:780px){
-    .nav-links{position:absolute; top:72px; right:4vw; flex-direction:column; gap:var(--space-2); padding:var(--space-4) var(--space-5); border-radius:18px; display:none}
-    .nav-links.open{display:flex}
-    .nav-links a{padding:var(--space-2) var(--space-1)}
-    .nav-toggle{display:flex}
-  }
-  @media (prefers-reduced-motion:reduce){
-    *{animation:none!important; scroll-behavior:auto!important; transition:none!important}
-    .glass-card:hover,.btn:hover,.btn:active{transform:none}
-    .reveal{opacity:1; transform:none}
-  }
-  :focus-visible{outline:3px solid var(--ink); outline-offset:2px}
-  .skip{position:absolute; left:50%; transform:translateX(-50%) translateY(-150%); top:8px; z-index:100;
-    background:var(--ink); color:#fff; padding:.7rem 1.2rem; border-radius:12px; font-weight:600; text-decoration:none; transition:transform .2s}
-  .skip:focus{transform:translateX(-50%) translateY(0)}
-  section[id],#top{scroll-margin-top:96px}
-</style>
-<noscript><style>.reveal{opacity:1!important;transform:none!important}</style></noscript>
-</head>
-<body>
-<a href="#main" class="skip">Skip to content</a>
-<div class="bg-field" aria-hidden="true">
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-  <div class="orb orb-3"></div>
-  <div class="floorplan"></div>
-</div>
+      @keyframes scan-sweep {
+        from {
+          transform: translateX(-110%);
+        }
+        to {
+          transform: translateX(110%);
+        }
+      }
 
-<!-- NAV -->
-<header class="nav">
-  <div class="wrap">
-    <div class="nav-inner glass">
-      <a href="#top" class="display nav-logo">PS<span class="grad-text">.</span></a>
-      <nav class="nav-links" id="navLinks">
-        <a href="#experience">Experience</a>
-        <a href="#skills">Skills</a>
-        <a href="#work">Work</a>
-        <a href="#about">About</a>
-        <a href="mailto:pakawat.zon@gmail.com" class="btn btn-ghost nav-cta">Get in touch</a>
-      </nav>
-      <button class="nav-toggle" id="navToggle" aria-label="Open navigation menu" aria-controls="navLinks" aria-expanded="false">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-      </button>
-    </div>
-  </div>
-</header>
+      .scroll-progress {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 90;
+        width: 100%;
+        height: 2px;
+        background: var(--signal);
+        transform: scaleX(0);
+        transform-origin: left center;
+        pointer-events: none;
+      }
 
-<main id="main">
-<!-- HERO -->
-<section id="top" class="section section--hero">
-  <div class="wrap">
-    <span class="pill reveal"><span class="dot"></span> Available for opportunities</span>
-    <h1 class="display reveal hero-name hero-title">
-      Pakawat<br><span class="grad-text">Smutkun</span>
-    </h1>
-    <p class="display reveal hero-subtitle">
-      Full-Stack Developer
-    </p>
-    <p class="reveal hero-lead">
-      Developer with 5+ years building scalable, efficient web applications across the front and back end.
-      I gravitate toward business-oriented solutions that streamline workflows and move the numbers that matter to an organization.
-    </p>
+      .skip {
+        position: fixed;
+        left: 50%;
+        top: 12px;
+        z-index: 100;
+        transform: translate(-50%, -140%);
+        padding: 0.7rem 1rem;
+        border-radius: var(--radius);
+        background: var(--paper);
+        color: var(--ink);
+        font-weight: 700;
+        text-decoration: none;
+        transition: transform 0.18s ease;
+      }
+      .skip:focus {
+        transform: translate(-50%, 0);
+      }
 
-    <div class="reveal flex-row hero-actions">
-      <!-- TODO: replace href with your real resume file -->
-      <a href="/resume.pdf" class="btn btn-primary" download>
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>
-        Download Resume
-      </a>
-      <!-- TODO: replace # with your GitHub URL -->
-      <a href="#" class="btn btn-ghost">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.5-3.9-1.5-.5-1.3-1.3-1.7-1.3-1.7-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.7 1.3 3.4 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2a11.5 11.5 0 016 0C17.3 5 18.3 5.3 18.3 5.3c.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6 4.6-1.5 7.9-5.8 7.9-10.9C23.5 5.7 18.3.5 12 .5z"/></svg>
-        GitHub
-      </a>
-      <!-- TODO: replace # with your LinkedIn URL -->
-      <a href="#" class="btn btn-ghost">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.4 20.4h-3.6v-5.6c0-1.3 0-3-1.9-3-1.9 0-2.1 1.4-2.1 2.9v5.7H9.2V9h3.4v1.6h.1c.5-.9 1.7-1.9 3.4-1.9 3.6 0 4.3 2.4 4.3 5.5v6.2zM5.3 7.4a2.1 2.1 0 110-4.2 2.1 2.1 0 010 4.2zM7.1 20.4H3.5V9h3.6v11.4zM22.2 0H1.8C.8 0 0 .8 0 1.7v20.6C0 23.2.8 24 1.8 24h20.4c1 0 1.8-.8 1.8-1.7V1.7C24 .8 23.2 0 22.2 0z"/></svg>
-        LinkedIn
-      </a>
-    </div>
+      .wrap {
+        width: var(--wrap);
+        margin: 0 auto;
+      }
+      .section {
+        padding: var(--section) 0;
+      }
+      .section-tight {
+        padding: clamp(48px, 7vw, 84px) 0;
+      }
+      section[id] {
+        scroll-margin-top: 96px;
+      }
 
-    <div class="reveal mono contact-row">
-      <a href="mailto:pakawat.zon@gmail.com">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/></svg>
-        pakawat.zon@gmail.com
-      </a>
-      <a href="tel:+66971427997">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.1-8.6A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.7a2 2 0 0 1-.5 2.1L8 9.6a16 16 0 0 0 6 6l1.1-1.1a2 2 0 0 1 2.1-.5c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2Z"/></svg>
-        (+66) 97-142-7997
-      </a>
-      <span>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-        Bangkok, Thailand
-      </span>
-    </div>
+      .nav {
+        position: sticky;
+        top: 0;
+        z-index: 40;
+        border-bottom: 1px solid rgba(244, 247, 242, 0.09);
+        background: rgba(16, 18, 22, 0.88);
+        backdrop-filter: blur(16px);
+      }
+      .nav-inner {
+        min-height: 72px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+      }
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        min-height: 44px;
+        font-family: var(--font-display);
+        font-weight: 750;
+        letter-spacing: -0.02em;
+        text-decoration: none;
+        transition:
+          color 0.18s var(--ease-out-quart),
+          transform 0.18s var(--ease-out-quart);
+      }
+      .brand:hover,
+      .brand:focus-visible {
+        transform: translateY(-1px);
+      }
+      .brand-mark {
+        width: 34px;
+        height: 34px;
+        border: 1px solid var(--line-strong);
+        border-radius: 6px;
+        display: grid;
+        place-items: center;
+        color: var(--signal);
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        letter-spacing: -0.04em;
+        transition:
+          border-color 0.2s var(--ease-out-quart),
+          background 0.2s var(--ease-out-quart),
+          color 0.2s var(--ease-out-quart);
+      }
+      .brand:hover .brand-mark,
+      .brand:focus-visible .brand-mark {
+        border-color: rgba(123, 216, 143, 0.72);
+        background: rgba(123, 216, 143, 0.1);
+      }
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: clamp(14px, 2.5vw, 28px);
+      }
+      .nav-links a {
+        color: var(--steel);
+        font-size: 0.95rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: color 0.18s var(--ease-out-quart);
+      }
+      .nav-links a:hover,
+      .nav-links a:focus-visible {
+        color: var(--paper);
+      }
+      .nav-toggle {
+        display: none;
+        width: 44px;
+        height: 44px;
+        border: 1px solid var(--line-strong);
+        border-radius: var(--radius);
+        background: transparent;
+        color: var(--paper);
+        transition:
+          background 0.18s var(--ease-out-quart),
+          border-color 0.18s var(--ease-out-quart),
+          transform 0.18s var(--ease-out-quart);
+      }
+      .nav-toggle:hover,
+      .nav-toggle:focus-visible {
+        background: rgba(123, 216, 143, 0.08);
+        border-color: rgba(123, 216, 143, 0.58);
+      }
+      .nav-toggle:active {
+        transform: scale(0.96);
+      }
 
-    <!-- Stats as dashboard panels -->
-    <div class="reveal grid-stats">
-      <div class="glass glass-card card-pad">
-        <div class="display grad-text stat-value"><span class="count" data-target="5" data-suffix="+">5+</span></div>
-        <div class="mono stat-label">YEARS EXPERIENCE</div>
+      .btn {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        border-radius: var(--radius);
+        border: 1px solid var(--line-strong);
+        padding: 0.75rem 1rem;
+        color: var(--paper);
+        background: transparent;
+        font-weight: 700;
+        text-decoration: none;
+        transition:
+          transform 0.18s var(--ease-out-quart),
+          border-color 0.18s var(--ease-out-quart),
+          background 0.18s var(--ease-out-quart),
+          color 0.18s var(--ease-out-quart);
+      }
+      .btn:hover,
+      .btn:focus-visible {
+        transform: translateY(-1px);
+        border-color: rgba(123, 216, 143, 0.72);
+        background: rgba(123, 216, 143, 0.08);
+      }
+      .btn-primary {
+        background: var(--paper);
+        color: var(--ink);
+        border-color: var(--paper);
+      }
+      .btn-primary:hover,
+      .btn-primary:focus-visible {
+        background: var(--signal);
+        border-color: var(--signal);
+        color: var(--ink);
+      }
+      .btn:active {
+        transform: translateY(0) scale(0.97);
+      }
+
+      .hero {
+        min-height: calc(100svh - 72px);
+        display: grid;
+        align-items: center;
+        padding: clamp(48px, 7vw, 86px) 0 clamp(40px, 8vw, 96px);
+      }
+      .hero-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 0.95fr) minmax(360px, 1.05fr);
+        align-items: center;
+        gap: clamp(36px, 6vw, 76px);
+      }
+      .availability {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 24px;
+        color: var(--paper-dim);
+        font-family: var(--font-mono);
+        font-size: 0.76rem;
+      }
+      .availability::before {
+        content: "";
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--signal);
+        box-shadow: 0 0 0 5px rgba(123, 216, 143, 0.12);
+        animation: soft-pulse 2.6s var(--ease-out-quart) infinite;
+      }
+      .hero h1 {
+        margin: 0;
+        font-family: var(--font-display);
+        font-size: clamp(3.2rem, 8.8vw, 6rem);
+        line-height: 0.92;
+        letter-spacing: -0.035em;
+        font-stretch: 112%;
+      }
+      .hero h1 span {
+        color: var(--signal);
+      }
+      .hero-title {
+        margin: 22px 0 0;
+        max-width: 52ch;
+        color: var(--paper-dim);
+        font-size: clamp(1.18rem, 2vw, 1.45rem);
+        line-height: 1.55;
+      }
+      .hero-title strong {
+        color: var(--paper);
+      }
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 32px;
+      }
+      .contact-strip {
+        display: grid;
+        gap: 10px;
+        margin-top: 28px;
+        color: var(--steel);
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+      }
+      .contact-strip a,
+      .contact-strip span {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        min-height: 28px;
+        text-decoration: none;
+      }
+      .contact-strip a {
+        min-height: 44px;
+      }
+      .contact-strip a:hover {
+        color: var(--paper);
+      }
+
+      .map-shell {
+        position: relative;
+        min-height: 540px;
+        border: 1px solid var(--line-strong);
+        border-radius: var(--radius);
+        background:
+          linear-gradient(
+            90deg,
+            rgba(244, 247, 242, 0.075) 1px,
+            transparent 1px
+          ),
+          linear-gradient(rgba(244, 247, 242, 0.075) 1px, transparent 1px),
+          rgba(244, 247, 242, 0.035);
+        background-size: 28px 28px;
+        overflow: hidden;
+        contain: paint;
+        transition:
+          border-color 0.24s var(--ease-out-quart),
+          background-color 0.24s var(--ease-out-quart),
+          transform 0.24s var(--ease-out-quart);
+      }
+      .map-shell:hover {
+        border-color: rgba(123, 216, 143, 0.46);
+        transform: translateY(-2px);
+      }
+      .map-shell::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(123, 216, 143, 0.09),
+          transparent
+        );
+        transform: translateX(-110%);
+        pointer-events: none;
+        z-index: 3;
+      }
+      .motion-ok .map-shell.in::after {
+        animation: scan-sweep 1.4s 0.55s var(--ease-out-expo) both;
+      }
+      .map-stage {
+        position: absolute;
+        inset: clamp(20px, 3vw, 40px);
+        z-index: 1;
+      }
+      .map-stage svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+      .map-note {
+        position: absolute;
+        z-index: 2;
+        display: grid;
+        gap: 5px;
+        width: clamp(176px, 17vw, 198px);
+        padding: 12px 14px;
+        border: 1px solid var(--line-strong);
+        border-radius: var(--radius);
+        background: rgba(16, 18, 22, 0.82);
+        backdrop-filter: blur(6px);
+        transition:
+          border-color 0.2s var(--ease-out-quart),
+          transform 0.2s var(--ease-out-quart),
+          background 0.2s var(--ease-out-quart);
+      }
+      .map-shell:hover .map-note {
+        border-color: rgba(117, 180, 213, 0.48);
+      }
+      .map-note b {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--paper);
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        font-weight: 500;
+        letter-spacing: 0.01em;
+      }
+      .map-note b::before {
+        content: "";
+        width: 7px;
+        height: 7px;
+        border-radius: 2px;
+        background: var(--draft-light);
+        box-shadow: 0 0 0 3px rgba(117, 180, 213, 0.16);
+      }
+      .map-note span {
+        color: var(--steel);
+        font-size: 0.82rem;
+        line-height: 1.35;
+      }
+      .map-note-1 {
+        left: 16px;
+        top: 16px;
+      }
+      .map-note-2 {
+        right: 16px;
+        top: 16px;
+      }
+      .map-note-3 {
+        left: 16px;
+        bottom: 56px;
+      }
+      .map-status {
+        position: absolute;
+        z-index: 2;
+        left: 14px;
+        right: 14px;
+        bottom: 14px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .status-pill {
+        border: 1px solid rgba(123, 216, 143, 0.38);
+        border-radius: 999px;
+        padding: 7px 11px;
+        color: var(--paper-dim);
+        background: rgba(123, 216, 143, 0.08);
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        letter-spacing: 0.01em;
+        transition:
+          border-color 0.18s var(--ease-out-quart),
+          background 0.18s var(--ease-out-quart);
+      }
+
+      .map-stage .draft {
+        stroke: var(--draft-light);
+      }
+      .map-stage .draft-fill {
+        fill: rgba(47, 111, 159, 0.12);
+      }
+      .map-stage .signal {
+        stroke: var(--signal);
+      }
+      .map-stage .signal-soft {
+        fill: rgba(123, 216, 143, 0.1);
+        stroke: rgba(123, 216, 143, 0.68);
+      }
+      .map-stage .node {
+        fill: var(--signal);
+        stroke: var(--ink);
+      }
+      .map-stage .alert {
+        stroke: var(--coral);
+      }
+      .map-stage .map-label {
+        fill: var(--paper-dim);
+        font-family: var(--font-mono);
+        font-size: 12px;
+        letter-spacing: 0.04em;
+      }
+
+      .evidence {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        border-top: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+      }
+      .evidence-item {
+        padding: 22px clamp(14px, 2.4vw, 28px);
+        border-right: 1px solid var(--line);
+        transition: background 0.2s var(--ease-out-quart);
+      }
+      .evidence-item:hover {
+        background: rgba(123, 216, 143, 0.045);
+      }
+      .evidence-item:last-child {
+        border-right: 0;
+      }
+      .evidence strong {
+        display: block;
+        font-family: var(--font-display);
+        font-size: clamp(1.65rem, 3vw, 2.4rem);
+        line-height: 1;
+        letter-spacing: -0.03em;
+        color: var(--signal);
+      }
+      .evidence span {
+        display: block;
+        margin-top: 8px;
+        color: var(--steel);
+        font-size: 0.92rem;
+        line-height: 1.35;
+      }
+
+      .section-kicker {
+        margin: 0 0 12px;
+        color: var(--signal);
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+      }
+      .section-title {
+        margin: 0;
+        font-family: var(--font-display);
+        font-size: clamp(2.15rem, 5.2vw, 4.1rem);
+        line-height: 0.98;
+        letter-spacing: -0.035em;
+      }
+      .section-copy {
+        max-width: 64ch;
+        margin: 18px 0 0;
+        color: var(--steel);
+        font-size: 1.08rem;
+        line-height: 1.65;
+      }
+      .section-head {
+        display: grid;
+        gap: 18px;
+      }
+      .section-heading {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+      }
+      .stack-mark {
+        flex: 0 0 auto;
+        width: 92px;
+        height: 92px;
+        padding: 12px;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        border: 1px solid var(--line-strong);
+        border-radius: 18px;
+        background: linear-gradient(
+            180deg,
+            rgba(244, 247, 242, 0.075),
+            rgba(244, 247, 242, 0.04)
+          ),
+          rgba(244, 247, 242, 0.02);
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+      }
+      .stack-mark-cell {
+        display: grid;
+        place-items: center;
+        border-radius: 12px;
+        background: rgba(16, 18, 22, 0.52);
+        overflow: hidden;
+      }
+      .stack-mark-cell img {
+        width: 24px;
+        height: 24px;
+        object-fit: contain;
+        display: block;
+      }
+
+      .experience-list {
+        margin-top: 44px;
+        display: grid;
+        gap: 0;
+        border-top: 1px solid var(--line);
+      }
+      .role {
+        display: grid;
+        grid-template-columns: minmax(180px, 0.7fr) minmax(0, 1.8fr);
+        gap: clamp(20px, 4vw, 48px);
+        padding: 30px 0;
+        border-bottom: 1px solid var(--line);
+        transition:
+          background 0.2s var(--ease-out-quart),
+          border-color 0.2s var(--ease-out-quart);
+      }
+      .role:hover {
+        background: linear-gradient(
+          90deg,
+          rgba(123, 216, 143, 0.035),
+          transparent 42%
+        );
+        border-color: rgba(123, 216, 143, 0.24);
+      }
+      .role-meta {
+        color: var(--steel);
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        line-height: 1.6;
+      }
+      .role h3 {
+        margin: 0;
+        font-family: var(--font-display);
+        font-size: clamp(1.35rem, 2.6vw, 2rem);
+        letter-spacing: -0.025em;
+      }
+      .role-company {
+        color: var(--draft-light);
+      }
+      .role ul {
+        display: grid;
+        gap: 12px;
+        margin: 18px 0 0;
+        padding: 0;
+        list-style: none;
+        color: var(--paper-dim);
+        line-height: 1.55;
+      }
+      .role li {
+        position: relative;
+        padding-left: 22px;
+      }
+      .role li::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0.72em;
+        width: 8px;
+        height: 1px;
+        background: var(--signal);
+      }
+
+      .work-layout {
+        margin-top: 48px;
+        display: grid;
+        grid-template-columns: minmax(280px, 0.72fr) minmax(0, 1.28fr);
+        gap: clamp(24px, 4vw, 48px);
+        align-items: start;
+      }
+      .case-summary {
+        position: sticky;
+        top: 104px;
+        display: grid;
+        gap: 20px;
+      }
+      .case-summary h3 {
+        margin: 0;
+        font-family: var(--font-display);
+        font-size: clamp(1.8rem, 4vw, 3.2rem);
+        line-height: 1;
+        letter-spacing: -0.035em;
+      }
+      .case-summary p {
+        margin: 0;
+        color: var(--steel);
+        font-size: 1.05rem;
+        line-height: 1.62;
+      }
+      .case-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .chip {
+        border: 1px solid rgba(117, 180, 213, 0.36);
+        border-radius: 999px;
+        padding: 7px 10px;
+        color: var(--paper-dim);
+        background: rgba(47, 111, 159, 0.12);
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        transition:
+          border-color 0.18s var(--ease-out-quart),
+          background 0.18s var(--ease-out-quart),
+          transform 0.18s var(--ease-out-quart);
+      }
+      .chip:hover {
+        border-color: rgba(123, 216, 143, 0.56);
+        background: rgba(123, 216, 143, 0.08);
+        transform: translateY(-1px);
+      }
+      .feature-board {
+        display: grid;
+        gap: 18px;
+      }
+      .feature-panel {
+        display: grid;
+        grid-template-columns: minmax(0, 0.96fr) minmax(260px, 1.04fr);
+        gap: 22px;
+        padding: 18px;
+        border: 1px solid var(--line-strong);
+        border-radius: var(--radius);
+        background: var(--surface);
+        transition:
+          transform 0.24s var(--ease-out-quart),
+          border-color 0.24s var(--ease-out-quart),
+          background 0.24s var(--ease-out-quart);
+      }
+      .feature-panel:hover {
+        transform: translateY(-3px);
+        border-color: rgba(123, 216, 143, 0.42);
+        background: var(--surface-2);
+      }
+      .feature-copy {
+        display: grid;
+        align-content: space-between;
+        gap: 18px;
+        min-height: 220px;
+      }
+      .feature-copy h4 {
+        margin: 0;
+        color: var(--paper);
+        font-family: var(--font-display);
+        font-size: clamp(1.25rem, 2vw, 1.65rem);
+        letter-spacing: -0.025em;
+      }
+      .feature-copy p {
+        margin: 10px 0 0;
+        color: var(--steel);
+        line-height: 1.55;
+      }
+      .feature-copy ul {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+      .feature-copy li {
+        color: var(--paper-dim);
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 6px 9px;
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        transition:
+          border-color 0.18s var(--ease-out-quart),
+          color 0.18s var(--ease-out-quart),
+          background 0.18s var(--ease-out-quart);
+      }
+      .feature-panel:hover .feature-copy li {
+        border-color: rgba(123, 216, 143, 0.34);
+        color: var(--paper);
+        background: rgba(123, 216, 143, 0.045);
+      }
+      .prototype {
+        min-height: 220px;
+        border: 1px solid rgba(244, 247, 242, 0.18);
+        border-radius: var(--radius);
+        background:
+          linear-gradient(
+            90deg,
+            rgba(244, 247, 242, 0.05) 1px,
+            transparent 1px
+          ),
+          linear-gradient(rgba(244, 247, 242, 0.05) 1px, transparent 1px),
+          rgba(16, 18, 22, 0.52);
+        background-size: 24px 24px;
+        overflow: hidden;
+        contain: paint;
+        transition:
+          border-color 0.24s var(--ease-out-quart),
+          background-position 0.8s var(--ease-out-quart);
+      }
+      .feature-panel:hover .prototype {
+        border-color: rgba(117, 180, 213, 0.42);
+        background-position:
+          8px 0,
+          0 8px,
+          0 0;
+      }
+      .prototype svg {
+        width: 100%;
+        height: 100%;
+        min-height: 220px;
+        display: block;
+      }
+
+      .other-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 16px;
+        margin-top: 64px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid var(--line);
+      }
+      .other-head h3 {
+        margin: 0;
+        font-family: var(--font-display);
+        font-size: clamp(1.3rem, 2.4vw, 1.85rem);
+        letter-spacing: -0.025em;
+      }
+      .other-head span {
+        color: var(--steel-2);
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        letter-spacing: 0.02em;
+      }
+      .other-work {
+        margin-top: 24px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+      }
+      .project {
+        display: grid;
+        grid-template-rows: auto 1fr;
+        border: 1px solid var(--line-strong);
+        border-radius: var(--radius);
+        background: var(--surface);
+        overflow: hidden;
+        transition:
+          background 0.24s var(--ease-out-quart),
+          border-color 0.24s var(--ease-out-quart),
+          transform 0.24s var(--ease-out-quart);
+      }
+      .project:hover {
+        transform: translateY(-3px);
+        border-color: rgba(123, 216, 143, 0.42);
+        background: var(--surface-2);
+      }
+      .project .prototype {
+        min-height: 150px;
+        border: 0;
+        border-bottom: 1px solid var(--line);
+        border-radius: 0;
+        background:
+          linear-gradient(
+            90deg,
+            rgba(244, 247, 242, 0.045) 1px,
+            transparent 1px
+          ),
+          linear-gradient(rgba(244, 247, 242, 0.045) 1px, transparent 1px),
+          rgba(16, 18, 22, 0.42);
+        background-size: 22px 22px;
+      }
+      .project:hover .prototype {
+        border-color: rgba(117, 180, 213, 0.36);
+      }
+      .project .prototype svg {
+        min-height: 150px;
+      }
+      .project-copy {
+        padding: 20px;
+        display: grid;
+        gap: 8px;
+        align-content: start;
+      }
+      .project-copy h4 {
+        margin: 0;
+        font-family: var(--font-display);
+        font-size: 1.2rem;
+        letter-spacing: -0.02em;
+      }
+      .project-copy p {
+        margin: 0;
+        color: var(--steel);
+        line-height: 1.55;
+      }
+      .project-tag {
+        margin-top: 4px;
+        color: var(--draft-light);
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        letter-spacing: 0.02em;
+      }
+
+      .skills-grid {
+        margin-top: 44px;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1px;
+        border: 1px solid var(--line);
+        background: var(--line);
+      }
+      .skill-cluster {
+        padding: 24px;
+        background: var(--ink);
+        display: grid;
+        gap: 14px;
+        transition: background 0.2s var(--ease-out-quart);
+      }
+      .skill-cluster:hover {
+        background: var(--ink-2);
+      }
+      .skill-head {
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+      }
+      .skill-icon {
+        flex: 0 0 auto;
+        width: 42px;
+        height: 42px;
+        display: grid;
+        place-items: center;
+        border-radius: 12px;
+        border: 1px solid rgba(244, 247, 242, 0.12);
+        background: rgba(244, 247, 242, 0.035);
+      }
+      .skill-icon img {
+        width: 24px;
+        height: 24px;
+        object-fit: contain;
+        display: block;
+      }
+      .skill-head h3 {
+        margin: 0;
+        color: var(--signal);
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+      }
+      .skill-head p {
+        margin: 8px 0 0;
+        color: var(--paper-dim);
+        line-height: 1.7;
+      }
+      .skill-cluster p {
+        margin: 0;
+        color: var(--paper-dim);
+        line-height: 1.7;
+      }
+      .skill-head > div > p {
+        margin-top: 8px;
+      }
+      .also {
+        margin-top: 18px;
+        color: var(--steel);
+        line-height: 1.7;
+      }
+
+      .background-grid {
+        margin-top: 44px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 1px;
+        border: 1px solid var(--line);
+        background: var(--line);
+      }
+      .background-panel {
+        padding: clamp(24px, 4vw, 36px);
+        background: var(--ink);
+      }
+      .background-panel h3 {
+        margin: 0 0 12px;
+        font-family: var(--font-display);
+        font-size: 1.55rem;
+        letter-spacing: -0.02em;
+      }
+      .background-panel p,
+      .background-panel li {
+        color: var(--steel);
+        line-height: 1.65;
+      }
+      .background-panel ul {
+        margin: 16px 0 0;
+        padding-left: 1.1rem;
+      }
+      .language-list {
+        display: grid;
+        gap: 14px;
+      }
+      .language-row {
+        display: grid;
+        gap: 8px;
+        padding: 16px 18px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: rgba(244, 247, 242, 0.03);
+      }
+      .language-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
+      .language-head strong {
+        font-family: var(--font-display);
+        font-size: 1.05rem;
+        letter-spacing: -0.02em;
+      }
+      .level-chip {
+        padding: 0.38rem 0.66rem;
+        border-radius: 999px;
+        background: rgba(123, 216, 143, 0.14);
+        color: var(--signal);
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+      .language-desc {
+        margin: 0;
+        color: var(--steel);
+        line-height: 1.65;
+      }
+
+      .footer {
+        border-top: 1px solid var(--line);
+        padding: clamp(44px, 7vw, 76px) 0;
+      }
+      .footer-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 24px;
+        align-items: center;
+      }
+      .footer h2 {
+        margin: 0;
+        font-family: var(--font-display);
+        font-size: clamp(1.8rem, 4vw, 3rem);
+        line-height: 1;
+        letter-spacing: -0.035em;
+      }
+      .footer p {
+        margin: 12px 0 0;
+        color: var(--steel);
+      }
+      .copyright {
+        margin-top: 30px;
+        color: var(--steel-2);
+        font-family: var(--font-mono);
+        font-size: 0.76rem;
+      }
+
+      .reveal {
+        opacity: 1;
+        transform: none;
+        transition:
+          opacity 0.7s ease,
+          transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      .motion-ok .reveal {
+        opacity: 0;
+        transform: translateY(18px);
+        filter: blur(8px);
+      }
+      .motion-ok .reveal.in {
+        animation: enter-panel 0.72s var(--ease-out-expo) both;
+      }
+      .motion-ok .hero-copy .reveal:nth-child(1) {
+        animation-delay: 0.04s;
+      }
+      .motion-ok .hero-copy .reveal:nth-child(2) {
+        animation-delay: 0.12s;
+      }
+      .motion-ok .hero-copy .reveal:nth-child(3) {
+        animation-delay: 0.2s;
+      }
+      .motion-ok .hero-copy .reveal:nth-child(4) {
+        animation-delay: 0.28s;
+      }
+      .motion-ok .hero-copy .reveal:nth-child(5) {
+        animation-delay: 0.34s;
+      }
+      .motion-ok .map-shell.in {
+        animation-delay: 0.22s;
+      }
+      .motion-ok .feature-board .feature-panel.in {
+        animation-delay: calc(var(--i, 0) * 70ms);
+      }
+      .motion-ok .map-plan,
+      .motion-ok .map-wall,
+      .motion-ok .map-route,
+      .motion-ok .proto-line,
+      .motion-ok .proto-route {
+        stroke-dasharray: var(--dash, 760);
+        stroke-dashoffset: var(--dash, 760);
+      }
+      .motion-ok .map-shell.in .map-plan {
+        animation: draw-line 0.9s 0.38s var(--ease-out-quart) both;
+      }
+      .motion-ok .map-shell.in .map-wall {
+        animation: draw-line 1s 0.58s var(--ease-out-quart) both;
+      }
+      .motion-ok .map-shell.in .map-route {
+        animation: draw-line 1.2s 0.8s var(--ease-out-quint) both;
+      }
+      .motion-ok .map-shell.in .map-node {
+        opacity: 0;
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: node-online 0.36s var(--ease-out-expo) both;
+      }
+      .motion-ok .map-shell.in .map-node:nth-child(1) {
+        animation-delay: 1.08s;
+      }
+      .motion-ok .map-shell.in .map-node:nth-child(2) {
+        animation-delay: 1.18s;
+      }
+      .motion-ok .map-shell.in .map-node:nth-child(3) {
+        animation-delay: 1.28s;
+      }
+      .motion-ok .map-shell.in .map-node:nth-child(4) {
+        animation-delay: 1.38s;
+      }
+      .motion-ok .map-shell.in .map-zone,
+      .motion-ok .map-shell.in .map-alert {
+        animation: soft-pulse 3.8s var(--ease-out-quart) infinite;
+      }
+      .motion-ok .feature-panel.in .proto-line,
+      .motion-ok .feature-panel.in .proto-route,
+      .motion-ok .project.in .proto-line,
+      .motion-ok .project.in .proto-route {
+        animation: draw-line 0.82s 0.18s var(--ease-out-quart) both;
+      }
+      .motion-ok .feature-panel.in .proto-node,
+      .motion-ok .feature-panel.in .proto-active,
+      .motion-ok .project.in .proto-node,
+      .motion-ok .project.in .proto-active {
+        opacity: 0;
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: node-online 0.34s 0.68s var(--ease-out-expo) both;
+      }
+      .motion-ok .feature-panel.in .proto-active,
+      .motion-ok .project.in .proto-active {
+        animation-delay: 0.78s;
+      }
+      .motion-ok .project.in .proto-pulse {
+        animation: soft-pulse 3.8s var(--ease-out-quart) infinite;
+      }
+
+      :focus-visible {
+        outline: 3px solid var(--signal);
+        outline-offset: 3px;
+      }
+
+      @media (max-width: 980px) {
+        .hero-grid,
+        .work-layout,
+        .feature-panel {
+          grid-template-columns: 1fr;
+        }
+        .hero {
+          min-height: auto;
+        }
+        .map-shell {
+          min-height: 480px;
+        }
+        .case-summary {
+          position: static;
+        }
+        .evidence,
+        .skills-grid,
+        .other-work {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .section-heading {
+          align-items: flex-start;
+        }
+      }
+
+      @media (max-width: 720px) {
+        .wrap {
+          width: min(100% - 28px, 1160px);
+        }
+        .nav-inner {
+          min-height: 64px;
+        }
+        .nav-toggle {
+          display: inline-grid;
+          place-items: center;
+        }
+        .nav-links {
+          position: fixed;
+          left: 14px;
+          right: 14px;
+          top: 74px;
+          display: none;
+          padding: 14px;
+          border: 1px solid var(--line-strong);
+          border-radius: var(--radius);
+          background: rgba(16, 18, 22, 0.96);
+          transform-origin: top center;
+        }
+        .nav-links.open {
+          display: grid;
+          gap: 4px;
+          animation: enter-panel 0.22s var(--ease-out-quart) both;
+        }
+        .nav-links a {
+          min-height: 42px;
+          display: flex;
+          align-items: center;
+        }
+        .hero h1 {
+          font-size: clamp(3rem, 16vw, 4.3rem);
+        }
+        .map-shell {
+          min-height: 0;
+          display: grid;
+          gap: 12px;
+          padding: 14px;
+        }
+        .map-stage {
+          position: relative;
+          inset: auto;
+          height: 320px;
+          order: -1;
+        }
+        .map-note {
+          position: static;
+          width: auto;
+          transform: none;
+        }
+        .map-shell:hover .map-note-2 {
+          transform: none;
+        }
+        .map-status {
+          position: static;
+          justify-content: flex-start;
+        }
+        .evidence,
+        .skills-grid,
+        .other-work,
+        .background-grid {
+          grid-template-columns: 1fr;
+        }
+        .section-heading {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        .stack-mark {
+          width: 76px;
+          height: 76px;
+          padding: 10px;
+          gap: 6px;
+          border-radius: 16px;
+        }
+        .stack-mark-cell img {
+          width: 20px;
+          height: 20px;
+        }
+        .evidence-item {
+          border-right: 0;
+          border-bottom: 1px solid var(--line);
+        }
+        .evidence-item:last-child {
+          border-bottom: 0;
+        }
+        .role {
+          grid-template-columns: 1fr;
+          gap: 12px;
+        }
+        .footer-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          scroll-behavior: auto !important;
+          transition-duration: 0.01ms !important;
+        }
+        body {
+          animation: none;
+        }
+        .scroll-progress {
+          display: none;
+        }
+        .reveal {
+          opacity: 1;
+          transform: none;
+          filter: none;
+        }
+        .btn:hover,
+        .btn:focus-visible {
+          transform: none;
+        }
+      }
+    </style>
+    <noscript
+      ><style>
+        .reveal {
+          opacity: 1;
+          transform: none;
+        }
+      </style></noscript
+    >
+  </head>
+  <body>
+    <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+    <a href="#main" class="skip">Skip to content</a>
+
+    <header class="nav">
+      <div class="wrap nav-inner">
+        <a class="brand" href="#top" aria-label="Pakawat Smutkun home">
+          <span class="brand-mark" aria-hidden="true">PS</span>
+          <span>Pakawat Smutkun</span>
+        </a>
+        <nav class="nav-links" id="navLinks" aria-label="Primary navigation">
+          <a href="#experience">Experience</a>
+          <a href="#work">Featured work</a>
+          <a href="#skills">Skills</a>
+          <a href="#background">Background</a>
+          <a href="mailto:pakawat.zon@gmail.com">Contact</a>
+        </nav>
+        <button
+          class="nav-toggle"
+          id="navToggle"
+          type="button"
+          aria-label="Open navigation menu"
+          aria-controls="navLinks"
+          aria-expanded="false"
+        >
+          <svg
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <path d="M4 7h16M4 12h16M4 17h16" />
+          </svg>
+        </button>
       </div>
-      <div class="glass glass-card card-pad">
-        <div class="display grad-text stat-value"><span class="count" data-target="200" data-suffix="+">200+</span></div>
-        <div class="mono stat-label">ACTIVE USERS SERVED</div>
-      </div>
-      <div class="glass glass-card card-pad">
-        <div class="display grad-text stat-value"><span class="count" data-target="2000" data-suffix="+">2,000+</span></div>
-        <div class="mono stat-label">BRANCHES AUTOMATED</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- EXPERIENCE -->
-<section id="experience" class="section">
-  <div class="wrap">
-    <header class="section-head reveal">
-      <p class="eyebrow">Career Journey</p>
-      <h2 class="display h2">Professional Experience</h2>
     </header>
 
-    <div class="timeline">
-      <!-- Role 1 -->
-      <div class="role reveal">
-        <span class="role-node"></span>
-        <div class="glass glass-card card-pad-lg">
-          <div class="flex-row--between">
-            <h3 class="display role-title">Frontend Developer <span style="color:var(--accent-ink)">· CP ORIGIN</span></h3>
-            <span class="mono role-date">Nov 2021 – Jan 2026 · 4+ yrs</span>
+    <main id="main">
+      <section class="hero" id="top">
+        <div class="wrap hero-grid">
+          <div class="hero-copy">
+            <div class="availability reveal">
+              Available for full-stack and product-engineering roles
+            </div>
+            <h1 class="reveal">Pakawat<br /><span>Smutkun</span></h1>
+            <p class="hero-title reveal">
+              Full-stack developer building business systems where
+              <strong>floorplans, reports, workflows, and field teams</strong>
+              need to operate as one reliable product.
+            </p>
+            <div class="hero-actions reveal">
+              <a href="/resume.pdf" class="btn btn-primary" download>
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  aria-hidden="true"
+                >
+                  <path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14" />
+                </svg>
+                Download resume
+              </a>
+              <a href="#" class="btn">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.5-3.9-1.5-.5-1.3-1.3-1.7-1.3-1.7-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.7 1.3 3.4 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6 4.6-1.5 7.9-5.8 7.9-10.9C23.5 5.7 18.3.5 12 .5Z"
+                  />
+                </svg>
+                GitHub
+              </a>
+              <a href="#" class="btn">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M20.4 20.4h-3.6v-5.6c0-1.3 0-3-1.9-3-1.9 0-2.1 1.4-2.1 2.9v5.7H9.2V9h3.4v1.6h.1c.5-.9 1.7-1.9 3.4-1.9 3.6 0 4.3 2.4 4.3 5.5v6.2ZM5.3 7.4a2.1 2.1 0 1 1 0-4.2 2.1 2.1 0 0 1 0 4.2ZM7.1 20.4H3.5V9h3.6v11.4ZM22.2 0H1.8C.8 0 0 .8 0 1.7v20.6C0 23.2.8 24 1.8 24h20.4c1 0 1.8-.8 1.8-1.7V1.7C24 .8 23.2 0 22.2 0Z"
+                  />
+                </svg>
+                LinkedIn
+              </a>
+            </div>
+            <div class="contact-strip reveal">
+              <a href="mailto:pakawat.zon@gmail.com">pakawat.zon@gmail.com</a>
+              <a href="tel:+66971427997">(+66) 97-142-7997</a>
+              <span>Bangkok, Thailand</span>
+            </div>
           </div>
-          <ul class="role-list">
-            <li><strong>ERP + LINE OA Integration</strong>: Engineered a specialized ERP solution enabling mobile-first management. <span class="tag">200+ active users</span></li>
-            <li><strong>Floorplan Visualization Tools</strong>: Interactive visualization with revenue/occupancy overlays and an event booking workflow. <span class="tag">Faster leasing decisions</span></li>
-            <li><strong>Reporting Pipeline Automation</strong>: Centralized data collection, validation, and consolidation, replacing Excel workflows. <span class="tag">2,000+ branches</span></li>
-            <li><strong>UX Monitoring System</strong>: Captured granular session data to eliminate friction points and streamline workflows. <span class="tag">Improved UX/UI</span></li>
-            <li><strong>Digital Mall Management System</strong>: End-to-end systems for task assignment, lead tracking, and field visits with automated bot follow-ups. <span class="tag">Enhanced accountability</span></li>
-          </ul>
-        </div>
-      </div>
-      <!-- Role 2 -->
-      <div class="role reveal">
-        <span class="role-node"></span>
-        <div class="glass glass-card card-pad-lg">
-          <div class="flex-row--between">
-            <h3 class="display role-title">Software Engineer <span style="color:var(--accent-ink)">· Softnix Technology</span></h3>
-            <span class="mono role-date">Nov 2020 – Nov 2021 · 1 yr</span>
+
+          <div class="map-shell reveal" aria-hidden="true">
+            <div class="map-note map-note-1">
+              <b>ERP + LINE OA</b
+              ><span>Mobile-first work intake for 200+ active users.</span>
+            </div>
+            <div class="map-note map-note-2">
+              <b>Floorplan intelligence</b
+              ><span>Revenue, occupancy, vacancy, and category overlays.</span>
+            </div>
+            <div class="map-note map-note-3">
+              <b>Reporting automation</b
+              ><span>Templates and consolidation across 2,000+ branches.</span>
+            </div>
+            <div class="map-stage">
+              <svg
+                viewBox="0 0 620 520"
+                role="img"
+                aria-label=""
+                preserveAspectRatio="xMidYMid meet"
+              >
+                <defs>
+                  <pattern
+                    id="smallGrid"
+                    width="28"
+                    height="28"
+                    patternUnits="userSpaceOnUse"
+                  >
+                    <path
+                      d="M28 0H0V28"
+                      fill="none"
+                      stroke="rgba(244,247,242,.10)"
+                      stroke-width="1"
+                    />
+                  </pattern>
+                </defs>
+                <rect
+                  x="0"
+                  y="0"
+                  width="620"
+                  height="520"
+                  fill="url(#smallGrid)"
+                />
+                <path
+                  class="map-plan draft draft-fill"
+                  style="--dash: 1320"
+                  d="M120 110h180v92h84v-60h116v326H384v44H236V388h-116Z"
+                  stroke-width="2"
+                />
+                <path
+                  class="map-wall draft"
+                  style="--dash: 1100"
+                  d="M236 388h148v92M300 110v278M384 142v292M500 478V332h-92M408 332h-24"
+                  fill="none"
+                  stroke-width="2"
+                />
+                <path
+                  class="map-route signal"
+                  style="--dash: 760"
+                  d="M160 392C226 344 300 332 360 350c78 24 104 92 180 76"
+                  fill="none"
+                  stroke-width="4"
+                  stroke-linecap="round"
+                />
+                <path
+                  class="map-zone signal-soft"
+                  d="M168 176h96v74h-96Zm240 0h84v74h-84Zm0 168h84v66h-84Zm-240 10h104v66H168Z"
+                  stroke-width="2"
+                />
+                <g class="node" stroke-width="5">
+                  <circle class="map-node" cx="216" cy="213" r="10" />
+                  <circle class="map-node" cx="360" cy="350" r="10" />
+                  <circle class="map-node" cx="450" cy="213" r="10" />
+                  <circle class="map-node" cx="450" cy="377" r="10" />
+                </g>
+                <g class="alert" fill="none" stroke-width="2">
+                  <path class="map-alert" d="M470 176h30v30h-30Z" />
+                  <path class="map-alert" d="M232 350h42v20h-42Z" />
+                </g>
+                <g class="map-label">
+                  <text x="176" y="270">LEASE ZONE</text>
+                  <text x="412" y="270">EVENT</text>
+                  <text x="300" y="478">REPORT NODE</text>
+                </g>
+              </svg>
+            </div>
+            <div class="map-status">
+              <span class="status-pill">10 modules</span>
+              <span class="status-pill">2,000+ branches</span>
+              <span class="status-pill">200+ users</span>
+            </div>
           </div>
-          <ul class="role-list">
-            <li><strong>PDPA Project Lead</strong>: Led as Product Owner: gathered business requirements and translated them into development tasks. <span class="tag">Full-stack delivery</span></li>
-            <li><strong>Team Mentorship</strong>: Mentored trainees building a Course Learning project. <span class="tag">Knowledge transfer</span></li>
-          </ul>
         </div>
-      </div>
-      <!-- Role 3 -->
-      <div class="role reveal">
-        <span class="role-node"></span>
-        <div class="glass glass-card card-pad-lg">
-          <div class="flex-row--between">
-            <h3 class="display role-title">Programmer <span style="color:var(--accent-ink)">· Thai Nippon Seiki</span></h3>
-            <span class="mono role-date">Apr 2020 – Oct 2020 · 7 mos</span>
+      </section>
+
+      <section class="section-tight" aria-label="Portfolio evidence">
+        <div class="wrap evidence reveal">
+          <div class="evidence-item">
+            <strong>5+</strong
+            ><span>years building production web systems</span>
           </div>
-          <ul class="role-list">
-            <li><strong>Document Approval System</strong>: Built an end-to-end system with electronic submissions, multi-level approvals, and real-time tracking. <span class="tag">Streamlined approvals</span></li>
-            <li><strong>ERP Pipeline Maintenance</strong>: Maintained the ERP pipeline in the factory workflow. <span class="tag">Factory operations</span></li>
-          </ul>
+          <div class="evidence-item">
+            <strong>200+</strong
+            ><span>active users served through ERP workflows</span>
+          </div>
+          <div class="evidence-item">
+            <strong>2,000+</strong
+            ><span>branches moved through automation pipelines</span>
+          </div>
+          <div class="evidence-item">
+            <strong>10</strong
+            ><span>integrated DMMS modules across mall operations</span>
+          </div>
         </div>
-      </div>
-    </div>
-  </div>
-</section>
+      </section>
 
-<!-- SKILLS -->
-<section id="skills" class="section">
-  <div class="wrap">
-    <header class="section-head reveal">
-      <p class="eyebrow">Technical Expertise</p>
-      <h2 class="display h2">Skills &amp; Technologies</h2>
-    </header>
+      <section class="section" id="experience">
+        <div class="wrap">
+          <p class="section-kicker reveal">Career systems</p>
+          <h2 class="section-title reveal">
+            Enterprise work, turned into operating rhythm.
+          </h2>
+          <p class="section-copy reveal">
+            The common thread is not one stack. It is taking scattered business
+            activity and making it visible, trackable, and easier to act on.
+          </p>
 
-    <div class="grid-cards">
-      <div class="glass glass-card reveal card-pad">
-        <h3 class="mono skill-label">FRONTEND</h3>
-        <div class="tag-row"><span class="tag">React</span><span class="tag">Next.js</span><span class="tag">TypeScript</span><span class="tag">Vue</span><span class="tag">Angular</span></div>
-      </div>
-      <div class="glass glass-card reveal card-pad">
-        <h3 class="mono skill-label">BACKEND</h3>
-        <div class="tag-row"><span class="tag">Node.js</span><span class="tag">NestJS</span><span class="tag">Express</span><span class="tag">Go</span><span class="tag">Python</span></div>
-      </div>
-      <div class="glass glass-card reveal card-pad">
-        <h3 class="mono skill-label">STATE &amp; TESTING</h3>
-        <div class="tag-row"><span class="tag">Zustand</span><span class="tag">XState</span><span class="tag">React Query</span><span class="tag">Jest</span><span class="tag">Vitest</span></div>
-      </div>
-      <div class="glass glass-card reveal card-pad">
-        <h3 class="mono skill-label">CLOUD &amp; DEVOPS</h3>
-        <div class="tag-row"><span class="tag">AWS</span><span class="tag">GCP</span><span class="tag">Docker</span><span class="tag">Firebase</span><span class="tag">Git</span></div>
-      </div>
-    </div>
+          <div class="experience-list">
+            <article class="role reveal">
+              <div class="role-meta">Nov 2021 - Jan 2026<br />4+ years</div>
+              <div>
+                <h3>
+                  Frontend Developer
+                  <span class="role-company">/ CP ORIGIN</span>
+                </h3>
+                <ul>
+                  <li>
+                    <strong>ERP + LINE OA Integration:</strong> engineered a
+                    specialized ERP solution enabling mobile-first management
+                    for 200+ active users.
+                  </li>
+                  <li>
+                    <strong>Floorplan Visualization Tools:</strong> built
+                    interactive overlays for revenue, occupancy, category, and
+                    vacancy decisions.
+                  </li>
+                  <li>
+                    <strong>Reporting Pipeline Automation:</strong> centralized
+                    data collection, validation, and consolidation for 2,000+
+                    branches.
+                  </li>
+                  <li>
+                    <strong>UX Monitoring System:</strong> captured granular
+                    session data to identify friction and streamline workflows.
+                  </li>
+                  <li>
+                    <strong>Digital Mall Management System:</strong> connected
+                    task assignment, lead tracking, field visits, and bot
+                    follow-ups.
+                  </li>
+                </ul>
+              </div>
+            </article>
 
-    <div class="glass reveal also-row">
-      <span class="mono also-label">Also experienced with</span>
-      <span class="tag-row">
-        <span class="tag">JavaScript</span><span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">SQL</span><span class="tag">PHP</span><span class="tag">Kotlin</span><span class="tag">C#</span><span class="tag">n8n</span><span class="tag">AI Integration</span><span class="tag">Agile/Scrum</span><span class="tag">LINE OA</span>
-      </span>
-    </div>
-  </div>
-</section>
+            <article class="role reveal">
+              <div class="role-meta">Nov 2020 - Nov 2021<br />1 year</div>
+              <div>
+                <h3>
+                  Software Engineer
+                  <span class="role-company">/ Softnix Technology</span>
+                </h3>
+                <ul>
+                  <li>
+                    <strong>PDPA Project Lead:</strong> acted as product owner,
+                    gathered requirements, and translated business needs into
+                    development work.
+                  </li>
+                  <li>
+                    <strong>Team Mentorship:</strong> mentored trainees building
+                    a course learning project and supported full-stack delivery
+                    habits.
+                  </li>
+                </ul>
+              </div>
+            </article>
 
-<!-- WORK -->
-<section id="work" class="section">
-  <div class="wrap">
-    <header class="section-head reveal">
-      <p class="eyebrow">Selected Work</p>
-      <h2 class="display h2">Featured Work</h2>
-    </header>
-    <p class="reveal section-intro">Enterprise solutions built to solve real business problems at scale.</p>
-
-    <!-- Featured case study: DMMS -->
-    <div class="glass glass-card reveal card-pad-xl featured-case">
-      <div class="flex-row--between">
-        <h3 class="display h3-case">
-          Digital Mall Management System <span class="grad-text">(DMMS)</span>
-        </h3>
-        <span class="pill">10 integrated modules</span>
-      </div>
-      <p class="case-lead">
-        A platform unifying mall operations, from floorplan analytics to field check-ins, across a 2,000+ branch footprint.
-      </p>
-      <div class="grid-modules">
-        <div class="glass module-card"><h4 class="display">Visual Data Mapping</h4><p>Floorplan visualization with occupancy / vacancy / category / revenue overlays plus admin tooling. <em>Faster space decisions &amp; inventory accuracy.</em></p><div class="tag-row"><span class="tag">Visualization</span><span class="tag">Analytics</span><span class="tag">Admin Tools</span></div></div>
-        <div class="glass module-card"><h4 class="display">Event Booking Planner</h4><p>Booking workflow with opportunity view, space occupancy, and booking status. <em>Prevents conflicts &amp; improves leasing throughput.</em></p><div class="tag-row"><span class="tag">Booking</span><span class="tag">Workflow</span><span class="tag">Revenue</span></div></div>
-        <div class="glass module-card"><h4 class="display">Occupancy Report Automation</h4><p>Automated branch-specific template generation, submission tracking, and consolidation. <em>2,000+ branches automated.</em></p><div class="tag-row"><span class="tag">Automation</span><span class="tag">Reports</span><span class="tag">Scalability</span></div></div>
-        <div class="glass module-card"><h4 class="display">Task Assignment &amp; Follow-Up</h4><p>Multi-store task workflow with assignment, status, and SLA follow-up via bot. <em>Replaced ad-hoc chat coordination.</em></p><div class="tag-row"><span class="tag">Workflow</span><span class="tag">Bot Integration</span><span class="tag">SLA</span></div></div>
-        <div class="glass module-card"><h4 class="display">Centralized Data Collection</h4><p>Standardized intake, validation, and a centralized data model for store submissions. <em>A single source of truth for reporting.</em></p><div class="tag-row"><span class="tag">Data Integrity</span><span class="tag">Validation</span><span class="tag">Centralization</span></div></div>
-        <div class="glass module-card"><h4 class="display">Consolidation &amp; Custom Reports</h4><p>Configurable aggregation and export pipelines for stakeholder-specific reports. <em>Eliminated manual Excel consolidation.</em></p><div class="tag-row"><span class="tag">Aggregation</span><span class="tag">Export</span><span class="tag">Stakeholders</span></div></div>
-        <div class="glass module-card"><h4 class="display">Mall Photo Gallery</h4><p>Media ingestion/storage with mandatory metadata (branch / date / type) and search. <em>Prevented loss of context from chat sharing.</em></p><div class="tag-row"><span class="tag">Media</span><span class="tag">Metadata</span><span class="tag">Search</span></div></div>
-        <div class="glass module-card"><h4 class="display">Temperature Report</h4><p>Digitized daily temperature capture with rule-based warning summaries and dashboarding. <em>Improved auditability &amp; exception review.</em></p><div class="tag-row"><span class="tag">Compliance</span><span class="tag">Dashboard</span><span class="tag">Alerts</span></div></div>
-        <div class="glass module-card"><h4 class="display">Lead Management System</h4><p>Lead lifecycle states, assignment, and follow-up tracking with reporting. <em>Increased pipeline visibility.</em></p><div class="tag-row"><span class="tag">CRM</span><span class="tag">Pipeline</span><span class="tag">Tracking</span></div></div>
-        <div class="glass module-card"><h4 class="display">Check-in + Tour Notes</h4><p>Visit check-in and reporting module with logging rules and survey forms. <em>Auditable field activity data.</em></p><div class="tag-row"><span class="tag">Field Ops</span><span class="tag">Surveys</span><span class="tag">Audit</span></div></div>
-      </div>
-    </div>
-
-    <!-- Other projects -->
-    <div class="grid-cards--wide">
-      <div class="glass glass-card reveal card-pad project-card">
-        <h3 class="display">Affiliate Referral System</h3>
-        <p>Affiliate marketing and referral tracking integrated with LINE OA. <em>Monitors user referrals &amp; conversions.</em></p>
-        <div class="tag-row"><span class="tag">LINE OA</span><span class="tag">Referrals</span><span class="tag">Tracking</span></div>
-      </div>
-      <div class="glass glass-card reveal card-pad project-card">
-        <h3 class="display">Market Rental Management</h3>
-        <p>Interactive visual floor plan with booking calendar and occupancy management. <em>Real-time stall availability.</em></p>
-        <div class="tag-row"><span class="tag">Floor Plan</span><span class="tag">Calendar</span><span class="tag">Rental</span></div>
-      </div>
-      <div class="glass glass-card reveal card-pad project-card">
-        <h3 class="display">Meal Order Management</h3>
-        <p>Excel-based order tool with QR code integration for menu display. <em>Streamlined operator workflow.</em></p>
-        <div class="tag-row"><span class="tag">QR Code</span><span class="tag">Orders</span><span class="tag">Automation</span></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ABOUT / BACKGROUND -->
-<section id="about" class="section">
-  <div class="wrap">
-    <header class="section-head reveal">
-      <p class="eyebrow">Background</p>
-      <h2 class="display h2">Education &amp; Languages</h2>
-    </header>
-
-    <div class="grid-cards--wide">
-      <div class="glass glass-card reveal card-pad-lg">
-        <div class="flex-row--between">
-          <h3 class="display h3-lg">Software Engineering</h3>
-          <span class="mono role-date" style="color:var(--accent-ink)">3.53 GPA</span>
+            <article class="role reveal">
+              <div class="role-meta">Apr 2020 - Oct 2020<br />7 months</div>
+              <div>
+                <h3>
+                  Programmer
+                  <span class="role-company">/ Thai Nippon Seiki</span>
+                </h3>
+                <ul>
+                  <li>
+                    <strong>Document Approval System:</strong> built electronic
+                    submissions, multi-level approvals, and real-time tracking.
+                  </li>
+                  <li>
+                    <strong>ERP Pipeline Maintenance:</strong> maintained
+                    factory ERP workflows where reliability mattered day to day.
+                  </li>
+                </ul>
+              </div>
+            </article>
+          </div>
         </div>
-        <p class="mono edu-meta">B.Sc · Burapha University · Graduated 2020</p>
-        <ul class="edu-list">
-          <li>Specialized in full-stack web development, software architecture, and database systems.</li>
-          <li>Strong foundation in algorithms, data structures, and software engineering principles.</li>
-          <li>Capstone projects focused on real-world business applications.</li>
-        </ul>
-      </div>
-      <div class="glass glass-card reveal card-pad-lg">
-        <h3 class="display h3-lg lang-heading">Languages</h3>
-        <div class="lang-block">
-          <div class="lang-bar-label"><strong>Thai</strong><span class="mono role-date">Native</span></div>
-          <div style="height:8px;border-radius:99px;background:rgba(99,102,241,.12)"><div style="height:100%;width:100%;border-radius:99px;background:linear-gradient(90deg,var(--indigo),var(--fuchsia))"></div></div>
+      </section>
+
+      <section class="section" id="work">
+        <div class="wrap">
+          <p class="section-kicker reveal">Featured work prototype</p>
+          <h2 class="section-title reveal">Digital Mall Management System.</h2>
+          <p class="section-copy reveal">
+            DMMS is framed here as a product surface, not a bullet list: a
+            connected operations board for spatial decisions, automation, field
+            work, and business pipeline visibility.
+          </p>
+
+          <div class="work-layout">
+            <aside class="case-summary reveal">
+              <h3>One platform for mall operations at branch scale.</h3>
+              <p>
+                A 10-module system unifying floorplan analytics, event booking,
+                reporting automation, task workflows, photo records, lead
+                management, and field check-ins.
+              </p>
+              <div class="case-chips" aria-label="DMMS capability tags">
+                <span class="chip">Visualization</span>
+                <span class="chip">Automation</span>
+                <span class="chip">Field ops</span>
+                <span class="chip">Bot follow-up</span>
+                <span class="chip">Reporting</span>
+              </div>
+            </aside>
+
+            <div class="feature-board">
+              <article class="feature-panel reveal">
+                <div class="feature-copy">
+                  <div>
+                    <h4>Spatial intelligence</h4>
+                    <p>
+                      Floorplan mapping, occupancy states, revenue overlays,
+                      category filters, and event booking come together as one
+                      decision surface.
+                    </p>
+                  </div>
+                  <ul>
+                    <li>Visual data mapping</li>
+                    <li>Event booking planner</li>
+                    <li>Occupancy overlays</li>
+                  </ul>
+                </div>
+                <div class="prototype" aria-hidden="true">
+                  <svg viewBox="0 0 420 260">
+                    <path
+                      class="proto-line"
+                      style="--dash: 900"
+                      d="M38 32h156v70h54V48h138v162H268v36H70v-84H38Z"
+                      fill="rgba(47,111,159,.14)"
+                      stroke="#75b4d5"
+                      stroke-width="2"
+                    />
+                    <path
+                      class="proto-line"
+                      style="--dash: 760"
+                      d="M70 162h94v84M194 32v130M248 48v162M268 210v-76h118M268 134h-20"
+                      fill="none"
+                      stroke="#75b4d5"
+                      stroke-width="2"
+                    />
+                    <rect
+                      x="86"
+                      y="58"
+                      width="72"
+                      height="36"
+                      fill="rgba(123,216,143,.16)"
+                      stroke="#7bd88f"
+                    />
+                    <rect
+                      x="286"
+                      y="72"
+                      width="70"
+                      height="46"
+                      fill="rgba(123,216,143,.16)"
+                      stroke="#7bd88f"
+                    />
+                    <rect
+                      x="288"
+                      y="154"
+                      width="66"
+                      height="36"
+                      fill="rgba(255,107,95,.12)"
+                      stroke="#ff6b5f"
+                    />
+                    <path
+                      class="proto-route"
+                      style="--dash: 420"
+                      d="M88 190c44-36 92-42 144-18 38 18 76 8 116-30"
+                      fill="none"
+                      stroke="#7bd88f"
+                      stroke-width="4"
+                      stroke-linecap="round"
+                    />
+                    <g
+                      font-family="Azeret Mono, monospace"
+                      font-size="11"
+                      fill="#dce5dd"
+                    >
+                      <text x="86" y="53">VACANT</text>
+                      <text x="286" y="67">ACTIVE</text>
+                      <text x="288" y="149">EVENT</text>
+                    </g>
+                  </svg>
+                </div>
+              </article>
+
+              <article class="feature-panel reveal">
+                <div class="feature-copy">
+                  <div>
+                    <h4>Automation backbone</h4>
+                    <p>
+                      Branch-specific templates, submission tracking,
+                      validation, consolidation, and custom reports replace
+                      manual Excel-heavy coordination.
+                    </p>
+                  </div>
+                  <ul>
+                    <li>Template generation</li>
+                    <li>Validation</li>
+                    <li>Custom exports</li>
+                  </ul>
+                </div>
+                <div class="prototype" aria-hidden="true">
+                  <svg viewBox="0 0 420 260">
+                    <g fill="none" stroke="#75b4d5" stroke-width="2">
+                      <path
+                        class="proto-line"
+                        style="--dash: 900"
+                        d="M64 62h78v48H64zM64 150h78v48H64zM178 106h84v50h-84zM300 72h70v44h-70zM300 158h70v44h-70z"
+                      />
+                      <path
+                        class="proto-route"
+                        style="--dash: 500"
+                        d="M142 86h36M142 174h36M262 130h38M262 130c18 0 18-36 38-36M262 130c18 0 18 50 38 50"
+                      />
+                    </g>
+                    <g fill="#7bd88f">
+                      <circle class="proto-node" cx="142" cy="86" r="5" />
+                      <circle class="proto-node" cx="142" cy="174" r="5" />
+                      <circle class="proto-node" cx="262" cy="130" r="5" />
+                      <circle class="proto-active" cx="300" cy="94" r="5" />
+                      <circle class="proto-active" cx="300" cy="180" r="5" />
+                    </g>
+                    <g
+                      font-family="Azeret Mono, monospace"
+                      font-size="11"
+                      fill="#dce5dd"
+                    >
+                      <text x="80" y="90">BRANCH</text>
+                      <text x="78" y="178">PHOTO</text>
+                      <text x="197" y="135">RULES</text>
+                      <text x="316" y="99">CSV</text>
+                      <text x="313" y="185">DASH</text>
+                    </g>
+                  </svg>
+                </div>
+              </article>
+
+              <article class="feature-panel reveal">
+                <div class="feature-copy">
+                  <div>
+                    <h4>Field operations</h4>
+                    <p>
+                      Task assignment, SLA follow-up, check-ins, tour notes,
+                      survey forms, and photo metadata create an auditable
+                      operational trail.
+                    </p>
+                  </div>
+                  <ul>
+                    <li>Task assignment</li>
+                    <li>Check-in logs</li>
+                    <li>Photo gallery</li>
+                  </ul>
+                </div>
+                <div class="prototype" aria-hidden="true">
+                  <svg viewBox="0 0 420 260">
+                    <path
+                      class="proto-line"
+                      style="--dash: 1000"
+                      d="M68 58h284v40H68zM68 118h284v40H68zM68 178h284v40H68z"
+                      fill="rgba(244,247,242,.04)"
+                      stroke="#75b4d5"
+                    />
+                    <path
+                      class="proto-line"
+                      style="--dash: 420"
+                      d="M92 78h96M92 138h140M92 198h114"
+                      stroke="#dce5dd"
+                      stroke-width="2"
+                    />
+                    <path
+                      class="proto-route"
+                      style="--dash: 300"
+                      d="M278 78h42M278 138h42M278 198h42"
+                      stroke="#7bd88f"
+                      stroke-width="6"
+                      stroke-linecap="round"
+                    />
+                    <circle
+                      class="proto-node"
+                      cx="338"
+                      cy="78"
+                      r="8"
+                      fill="#7bd88f"
+                    />
+                    <circle
+                      class="proto-active"
+                      cx="338"
+                      cy="138"
+                      r="8"
+                      fill="#ff6b5f"
+                    />
+                    <circle
+                      class="proto-node"
+                      cx="338"
+                      cy="198"
+                      r="8"
+                      fill="#7bd88f"
+                    />
+                    <g
+                      font-family="Azeret Mono, monospace"
+                      font-size="10"
+                      fill="#a9b1b8"
+                    >
+                      <text x="92" y="93">ASSIGNED</text>
+                      <text x="92" y="153">SLA WATCH</text>
+                      <text x="92" y="213">VISIT LOGGED</text>
+                    </g>
+                  </svg>
+                </div>
+              </article>
+
+              <article class="feature-panel reveal">
+                <div class="feature-copy">
+                  <div>
+                    <h4>Business pipeline</h4>
+                    <p>
+                      Lead states, assignment, follow-up tracking, and LINE OA
+                      bot reminders give teams visibility from first interest to
+                      next action.
+                    </p>
+                  </div>
+                  <ul>
+                    <li>Lead lifecycle</li>
+                    <li>Bot reminders</li>
+                    <li>Pipeline reporting</li>
+                  </ul>
+                </div>
+                <div class="prototype" aria-hidden="true">
+                  <svg viewBox="0 0 420 260">
+                    <path
+                      class="proto-line"
+                      style="--dash: 360"
+                      d="M58 130h304"
+                      stroke="#75b4d5"
+                      stroke-width="2"
+                    />
+                    <g
+                      class="proto-line"
+                      style="--dash: 900"
+                      fill="rgba(47,111,159,.16)"
+                      stroke="#75b4d5"
+                      stroke-width="2"
+                    >
+                      <rect x="48" y="82" width="76" height="96" rx="4" />
+                      <rect x="150" y="82" width="76" height="96" rx="4" />
+                      <rect x="252" y="82" width="76" height="96" rx="4" />
+                    </g>
+                    <path
+                      class="proto-route"
+                      style="--dash: 260"
+                      d="M124 130h26M226 130h26M328 130h34"
+                      stroke="#7bd88f"
+                      stroke-width="4"
+                      stroke-linecap="round"
+                    />
+                    <circle
+                      class="proto-node"
+                      cx="86"
+                      cy="130"
+                      r="14"
+                      fill="#7bd88f"
+                    />
+                    <circle
+                      class="proto-node"
+                      cx="188"
+                      cy="130"
+                      r="14"
+                      fill="#7bd88f"
+                    />
+                    <circle
+                      class="proto-active"
+                      cx="290"
+                      cy="130"
+                      r="14"
+                      fill="#ff6b5f"
+                    />
+                    <g
+                      font-family="Azeret Mono, monospace"
+                      font-size="10"
+                      fill="#dce5dd"
+                    >
+                      <text x="67" y="107">LEAD</text>
+                      <text x="166" y="107">ASSIGN</text>
+                      <text x="270" y="107">FOLLOW</text>
+                      <text x="70" y="162">18</text>
+                      <text x="172" y="162">11</text>
+                      <text x="274" y="162">04</text>
+                    </g>
+                  </svg>
+                </div>
+              </article>
+            </div>
+          </div>
+
+          <div class="other-head reveal">
+            <h3>More built systems.</h3>
+            <span>SHIPPED · SELECTED</span>
+          </div>
+          <div class="other-work" aria-label="Other selected projects">
+            <article class="project reveal">
+              <div class="prototype" aria-hidden="true">
+                <svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid meet">
+                  <path
+                    class="proto-line"
+                    style="--dash: 360"
+                    d="M28 52h264M28 92h264M28 132h264"
+                    fill="none"
+                    stroke="rgba(244,247,242,.16)"
+                    stroke-width="1"
+                  />
+                  <g
+                    font-family="Azeret Mono, monospace"
+                    font-size="9"
+                    fill="#79848c"
+                  >
+                    <text x="64" y="38">REFERRER</text>
+                    <text x="232" y="38">STATUS</text>
+                  </g>
+                  <g class="proto-node">
+                    <circle cx="44" cy="68" r="10" fill="rgba(47,111,159,.5)" stroke="#75b4d5" />
+                    <circle cx="44" cy="108" r="10" fill="rgba(47,111,159,.5)" stroke="#75b4d5" />
+                    <circle cx="44" cy="148" r="10" fill="rgba(47,111,159,.5)" stroke="#75b4d5" />
+                    <path
+                      d="M40 66a4 4 0 1 1 8 0 4 4 0 0 1-8 0M37 74c0-4 14-4 14 0"
+                      fill="#75b4d5"
+                    />
+                    <path
+                      d="M40 106a4 4 0 1 1 8 0 4 4 0 0 1-8 0M37 114c0-4 14-4 14 0"
+                      fill="#75b4d5"
+                    />
+                    <path
+                      d="M40 146a4 4 0 1 1 8 0 4 4 0 0 1-8 0M37 154c0-4 14-4 14 0"
+                      fill="#75b4d5"
+                    />
+                  </g>
+                  <g class="proto-route" style="--dash: 200" fill="none" stroke-linecap="round" stroke-width="6">
+                    <path d="M64 68h120" stroke="rgba(123,216,143,.32)" />
+                    <path d="M64 108h120" stroke="rgba(123,216,143,.32)" />
+                    <path d="M64 148h120" stroke="rgba(255,107,95,.28)" />
+                  </g>
+                  <g font-family="Azeret Mono, monospace" font-size="9" fill="#dce5dd">
+                    <text x="232" y="71">CONVERTED</text>
+                    <text x="232" y="111">CONVERTED</text>
+                    <text x="232" y="151" fill="#ff6b5f">PENDING</text>
+                  </g>
+                  <g>
+                    <circle class="proto-node" cx="220" cy="68" r="4" fill="#7bd88f" />
+                    <circle class="proto-node" cx="220" cy="108" r="4" fill="#7bd88f" />
+                    <circle class="proto-active proto-pulse" cx="220" cy="148" r="4" fill="#ff6b5f" />
+                  </g>
+                </svg>
+              </div>
+              <div class="project-copy">
+                <h4>Affiliate Referral System</h4>
+                <p>
+                  Referral tracking wired into LINE OA, watching how invites
+                  spread and which ones convert.
+                </p>
+                <p class="project-tag">LINE OA · attribution</p>
+              </div>
+            </article>
+
+            <article class="project reveal">
+              <div class="prototype" aria-hidden="true">
+                <svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid meet">
+                  <g class="proto-line" style="--dash: 1400" fill="none" stroke="#75b4d5" stroke-width="1.5">
+                    <rect x="40" y="36" width="44" height="40" />
+                    <rect x="96" y="36" width="44" height="40" />
+                    <rect x="152" y="36" width="44" height="40" />
+                    <rect x="208" y="36" width="44" height="40" />
+                    <rect x="40" y="100" width="44" height="40" />
+                    <rect x="96" y="100" width="44" height="40" />
+                    <rect x="152" y="100" width="44" height="40" />
+                    <rect x="208" y="100" width="44" height="40" />
+                  </g>
+                  <rect x="40" y="36" width="44" height="40" fill="rgba(123,216,143,.18)" />
+                  <rect x="152" y="36" width="44" height="40" fill="rgba(123,216,143,.18)" />
+                  <rect x="96" y="100" width="44" height="40" fill="rgba(255,107,95,.14)" class="proto-pulse" />
+                  <rect x="208" y="100" width="44" height="40" fill="rgba(123,216,143,.18)" />
+                  <path
+                    class="proto-route"
+                    style="--dash: 240"
+                    d="M268 56v84"
+                    stroke="#7bd88f"
+                    stroke-width="3"
+                    stroke-linecap="round"
+                  />
+                  <g
+                    font-family="Azeret Mono, monospace"
+                    font-size="9"
+                    fill="#a9b1b8"
+                  >
+                    <text x="44" y="158">BOOKED</text>
+                    <text x="156" y="158">HELD</text>
+                  </g>
+                </svg>
+              </div>
+              <div class="project-copy">
+                <h4>Market Rental Management</h4>
+                <p>
+                  A visual stall map paired with a booking calendar, so
+                  availability updates the moment a stall changes hands.
+                </p>
+                <p class="project-tag">Floorplan · booking</p>
+              </div>
+            </article>
+
+            <article class="project reveal">
+              <div class="prototype" aria-hidden="true">
+                <svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid meet">
+                  <path
+                    class="proto-line"
+                    style="--dash: 600"
+                    d="M40 44h150M40 78h150M40 112h150"
+                    fill="none"
+                    stroke="#75b4d5"
+                    stroke-width="1.5"
+                  />
+                  <path
+                    class="proto-route"
+                    style="--dash: 200"
+                    d="M40 44h66M40 78h94M40 112h54"
+                    stroke="#7bd88f"
+                    stroke-width="4"
+                    stroke-linecap="round"
+                  />
+                  <rect
+                    class="proto-active"
+                    x="224"
+                    y="40"
+                    width="58"
+                    height="58"
+                    rx="6"
+                    fill="rgba(244,247,242,.06)"
+                    stroke="#7bd88f"
+                    stroke-width="1.5"
+                  />
+                  <g class="proto-node" fill="#dce5dd">
+                    <rect x="234" y="50" width="10" height="10" />
+                    <rect x="250" y="50" width="6" height="10" />
+                    <rect x="262" y="50" width="10" height="10" />
+                    <rect x="234" y="66" width="6" height="10" />
+                    <rect x="246" y="66" width="10" height="10" />
+                    <rect x="262" y="66" width="10" height="10" />
+                    <rect x="234" y="82" width="10" height="6" />
+                    <rect x="250" y="82" width="10" height="6" />
+                  </g>
+                  <g
+                    font-family="Azeret Mono, monospace"
+                    font-size="9"
+                    fill="#a9b1b8"
+                  >
+                    <text x="40" y="138">ORDERS</text>
+                    <text x="224" y="118">QR MENU</text>
+                  </g>
+                </svg>
+              </div>
+              <div class="project-copy">
+                <h4>Meal Order Management</h4>
+                <p>
+                  Spreadsheet-backed order tooling with a scannable QR menu that
+                  keeps operators moving through service.
+                </p>
+                <p class="project-tag">QR menu · ops</p>
+              </div>
+            </article>
+          </div>
         </div>
-        <div class="lang-block">
-          <div class="lang-bar-label"><strong>English</strong><span class="mono role-date">Conversational</span></div>
-          <div style="height:8px;border-radius:99px;background:rgba(99,102,241,.12)"><div style="height:100%;width:62%;border-radius:99px;background:linear-gradient(90deg,var(--indigo),var(--cyan))"></div></div>
-          <p class="mono lang-note">Listening &amp; Speaking</p>
+      </section>
+
+      <section class="section" id="skills">
+        <div class="wrap">
+          <div class="section-head reveal">
+            <div class="section-heading">
+              <div class="stack-mark" aria-hidden="true">
+                <span class="stack-mark-cell">
+                  <img
+                    src="https://svgl.app/library/react_dark.svg"
+                    alt=""
+                    aria-hidden="true"
+                  />
+                </span>
+                <span class="stack-mark-cell">
+                  <img
+                    src="https://svgl.app/library/nodejs.svg"
+                    alt=""
+                    aria-hidden="true"
+                  />
+                </span>
+                <span class="stack-mark-cell">
+                  <img
+                    src="https://svgl.app/library/reactquery.svg"
+                    alt=""
+                    aria-hidden="true"
+                  />
+                </span>
+                <span class="stack-mark-cell">
+                  <img
+                    src="https://svgl.app/library/google-cloud.svg"
+                    alt=""
+                    aria-hidden="true"
+                  />
+                </span>
+              </div>
+              <div>
+                <p class="section-kicker">Capability clusters</p>
+                <h2 class="section-title">The stack follows the workflow.</h2>
+              </div>
+            </div>
+            <p class="section-copy">
+              Pakawat works across frontend, backend, cloud, state, testing, and
+              automation tools, choosing the shape that makes business systems
+              easier to operate.
+            </p>
+          </div>
+          <div class="skills-grid reveal">
+            <article class="skill-cluster">
+              <div class="skill-head">
+                <span class="skill-icon" aria-hidden="true">
+                  <img
+                    src="https://svgl.app/library/react_dark.svg"
+                    alt=""
+                    aria-hidden="true"
+                  />
+                </span>
+                <div>
+                  <h3>FRONTEND SYSTEMS</h3>
+                  <p>React, Next.js, TypeScript, Vue, Angular, HTML, CSS</p>
+                </div>
+              </div>
+            </article>
+            <article class="skill-cluster">
+              <div class="skill-head">
+                <span class="skill-icon" aria-hidden="true">
+                  <img
+                    src="https://svgl.app/library/nodejs.svg"
+                    alt=""
+                    aria-hidden="true"
+                  />
+                </span>
+                <div>
+                  <h3>BACKEND DELIVERY</h3>
+                  <p>Node.js, NestJS, Express, Go, Python, PHP, SQL</p>
+                </div>
+              </div>
+            </article>
+            <article class="skill-cluster">
+              <div class="skill-head">
+                <span class="skill-icon" aria-hidden="true">
+                  <img
+                    src="https://svgl.app/library/reactquery.svg"
+                    alt=""
+                    aria-hidden="true"
+                  />
+                </span>
+                <div>
+                  <h3>REACT QUERY + STATE</h3>
+                  <p>React Query, Zustand, XState, Jest, Vitest, Agile/Scrum</p>
+                </div>
+              </div>
+            </article>
+            <article class="skill-cluster">
+              <div class="skill-head">
+                <span class="skill-icon" aria-hidden="true">
+                  <img
+                    src="https://svgl.app/library/google-cloud.svg"
+                    alt=""
+                    aria-hidden="true"
+                  />
+                </span>
+                <div>
+                  <h3>CLOUD + AUTOMATION</h3>
+                  <p>
+                    GCP, AWS, Docker, Firebase, Git, n8n, AI Integration, LINE
+                    OA
+                  </p>
+                </div>
+              </div>
+            </article>
+          </div>
+          <p class="also reveal">
+            Also experienced with JavaScript, Kotlin, C#, QR workflows, bot
+            follow-ups, reporting pipelines, and enterprise data collection
+            flows.
+          </p>
         </div>
+      </section>
+
+      <section class="section" id="background">
+        <div class="wrap">
+          <p class="section-kicker reveal">Background</p>
+          <h2 class="section-title reveal">
+            Software engineering foundation, business-system bias.
+          </h2>
+
+          <div class="background-grid reveal">
+            <article class="background-panel">
+              <h3>Education</h3>
+              <p>
+                <strong>B.Sc. Software Engineering</strong><br />Burapha
+                University, graduated 2020<br />GPA 3.53
+              </p>
+              <ul>
+                <li>
+                  Specialized in full-stack web development, software
+                  architecture, and database systems.
+                </li>
+                <li>
+                  Built a foundation in algorithms, data structures, and
+                  software engineering principles.
+                </li>
+                <li>
+                  Completed capstone projects focused on real-world business
+                  applications.
+                </li>
+              </ul>
+            </article>
+            <article class="background-panel">
+              <h3>Languages</h3>
+              <div class="language-list">
+                <div class="language-row">
+                  <div class="language-head">
+                    <strong>Thai</strong>
+                    <span class="level-chip">Native</span>
+                  </div>
+                  <p class="language-desc">
+                    Primary working language for daily communication, writing,
+                    and collaboration.
+                  </p>
+                </div>
+                <div class="language-row">
+                  <div class="language-head">
+                    <strong>English</strong>
+                    <span class="level-chip">Conversational</span>
+                  </div>
+                  <p class="language-desc">
+                    Comfortable in meetings, requirements discussions, written
+                    updates, and collaborative product or engineering work.
+                  </p>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="wrap">
+        <div class="footer-grid">
+          <div>
+            <h2>Ready to make operations legible.</h2>
+            <p>Open to full-stack and product-engineering roles.</p>
+          </div>
+          <a href="mailto:pakawat.zon@gmail.com" class="btn btn-primary"
+            >pakawat.zon@gmail.com</a
+          >
+        </div>
+        <div class="copyright">© 2026 Pakawat Smutkun.</div>
       </div>
-    </div>
-  </div>
-</section>
-</main>
+    </footer>
 
-<!-- FOOTER -->
-<footer class="section section--footer">
-  <div class="wrap">
-    <div class="glass footer-cta">
-      <h2 class="display">Let's build something that moves the numbers.</h2>
-      <p>Open to full-stack and product-engineering roles.</p>
-      <a href="mailto:pakawat.zon@gmail.com" class="btn btn-primary"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/></svg> pakawat.zon@gmail.com</a>
-      <p class="mono footer-copy">© 2026 Pakawat Smutkun · Built with passion for great software.</p>
-    </div>
-  </div>
-</footer>
+    <script>
+      const navToggle = document.getElementById("navToggle");
+      const navLinks = document.getElementById("navLinks");
 
-<script>
-  // Mobile nav
-  const toggle = document.getElementById('navToggle');
-  const links = document.getElementById('navLinks');
-  toggle.addEventListener('click', () => {
-    const open = links.classList.toggle('open');
-    if (open) links.classList.add('glass');
-    toggle.setAttribute('aria-expanded', open);
-  });
-  const closeMenu = () => { links.classList.remove('open'); toggle.setAttribute('aria-expanded', false); };
-  links.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
-  document.addEventListener('keydown', e => { if (e.key === 'Escape' && links.classList.contains('open')) { closeMenu(); toggle.focus(); } });
+      function closeNav() {
+        navLinks.classList.remove("open");
+        navToggle.setAttribute("aria-expanded", "false");
+        navToggle.setAttribute("aria-label", "Open navigation menu");
+      }
 
-  // Scroll reveal
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
-  }, { threshold: 0.12 });
-  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+      navToggle.addEventListener("click", () => {
+        const open = navLinks.classList.toggle("open");
+        navToggle.setAttribute("aria-expanded", String(open));
+        navToggle.setAttribute(
+          "aria-label",
+          open ? "Close navigation menu" : "Open navigation menu",
+        );
+      });
 
-  // Count-up stats
-  const fmt = n => n.toLocaleString('en-US');
-  const countIO = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (!e.isIntersecting) return;
-      const el = e.target, target = +el.dataset.target, suffix = el.dataset.suffix || '';
-      const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (reduce) { el.textContent = fmt(target) + suffix; countIO.unobserve(el); return; }
-      let start = null;
-      const step = (t) => {
-        if (!start) start = t;
-        const p = Math.min((t - start) / 1400, 1);
-        const eased = 1 - Math.pow(1 - p, 3);
-        el.textContent = fmt(Math.floor(eased * target)) + suffix;
-        if (p < 1) requestAnimationFrame(step);
+      navLinks
+        .querySelectorAll("a")
+        .forEach((link) => link.addEventListener("click", closeNav));
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && navLinks.classList.contains("open")) {
+          closeNav();
+          navToggle.focus();
+        }
+      });
+
+      document
+        .querySelectorAll(".feature-board .feature-panel")
+        .forEach((panel, index) => {
+          panel.style.setProperty("--i", index);
+        });
+
+      const progress = document.getElementById("scrollProgress");
+      const updateProgress = () => {
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        const amount = max > 0 ? window.scrollY / max : 0;
+        progress.style.transform = `scaleX(${Math.min(Math.max(amount, 0), 1)})`;
       };
-      requestAnimationFrame(step);
-      countIO.unobserve(el);
-    });
-  }, { threshold: 0.5 });
-  document.querySelectorAll('.count').forEach(el => countIO.observe(el));
-</script>
-</body>
+      updateProgress();
+      document.addEventListener("scroll", updateProgress, { passive: true });
+      window.addEventListener("resize", updateProgress);
+
+      if ("IntersectionObserver" in window) {
+        const revealObserver = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (!entry.isIntersecting) return;
+              entry.target.classList.add("in");
+              revealObserver.unobserve(entry.target);
+            });
+          },
+          { threshold: 0.14, rootMargin: "0px 0px -8% 0px" },
+        );
+
+        document
+          .querySelectorAll(".reveal")
+          .forEach((element) => revealObserver.observe(element));
+      } else {
+        document
+          .querySelectorAll(".reveal")
+          .forEach((element) => element.classList.add("in"));
+      }
+    </script>
+  </body>
 </html>
