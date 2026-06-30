@@ -1,248 +1,725 @@
 <!doctype html>
 <html lang="th">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ไทยมาร์ท — ต้นแบบโปรดักต์ (กรณีศึกษา PM)</title>
-<style>
-  @font-face{font-family:sukhumvit;src:url(fonts/sukhumvit-400.woff2) format("woff2");font-weight:400;font-display:swap}
-  @font-face{font-family:sukhumvit;src:url(fonts/sukhumvit-500.woff2) format("woff2");font-weight:500;font-display:swap}
-  @font-face{font-family:sukhumvit;src:url(fonts/sukhumvit-700.woff2) format("woff2");font-weight:600;font-display:swap}
-  @font-face{font-family:sukhumvit;src:url(fonts/sukhumvit-700.woff2) format("woff2");font-weight:700;font-display:swap}
-  :root{
-    --primary:#e32321; --primary-dark:#b42026; --green:#00a63e; --gold:#f59e0b;
-    --ink:#171717; --muted:#72757e; --surface:#fff; --canvas:#f5f5f7; --hair:#e5e5e7;
-    --r:12px; --shadow:0 1px 3px rgba(23,23,23,.08),0 8px 24px rgba(23,23,23,.06);
-  }
-  *{box-sizing:border-box}
-  body{margin:0;font-family:sukhumvit,'Noto Sans Thai',system-ui,sans-serif;color:var(--ink);
-    background:var(--canvas);line-height:1.55;-webkit-font-smoothing:antialiased}
-  .wrap{max-width:1080px;margin:0 auto;padding:40px 24px 72px}
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ไทยมาร์ท — ต้นแบบโปรดักต์ (กรณีศึกษา PM)</title>
+    <style>
+      @font-face {
+        font-family: sukhumvit;
+        src: url(fonts/sukhumvit-400.woff2) format("woff2");
+        font-weight: 400;
+        font-display: swap;
+      }
+      @font-face {
+        font-family: sukhumvit;
+        src: url(fonts/sukhumvit-500.woff2) format("woff2");
+        font-weight: 500;
+        font-display: swap;
+      }
+      @font-face {
+        font-family: sukhumvit;
+        src: url(fonts/sukhumvit-700.woff2) format("woff2");
+        font-weight: 600;
+        font-display: swap;
+      }
+      @font-face {
+        font-family: sukhumvit;
+        src: url(fonts/sukhumvit-700.woff2) format("woff2");
+        font-weight: 700;
+        font-display: swap;
+      }
+      :root {
+        --primary: #e32321;
+        --primary-dark: #b42026;
+        --green: #00a63e;
+        --gold: #f59e0b;
+        --ink: #171717;
+        --muted: #72757e;
+        --surface: #fff;
+        --canvas: #f5f5f7;
+        --hair: #e5e5e7;
+        --r: 12px;
+        --shadow:
+          0 1px 3px rgba(23, 23, 23, 0.08), 0 8px 24px rgba(23, 23, 23, 0.06);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: sukhumvit, "Noto Sans Thai", system-ui, sans-serif;
+        color: var(--ink);
+        background: var(--canvas);
+        line-height: 1.55;
+        -webkit-font-smoothing: antialiased;
+      }
+      .wrap {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: 40px 24px 72px;
+      }
+      .profile-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        border: 1px solid var(--hair);
+        background: var(--surface);
+        color: var(--ink);
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 600;
+        box-shadow: var(--shadow);
+        transition:
+          transform 0.15s ease,
+          box-shadow 0.15s ease;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+      .profile-link:hover {
+        transform: translateY(-1px);
+        box-shadow:
+          0 6px 14px rgba(23, 23, 23, 0.12),
+          0 18px 40px rgba(23, 23, 23, 0.1);
+      }
+      .profile-link:focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 3px;
+      }
+      .profile-link svg {
+        width: 16px;
+        height: 16px;
+        fill: currentColor;
+      }
 
-  /* ---- header ---- */
-  .top{display:flex;align-items:center;gap:12px;margin-bottom:36px}
-  .logo{width:40px;height:40px;border-radius:11px;color:#fff;display:grid;place-items:center;
-    font-weight:700;font-size:19px;box-shadow:var(--shadow);
-    background:linear-gradient(180deg,var(--primary),var(--primary-dark))}
-  .top h1{font-size:15px;font-weight:600;margin:0;letter-spacing:.2px}
-  .top .pill{margin-left:auto;font-size:12px;font-weight:600;color:var(--muted);
-    background:var(--surface);border:1px solid var(--hair);border-radius:999px;padding:6px 13px}
+      /* ---- header ---- */
+      .top {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 36px;
+        flex-wrap: nowrap;
+      }
+      .logo {
+        width: 40px;
+        height: 40px;
+        border-radius: 11px;
+        color: #fff;
+        display: grid;
+        place-items: center;
+        font-weight: 700;
+        font-size: 19px;
+        box-shadow: var(--shadow);
+        background: linear-gradient(
+          180deg,
+          var(--primary),
+          var(--primary-dark)
+        );
+      }
+      .top h1 {
+        font-size: 15px;
+        font-weight: 600;
+        margin: 0;
+        letter-spacing: 0.2px;
+      }
+      .top .pill {
+        margin-left: auto;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--muted);
+        background: var(--surface);
+        border: 1px solid var(--hair);
+        border-radius: 999px;
+        padding: 6px 13px;
+        white-space: nowrap;
+      }
 
-  /* ---- hero: flywheel + thesis ---- */
-  .hero{display:grid;grid-template-columns:340px 1fr;gap:44px;align-items:center;margin-bottom:52px}
-  .graphic{width:100%;max-width:340px;aspect-ratio:1;margin:0 auto}
-  .graphic svg{width:100%;height:auto;display:block;overflow:visible}
-  .track{fill:none;stroke:var(--hair);stroke-width:16}
-  .arc{fill:none;stroke-width:16;stroke-linecap:round;transition:opacity .25s ease,stroke-width .25s ease}
-  .arcA{stroke:var(--gold)} .arcB{stroke:var(--green)} .arcC{stroke:var(--primary)}
-  .dotA{fill:var(--gold)} .dotB{fill:var(--green)} .dotC{fill:var(--primary)}
-  .dot{transition:opacity .25s ease}
-  .lbl{font-family:sukhumvit,'Noto Sans Thai',sans-serif;font-weight:700;font-size:14px;text-anchor:middle}
-  .lblA{fill:#b45309} .lblB{fill:#15803d} .lblC{fill:var(--primary-dark)}
-  .cap{font-family:sukhumvit,sans-serif;font-size:8.5px;font-weight:600;letter-spacing:.12em;
-    fill:var(--muted);text-anchor:middle;text-transform:uppercase}
-  .hub{fill:var(--surface);stroke:var(--hair);stroke-width:1.5}
-  .hub-name{font-family:sukhumvit,'Noto Sans Thai',sans-serif;font-weight:700;font-size:15px;
-    fill:var(--primary);text-anchor:middle}
-  .hub-sub{font-family:sukhumvit,sans-serif;font-size:8px;font-weight:600;letter-spacing:.18em;
-    fill:var(--muted);text-anchor:middle;text-transform:uppercase}
-  .ball{transform-box:view-box;transform-origin:160px 160px;animation:orbit 7s linear infinite}
-  @keyframes orbit{to{transform:rotate(360deg)}}
+      /* ---- hero: flywheel + thesis ---- */
+      .hero {
+        display: grid;
+        grid-template-columns: 340px 1fr;
+        gap: 44px;
+        align-items: center;
+        margin-bottom: 52px;
+      }
+      .graphic {
+        width: 100%;
+        max-width: 340px;
+        aspect-ratio: 1;
+        margin: 0 auto;
+      }
+      .graphic svg {
+        width: 100%;
+        height: auto;
+        display: block;
+        overflow: visible;
+      }
+      .track {
+        fill: none;
+        stroke: var(--hair);
+        stroke-width: 16;
+      }
+      .arc {
+        fill: none;
+        stroke-width: 16;
+        stroke-linecap: round;
+        transition:
+          opacity 0.25s ease,
+          stroke-width 0.25s ease;
+      }
+      .arcA {
+        stroke: var(--gold);
+      }
+      .arcB {
+        stroke: var(--green);
+      }
+      .arcC {
+        stroke: var(--primary);
+      }
+      .dotA {
+        fill: var(--gold);
+      }
+      .dotB {
+        fill: var(--green);
+      }
+      .dotC {
+        fill: var(--primary);
+      }
+      .dot {
+        transition: opacity 0.25s ease;
+      }
+      .lbl {
+        font-family: sukhumvit, "Noto Sans Thai", sans-serif;
+        font-weight: 700;
+        font-size: 14px;
+        text-anchor: middle;
+      }
+      .lblA {
+        fill: #b45309;
+      }
+      .lblB {
+        fill: #15803d;
+      }
+      .lblC {
+        fill: var(--primary-dark);
+      }
+      .cap {
+        font-family: sukhumvit, sans-serif;
+        font-size: 8.5px;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        fill: var(--muted);
+        text-anchor: middle;
+        text-transform: uppercase;
+      }
+      .hub {
+        fill: var(--surface);
+        stroke: var(--hair);
+        stroke-width: 1.5;
+      }
+      .hub-name {
+        font-family: sukhumvit, "Noto Sans Thai", sans-serif;
+        font-weight: 700;
+        font-size: 15px;
+        fill: var(--primary);
+        text-anchor: middle;
+      }
+      .hub-sub {
+        font-family: sukhumvit, sans-serif;
+        font-size: 8px;
+        font-weight: 600;
+        letter-spacing: 0.18em;
+        fill: var(--muted);
+        text-anchor: middle;
+        text-transform: uppercase;
+      }
+      .ball {
+        transform-box: view-box;
+        transform-origin: 160px 160px;
+        animation: orbit 7s linear infinite;
+      }
+      @keyframes orbit {
+        to {
+          transform: rotate(360deg);
+        }
+      }
 
-  .thesis .eyebrow{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
-    color:var(--primary);margin:0 0 12px}
-  .lede{font-size:34px;font-weight:700;letter-spacing:-.5px;line-height:1.2;margin:0 0 14px;max-width:16ch}
-  .sub{font-size:16px;color:var(--muted);max-width:54ch;margin:0}
+      .thesis .eyebrow {
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--primary);
+        margin: 0 0 12px;
+      }
+      .lede {
+        font-size: 34px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+        line-height: 1.2;
+        margin: 0 0 14px;
+        max-width: 16ch;
+      }
+      .sub {
+        font-size: 16px;
+        color: var(--muted);
+        max-width: 54ch;
+        margin: 0;
+      }
 
-  /* ---- cards ---- */
-  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:20px}
-  a.card{position:relative;display:flex;flex-direction:column;text-decoration:none;color:inherit;
-    background:var(--surface);border:1px solid var(--hair);border-radius:var(--r);padding:24px;
-    box-shadow:var(--shadow);overflow:hidden;transition:transform .15s ease,box-shadow .15s ease}
-  a.card::before{content:"";position:absolute;inset:0 0 auto 0;height:3px}
-  .c1::before{background:var(--primary)} .c2::before{background:var(--green)} .c3::before{background:var(--gold)}
-  a.card:hover{transform:translateY(-3px);box-shadow:0 6px 14px rgba(23,23,23,.12),0 18px 40px rgba(23,23,23,.10)}
-  a.card:focus-visible{outline:2px solid var(--primary);outline-offset:3px}
-  .tag{display:inline-flex;align-self:flex-start;font-size:12px;font-weight:600;padding:5px 11px;
-    border-radius:999px;margin-bottom:14px}
-  .t1{background:#fef2f2;color:var(--primary-dark)}
-  .t2{background:#dcfce7;color:#15803d}
-  .t3{background:#fef3c7;color:#b45309}
-  .card h2{font-size:20px;margin:0 0 4px;font-weight:700}
-  .concept{font-size:13px;color:var(--muted);margin:0 0 14px}
-  .card p.body{font-size:14px;color:var(--ink);margin:0 0 18px;flex:1}
-  .kpi{display:flex;gap:18px;border-top:1px solid var(--hair);padding-top:14px;margin-bottom:16px}
-  .kpi div{font-size:12px;color:var(--muted)}
-  .kpi b{display:block;font-size:18px;color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums}
-  .open{font-size:14px;font-weight:600;color:var(--primary);display:inline-flex;align-items:center;gap:6px}
+      /* ---- cards ---- */
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+        gap: 20px;
+      }
+      a.card {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        text-decoration: none;
+        color: inherit;
+        background: var(--surface);
+        border: 1px solid var(--hair);
+        border-radius: var(--r);
+        padding: 24px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        transition:
+          transform 0.15s ease,
+          box-shadow 0.15s ease;
+      }
+      a.card::before {
+        content: "";
+        position: absolute;
+        inset: 0 0 auto 0;
+        height: 3px;
+      }
+      .c1::before {
+        background: var(--primary);
+      }
+      .c2::before {
+        background: var(--green);
+      }
+      .c3::before {
+        background: var(--gold);
+      }
+      a.card:hover {
+        transform: translateY(-3px);
+        box-shadow:
+          0 6px 14px rgba(23, 23, 23, 0.12),
+          0 18px 40px rgba(23, 23, 23, 0.1);
+      }
+      a.card:focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 3px;
+      }
+      .tag {
+        display: inline-flex;
+        align-self: flex-start;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 5px 11px;
+        border-radius: 999px;
+        margin-bottom: 14px;
+      }
+      .t1 {
+        background: #fef2f2;
+        color: var(--primary-dark);
+      }
+      .t2 {
+        background: #dcfce7;
+        color: #15803d;
+      }
+      .t3 {
+        background: #fef3c7;
+        color: #b45309;
+      }
+      .card h2 {
+        font-size: 20px;
+        margin: 0 0 4px;
+        font-weight: 700;
+      }
+      .concept {
+        font-size: 13px;
+        color: var(--muted);
+        margin: 0 0 14px;
+      }
+      .card p.body {
+        font-size: 14px;
+        color: var(--ink);
+        margin: 0 0 18px;
+        flex: 1;
+      }
+      .kpi {
+        display: flex;
+        gap: 18px;
+        border-top: 1px solid var(--hair);
+        padding-top: 14px;
+        margin-bottom: 16px;
+      }
+      .kpi div {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .kpi b {
+        display: block;
+        font-size: 18px;
+        color: var(--ink);
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+      }
+      .open {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--primary);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
 
-  footer{margin-top:44px;font-size:13px;color:var(--muted);border-top:1px solid var(--hair);padding-top:20px}
-  footer b{color:var(--ink)}
+      footer {
+        margin-top: 44px;
+        font-size: 13px;
+        color: var(--muted);
+        border-top: 1px solid var(--hair);
+        padding-top: 20px;
+      }
+      footer b {
+        color: var(--ink);
+      }
 
-  /* ---- opportunity: have / lack ---- */
-  .opp{margin:0 0 52px}
-  .opp .eyebrow{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
-    color:var(--primary);margin:0 0 18px}
-  .opp-grid{display:grid;grid-template-columns:1fr 1.15fr;gap:36px}
-  .opp h3{font-size:14px;font-weight:700;margin:0 0 14px}
-  .have ul{list-style:none;margin:0;padding:0;display:grid;gap:11px}
-  .have li{font-size:14px;color:var(--muted);padding-left:22px;position:relative;line-height:1.5}
-  .have li::before{content:"✓";position:absolute;left:0;top:0;color:var(--green);font-weight:700}
-  a.gap{display:block;text-decoration:none;color:inherit;padding:13px 16px;margin-bottom:11px;
-    background:var(--surface);border:1px solid var(--hair);border-left-width:3px;border-radius:8px;
-    transition:transform .15s ease,box-shadow .15s ease}
-  a.gap:hover{transform:translateX(3px);box-shadow:var(--shadow)}
-  a.gap:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
-  .g1{border-left-color:var(--primary)} .g2{border-left-color:var(--green)} .g3{border-left-color:var(--gold)}
-  .gap .h{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;margin-bottom:4px}
-  .gap .to{margin-left:auto;font-size:12px;font-weight:600;color:var(--muted);white-space:nowrap}
-  .gap p{font-size:13px;color:var(--muted);margin:0;line-height:1.5}
+      /* ---- opportunity: have / lack ---- */
+      .opp {
+        margin: 0 0 52px;
+      }
+      .opp .eyebrow {
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--primary);
+        margin: 0 0 18px;
+      }
+      .opp-grid {
+        display: grid;
+        grid-template-columns: 1fr 1.15fr;
+        gap: 36px;
+      }
+      .opp h3 {
+        font-size: 14px;
+        font-weight: 700;
+        margin: 0 0 14px;
+      }
+      .have ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 11px;
+      }
+      .have li {
+        font-size: 14px;
+        color: var(--muted);
+        padding-left: 22px;
+        position: relative;
+        line-height: 1.5;
+      }
+      .have li::before {
+        content: "✓";
+        position: absolute;
+        left: 0;
+        top: 0;
+        color: var(--green);
+        font-weight: 700;
+      }
+      a.gap {
+        display: block;
+        text-decoration: none;
+        color: inherit;
+        padding: 13px 16px;
+        margin-bottom: 11px;
+        background: var(--surface);
+        border: 1px solid var(--hair);
+        border-left-width: 3px;
+        border-radius: 8px;
+        transition:
+          transform 0.15s ease,
+          box-shadow 0.15s ease;
+      }
+      a.gap:hover {
+        transform: translateX(3px);
+        box-shadow: var(--shadow);
+      }
+      a.gap:focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
+      }
+      .g1 {
+        border-left-color: var(--primary);
+      }
+      .g2 {
+        border-left-color: var(--green);
+      }
+      .g3 {
+        border-left-color: var(--gold);
+      }
+      .gap .h {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+      .gap .to {
+        margin-left: auto;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--muted);
+        white-space: nowrap;
+      }
+      .gap p {
+        font-size: 13px;
+        color: var(--muted);
+        margin: 0;
+        line-height: 1.5;
+      }
 
-  /* ---- wheel <-> card linking on hover ---- */
-  .wrap:has(.c1:hover) .arcA,.wrap:has(.c1:hover) .arcB,.wrap:has(.c1:hover) .dotA,.wrap:has(.c1:hover) .dotB,
-  .wrap:has(.c2:hover) .arcA,.wrap:has(.c2:hover) .arcC,.wrap:has(.c2:hover) .dotA,.wrap:has(.c2:hover) .dotC,
-  .wrap:has(.c3:hover) .arcB,.wrap:has(.c3:hover) .arcC,.wrap:has(.c3:hover) .dotB,.wrap:has(.c3:hover) .dotC
-  {opacity:.18}
-  .wrap:has(.c1:hover) .arcC,.wrap:has(.c2:hover) .arcB,.wrap:has(.c3:hover) .arcA{stroke-width:22}
+      /* ---- wheel <-> card linking on hover ---- */
+      .wrap:has(.c1:hover) .arcA,
+      .wrap:has(.c1:hover) .arcB,
+      .wrap:has(.c1:hover) .dotA,
+      .wrap:has(.c1:hover) .dotB,
+      .wrap:has(.c2:hover) .arcA,
+      .wrap:has(.c2:hover) .arcC,
+      .wrap:has(.c2:hover) .dotA,
+      .wrap:has(.c2:hover) .dotC,
+      .wrap:has(.c3:hover) .arcB,
+      .wrap:has(.c3:hover) .arcC,
+      .wrap:has(.c3:hover) .dotB,
+      .wrap:has(.c3:hover) .dotC {
+        opacity: 0.18;
+      }
+      .wrap:has(.c1:hover) .arcC,
+      .wrap:has(.c2:hover) .arcB,
+      .wrap:has(.c3:hover) .arcA {
+        stroke-width: 22;
+      }
 
-  @media (max-width:780px){
-    .hero{grid-template-columns:1fr;gap:28px}
-    .graphic{max-width:280px}
-    .lede{font-size:28px}
-    .opp-grid{grid-template-columns:1fr;gap:24px}
-  }
-  @media (prefers-reduced-motion:reduce){
-    .ball{animation:none}
-    a.card{transition:none}
-  }
-</style>
-</head>
-<body>
-<div class="wrap">
-  <header class="top">
-    <div class="logo">T</div>
-    <h1>ไทยมาร์ท · ต้นแบบโปรดักต์</h1>
-    <span class="pill">3 ต้นแบบ · กดใช้งานได้จริง</span>
-  </header>
-
-  <section class="hero">
-    <div class="graphic">
-      <svg viewBox="0 0 320 320" role="img" aria-labelledby="fwTitle fwDesc">
-        <title id="fwTitle">วงล้อมาร์เก็ตเพลสของไทยมาร์ท</title>
-        <desc id="fwDesc">ลูปต่อเนื่อง: ผู้ขาย → การจัดส่ง → ลูกค้า โดยแต่ละส่วนแทนต้นแบบหนึ่งชิ้น</desc>
-        <circle class="track" cx="160" cy="160" r="120"/>
-        <!-- arcs: A=ผู้ขาย (amber, VendorExpress), B=การจัดส่ง (green, LocalPick), C=ลูกค้า (red, SmartRewards) -->
-        <path class="arc arcA" d="M170.5,40.5 A120,120 0 0 1 268.8,210.7"/>
-        <path class="arc arcB" d="M258.3,228.8 A120,120 0 0 1 61.7,228.8"/>
-        <path class="arc arcC" d="M51.2,210.7 A120,120 0 0 1 149.5,40.5"/>
-        <circle class="dot dotA" cx="263.9" cy="100" r="6"/>
-        <circle class="dot dotB" cx="160" cy="280" r="6"/>
-        <circle class="dot dotC" cx="56.1" cy="100" r="6"/>
-        <!-- inner labels -->
-        <text class="lbl lblA" x="234" y="114">ผู้ขาย</text>
-        <text class="cap" x="234" y="127">Supply</text>
-        <text class="lbl lblB" x="160" y="240">การจัดส่ง</text>
-        <text class="cap" x="160" y="253">Fulfillment</text>
-        <text class="lbl lblC" x="86" y="114">ลูกค้า</text>
-        <text class="cap" x="86" y="127">Demand</text>
-        <!-- hub -->
-        <circle class="hub" cx="160" cy="160" r="48"/>
-        <text class="hub-name" x="160" y="157">ไทยมาร์ท</text>
-        <text class="hub-sub" x="160" y="172">Marketplace</text>
-        <!-- flowing order token -->
-        <g class="ball">
-          <circle cx="160" cy="40" r="9" fill="#fff"/>
-          <circle cx="160" cy="40" r="5.5" fill="#e32321"/>
-        </g>
-      </svg>
-    </div>
-
-    <div class="thesis">
-      <p class="eyebrow">กรณีศึกษา Product Management</p>
-      <h1 class="lede">สามเดิมพันโปรดักต์ หนึ่งวงล้อมาร์เก็ตเพลส</h1>
-      <p class="sub">ต้นแบบสามชิ้นสำหรับไทยมาร์ท แต่ละชิ้นออกแรงกับคนละจุดของวงล้อ —
-        ดึงผู้ขายเข้าระบบ เร่งการจัดส่ง และรักษาลูกค้าให้กลับมาซ้ำ ทุกชิ้นกดใช้งานได้จริง
-        พร้อมมุมมอง “วิธีการทำงาน” ที่อธิบายปัญหา กลุ่มผู้ใช้ ตัวชี้วัดเป้าหมาย และไดอะแกรมระบบ/พิมพ์เขียวบริการ
-        ให้เห็นว่าโจทย์ธุรกิจถูกแปลงเป็นเชิงเทคนิคอย่างไร</p>
-    </div>
-  </section>
-
-  <section class="opp">
-    <p class="eyebrow">บริบทโอกาส · มีอะไรแล้ว → ยังขาดอะไร</p>
-    <div class="opp-grid">
-      <div class="have">
-        <h3>ไทยมาร์ทมีอะไรแล้ว</h3>
-        <ul>
-          <li>มาร์เก็ตเพลสหลายหมวด — จากเครื่องใช้ไฟฟ้าและของใช้ในบ้าน ขยายสู่อาหาร แฟชั่น เครื่องสำอาง แม่และเด็ก</li>
-          <li>แอปเนทีฟครบทั้ง iOS และ Android</li>
-          <li>ออมนิแชนเนล — ร้านที่ยืนยันตัวตนจริง พร้อมสโตร์ทางการบน Shopee และ Lazada</li>
-          <li>กรอบการคืนเงิน คืนสินค้า และทีมไกล่เกลี่ยข้อพิพาทมาตรฐาน</li>
-        </ul>
-      </div>
-      <div class="lack">
-        <h3>ยังขาด — และนี่คือสามเดิมพัน</h3>
-        <a class="gap g1" href="01-smartrewards.html">
-          <div class="h">การแนะนำเฉพาะบุคคล<span class="to">SmartRewards →</span></div>
-          <p>พอขยายจากเครื่องใช้ไฟฟ้าซื้อครั้งเดียว มาสู่ของกินของใช้ประจำวัน หน้าจอแนะนำสินค้ายังหว่านเหมือนกันทุกคน ขาดการค้นพบเชิงทำนายตามพฤติกรรมรายบุคคลเพื่อดัน LTV</p>
+      @media (max-width: 780px) {
+        .hero {
+          grid-template-columns: 1fr;
+          gap: 28px;
+        }
+        .graphic {
+          max-width: 280px;
+        }
+        .lede {
+          font-size: 28px;
+        }
+        .opp-grid {
+          grid-template-columns: 1fr;
+          gap: 24px;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .ball {
+          animation: none;
+        }
+        a.card {
+          transition: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="top">
+        <div class="logo">T</div>
+        <h1>ไทยมาร์ท · ต้นแบบโปรดักต์</h1>
+        <span class="pill">3 ต้นแบบ · กดใช้งานได้จริง</span>
+        <a
+          class="profile-link"
+          href="https://zonxpk.github.io"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Go to zonxpk profile"
+        >
+          <svg viewBox="0 0 16 16" aria-hidden="true">
+            <path
+              d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.5-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.65 7.65 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8Z"
+            />
+          </svg>
+          <span>Zonxpk</span>
         </a>
-        <a class="gap g2" href="02-localpick.html">
-          <div class="h">เชื่อมออนไลน์กับหน้าร้าน<span class="to">LocalPick →</span></div>
-          <p>ยืนยันร้านจริงแล้ว แต่สะพานจาก “เลือกของออนไลน์” สู่ “รับที่ร้าน” ยังขาดตอน ขาดลูป click-and-collect ที่ซิงก์สต็อกหน้าร้านแบบเรียลไทม์เพื่อสู้กับการจัดส่งที่ช้า</p>
+      </header>
+
+      <section class="hero">
+        <div class="graphic">
+          <svg
+            viewBox="0 0 320 320"
+            role="img"
+            aria-labelledby="fwTitle fwDesc"
+          >
+            <title id="fwTitle">วงล้อมาร์เก็ตเพลสของไทยมาร์ท</title>
+            <desc id="fwDesc">
+              ลูปต่อเนื่อง: ผู้ขาย → การจัดส่ง → ลูกค้า
+              โดยแต่ละส่วนแทนต้นแบบหนึ่งชิ้น
+            </desc>
+            <circle class="track" cx="160" cy="160" r="120" />
+            <!-- arcs: A=ผู้ขาย (amber, VendorExpress), B=การจัดส่ง (green, LocalPick), C=ลูกค้า (red, SmartRewards) -->
+            <path class="arc arcA" d="M170.5,40.5 A120,120 0 0 1 268.8,210.7" />
+            <path class="arc arcB" d="M258.3,228.8 A120,120 0 0 1 61.7,228.8" />
+            <path class="arc arcC" d="M51.2,210.7 A120,120 0 0 1 149.5,40.5" />
+            <circle class="dot dotA" cx="263.9" cy="100" r="6" />
+            <circle class="dot dotB" cx="160" cy="280" r="6" />
+            <circle class="dot dotC" cx="56.1" cy="100" r="6" />
+            <!-- inner labels -->
+            <text class="lbl lblA" x="234" y="114">ผู้ขาย</text>
+            <text class="cap" x="234" y="127">Supply</text>
+            <text class="lbl lblB" x="160" y="240">การจัดส่ง</text>
+            <text class="cap" x="160" y="253">Fulfillment</text>
+            <text class="lbl lblC" x="86" y="114">ลูกค้า</text>
+            <text class="cap" x="86" y="127">Demand</text>
+            <!-- hub -->
+            <circle class="hub" cx="160" cy="160" r="48" />
+            <text class="hub-name" x="160" y="157">ไทยมาร์ท</text>
+            <text class="hub-sub" x="160" y="172">Marketplace</text>
+            <!-- flowing order token -->
+            <g class="ball">
+              <circle cx="160" cy="40" r="9" fill="#fff" />
+              <circle cx="160" cy="40" r="5.5" fill="#e32321" />
+            </g>
+          </svg>
+        </div>
+
+        <div class="thesis">
+          <p class="eyebrow">กรณีศึกษา Product Management</p>
+          <h1 class="lede">สามเดิมพันโปรดักต์ หนึ่งวงล้อมาร์เก็ตเพลส</h1>
+          <p class="sub">
+            ต้นแบบสามชิ้นสำหรับไทยมาร์ท แต่ละชิ้นออกแรงกับคนละจุดของวงล้อ —
+            ดึงผู้ขายเข้าระบบ เร่งการจัดส่ง และรักษาลูกค้าให้กลับมาซ้ำ
+            ทุกชิ้นกดใช้งานได้จริง พร้อมมุมมอง “วิธีการทำงาน” ที่อธิบายปัญหา
+            กลุ่มผู้ใช้ ตัวชี้วัดเป้าหมาย และไดอะแกรมระบบ/พิมพ์เขียวบริการ
+            ให้เห็นว่าโจทย์ธุรกิจถูกแปลงเป็นเชิงเทคนิคอย่างไร
+          </p>
+        </div>
+      </section>
+
+      <section class="opp">
+        <p class="eyebrow">บริบทโอกาส · มีอะไรแล้ว → ยังขาดอะไร</p>
+        <div class="opp-grid">
+          <div class="have">
+            <h3>ไทยมาร์ทมีอะไรแล้ว</h3>
+            <ul>
+              <li>
+                มาร์เก็ตเพลสหลายหมวด — จากเครื่องใช้ไฟฟ้าและของใช้ในบ้าน
+                ขยายสู่อาหาร แฟชั่น เครื่องสำอาง แม่และเด็ก
+              </li>
+              <li>แอปเนทีฟครบทั้ง iOS และ Android</li>
+              <li>
+                ออมนิแชนเนล — ร้านที่ยืนยันตัวตนจริง พร้อมสโตร์ทางการบน Shopee
+                และ Lazada
+              </li>
+              <li>กรอบการคืนเงิน คืนสินค้า และทีมไกล่เกลี่ยข้อพิพาทมาตรฐาน</li>
+            </ul>
+          </div>
+          <div class="lack">
+            <h3>ยังขาด — และนี่คือสามเดิมพัน</h3>
+            <a class="gap g1" href="01-smartrewards.html">
+              <div class="h">
+                การแนะนำเฉพาะบุคคล<span class="to">SmartRewards →</span>
+              </div>
+              <p>
+                พอขยายจากเครื่องใช้ไฟฟ้าซื้อครั้งเดียว มาสู่ของกินของใช้ประจำวัน
+                หน้าจอแนะนำสินค้ายังหว่านเหมือนกันทุกคน
+                ขาดการค้นพบเชิงทำนายตามพฤติกรรมรายบุคคลเพื่อดัน LTV
+              </p>
+            </a>
+            <a class="gap g2" href="02-localpick.html">
+              <div class="h">
+                เชื่อมออนไลน์กับหน้าร้าน<span class="to">LocalPick →</span>
+              </div>
+              <p>
+                ยืนยันร้านจริงแล้ว แต่สะพานจาก “เลือกของออนไลน์” สู่
+                “รับที่ร้าน” ยังขาดตอน ขาดลูป click-and-collect
+                ที่ซิงก์สต็อกหน้าร้านแบบเรียลไทม์เพื่อสู้กับการจัดส่งที่ช้า
+              </p>
+            </a>
+            <a class="gap g3" href="03-vendorexpress.html">
+              <div class="h">
+                ออโตเมชันฝั่งผู้ขาย<span class="to">VendorExpress →</span>
+              </div>
+              <p>
+                ผู้ขายที่ไม่สายเทคจัดรูปแบบแคตตาล็อกให้ตรงสคีมาไม่ไหว
+                การตรวจด้วยมือกลายเป็นคอขวดของการสเกล
+                ขาดเครื่องมือแมประดับบัลก์ที่จัดหมวดหมู่ให้อัตโนมัติ
+              </p>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <div class="grid">
+        <a class="card c1" href="01-smartrewards.html">
+          <span class="tag t1">ส่วนบุคคล · รักษาฐานลูกค้า</span>
+          <h2>SmartRewards &amp; ตะกร้าอัจฉริยะ</h2>
+          <p class="concept">
+            วิดเจ็ตสะสมแต้ม + แนะนำสินค้าด้วย AI ในแอปไทยมาร์ท
+          </p>
+          <p class="body">
+            เพอร์โซนา “นักช้อปสายคุ้ม” กับ “สายสะดวก” ขับเคลื่อนคำแนะนำเฉพาะคน
+            เพื่อลดการเลิกใช้โดยไม่ต้องหั่นมาร์จิ้นด้วยส่วนลดแบบหว่าน
+          </p>
+          <div class="kpi">
+            <div>ซื้อซ้ำ<b>+15%</b></div>
+            <div>ยอดต่อบิล<b>+10%</b></div>
+          </div>
+          <span class="open">เปิดต้นแบบ →</span>
         </a>
-        <a class="gap g3" href="03-vendorexpress.html">
-          <div class="h">ออโตเมชันฝั่งผู้ขาย<span class="to">VendorExpress →</span></div>
-          <p>ผู้ขายที่ไม่สายเทคจัดรูปแบบแคตตาล็อกให้ตรงสคีมาไม่ไหว การตรวจด้วยมือกลายเป็นคอขวดของการสเกล ขาดเครื่องมือแมประดับบัลก์ที่จัดหมวดหมู่ให้อัตโนมัติ</p>
+
+        <a class="card c2" href="02-localpick.html">
+          <span class="tag t2">ปฏิบัติการ · การจัดส่ง</span>
+          <h2>LocalPick</h2>
+          <p class="concept">
+            สต็อกหน้าร้านแบบเรียลไทม์ + รับสินค้าที่ร้านใน 2 ชั่วโมง
+          </p>
+          <p class="body">
+            ลูกค้าจองสต็อกหน้าร้าน พนักงานจัดและเตรียมสินค้าผ่านแอป
+            พิมพ์เขียวบริการครอบคลุมทั้งสองฝั่ง เริ่มนำร่องที่ร้านเดียว
+          </p>
+          <div class="kpi">
+            <div>SLA การจัดส่ง<b>&lt; 2 ชม.</b></div>
+            <div>นำร่อง<b>1 ร้าน</b></div>
+          </div>
+          <span class="open">เปิดต้นแบบ →</span>
+        </a>
+
+        <a class="card c3" href="03-vendorexpress.html">
+          <span class="tag t3">B2B · แพลตฟอร์มมาร์เก็ตเพลส</span>
+          <h2>VendorExpress</h2>
+          <p class="concept">ลงทะเบียนผู้ขายด้วยตนเอง + แดชบอร์ดจัดการสินค้า</p>
+          <p class="body">
+            ยืนยันตัวตนอัตโนมัติ อัปโหลดสินค้าจำนวนมาก และจัดหมวดหมู่ด้วย AI
+            แทนการกรอกข้อมูลด้วยมือ 14 วัน
+          </p>
+          <div class="kpi">
+            <div>ลงทะเบียน<b>14 วัน → 48 ชม.</b></div>
+            <div>การกรอกข้อมูล<b>บริการตนเอง</b></div>
+          </div>
+          <span class="open">เปิดต้นแบบ →</span>
         </a>
       </div>
+
+      <footer>
+        <b>วิธีเดโม:</b> เปิดต้นแบบใดก็ได้ แล้วใช้แท็บด้านบนสลับระหว่างโฟลว์
+        <b>ตัวอย่างการใช้งาน</b> ที่กดได้จริง กับมุมมอง
+        <b>วิธีการทำงาน</b> (ไดอะแกรม + เหตุผลเชิง PM) การทำงานแบบ async
+        จำลองด้วยตัวจับเวลาสั้นๆ สถานะหน้าจอและฟอร์มจะถูกบันทึกไว้แม้รีโหลดหน้า
+      </footer>
     </div>
-  </section>
-
-  <div class="grid">
-    <a class="card c1" href="01-smartrewards.html">
-      <span class="tag t1">ส่วนบุคคล · รักษาฐานลูกค้า</span>
-      <h2>SmartRewards &amp; ตะกร้าอัจฉริยะ</h2>
-      <p class="concept">วิดเจ็ตสะสมแต้ม + แนะนำสินค้าด้วย AI ในแอปไทยมาร์ท</p>
-      <p class="body">เพอร์โซนา “นักช้อปสายคุ้ม” กับ “สายสะดวก” ขับเคลื่อนคำแนะนำเฉพาะคน
-        เพื่อลดการเลิกใช้โดยไม่ต้องหั่นมาร์จิ้นด้วยส่วนลดแบบหว่าน</p>
-      <div class="kpi">
-        <div>ซื้อซ้ำ<b>+15%</b></div>
-        <div>ยอดต่อบิล<b>+10%</b></div>
-      </div>
-      <span class="open">เปิดต้นแบบ →</span>
-    </a>
-
-    <a class="card c2" href="02-localpick.html">
-      <span class="tag t2">ปฏิบัติการ · การจัดส่ง</span>
-      <h2>LocalPick</h2>
-      <p class="concept">สต็อกหน้าร้านแบบเรียลไทม์ + รับสินค้าที่ร้านใน 2 ชั่วโมง</p>
-      <p class="body">ลูกค้าจองสต็อกหน้าร้าน พนักงานจัดและเตรียมสินค้าผ่านแอป
-        พิมพ์เขียวบริการครอบคลุมทั้งสองฝั่ง เริ่มนำร่องที่ร้านเดียว</p>
-      <div class="kpi">
-        <div>SLA การจัดส่ง<b>&lt; 2 ชม.</b></div>
-        <div>นำร่อง<b>1 ร้าน</b></div>
-      </div>
-      <span class="open">เปิดต้นแบบ →</span>
-    </a>
-
-    <a class="card c3" href="03-vendorexpress.html">
-      <span class="tag t3">B2B · แพลตฟอร์มมาร์เก็ตเพลส</span>
-      <h2>VendorExpress</h2>
-      <p class="concept">ลงทะเบียนผู้ขายด้วยตนเอง + แดชบอร์ดจัดการสินค้า</p>
-      <p class="body">ยืนยันตัวตนอัตโนมัติ อัปโหลดสินค้าจำนวนมาก และจัดหมวดหมู่ด้วย AI
-        แทนการกรอกข้อมูลด้วยมือ 14 วัน</p>
-      <div class="kpi">
-        <div>ลงทะเบียน<b>14 วัน → 48 ชม.</b></div>
-        <div>การกรอกข้อมูล<b>บริการตนเอง</b></div>
-      </div>
-      <span class="open">เปิดต้นแบบ →</span>
-    </a>
-  </div>
-
-  <footer>
-    <b>วิธีเดโม:</b> เปิดต้นแบบใดก็ได้ แล้วใช้แท็บด้านบนสลับระหว่างโฟลว์ <b>ตัวอย่างการใช้งาน</b> ที่กดได้จริง
-    กับมุมมอง <b>วิธีการทำงาน</b> (ไดอะแกรม + เหตุผลเชิง PM) การทำงานแบบ async จำลองด้วยตัวจับเวลาสั้นๆ
-    สถานะหน้าจอและฟอร์มจะถูกบันทึกไว้แม้รีโหลดหน้า
-  </footer>
-</div>
-</body>
+  </body>
 </html>

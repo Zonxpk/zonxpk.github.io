@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="th">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>ThaiMart VendorExpress</title>
-<!--
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ThaiMart VendorExpress</title>
+    <!--
 ========================================================================
 ThaiMart VendorExpress — clickable prototype (single file)
 ========================================================================
@@ -32,1062 +32,2671 @@ STATE (persisted to localStorage key tm_vx_state):
   onboardingPct    derived 0..100
 ========================================================================
 -->
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet" />
-<style>
-@font-face{font-family:sukhumvit;src:url(fonts/sukhumvit-400.woff2) format("woff2");font-weight:400;font-display:swap}@font-face{font-family:sukhumvit;src:url(fonts/sukhumvit-500.woff2) format("woff2");font-weight:500;font-display:swap}@font-face{font-family:sukhumvit;src:url(fonts/sukhumvit-700.woff2) format("woff2");font-weight:600;font-display:swap}@font-face{font-family:sukhumvit;src:url(fonts/sukhumvit-700.woff2) format("woff2");font-weight:700;font-display:swap}
-  :root{
-    --primary:#e32321; --primary-dark:#b91c1c;
-    --green:#00a63e; --gold:#f59e0b;
-    --ink:#171717; --muted:#72757e;
-    --surface:#FFFFFF; --canvas:#f5f5f7; --hair:#e5e5e7;
-    --r-card:12px; --r-input:5px; --r-pill:999px;
-    --sh-sm:0 1px 3px rgba(23,23,23,.08);
-    --sh-lg:0 8px 24px rgba(23,23,23,.06);
-    --focus:0 0 0 2px var(--surface), 0 0 0 4px var(--green);
-  }
-  *{box-sizing:border-box}
-  html,body{margin:0;padding:0}
-  body{
-    font-family:sukhumvit,'Inter','Noto Sans Thai',system-ui,sans-serif;
-    background:#ebebeb; color:var(--ink);
-    -webkit-font-smoothing:antialiased; line-height:1.5;
-    min-height:100vh; padding:24px 16px 64px;
-  }
-  button{font-family:inherit; cursor:pointer}
-  :focus-visible{outline:none; box-shadow:var(--focus)}
-  .visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      @font-face {
+        font-family: sukhumvit;
+        src: url(fonts/sukhumvit-400.woff2) format("woff2");
+        font-weight: 400;
+        font-display: swap;
+      }
+      @font-face {
+        font-family: sukhumvit;
+        src: url(fonts/sukhumvit-500.woff2) format("woff2");
+        font-weight: 500;
+        font-display: swap;
+      }
+      @font-face {
+        font-family: sukhumvit;
+        src: url(fonts/sukhumvit-700.woff2) format("woff2");
+        font-weight: 600;
+        font-display: swap;
+      }
+      @font-face {
+        font-family: sukhumvit;
+        src: url(fonts/sukhumvit-700.woff2) format("woff2");
+        font-weight: 700;
+        font-display: swap;
+      }
+      :root {
+        --primary: #e32321;
+        --primary-dark: #b91c1c;
+        --green: #00a63e;
+        --gold: #f59e0b;
+        --ink: #171717;
+        --muted: #72757e;
+        --surface: #ffffff;
+        --canvas: #f5f5f7;
+        --hair: #e5e5e7;
+        --r-card: 12px;
+        --r-input: 5px;
+        --r-pill: 999px;
+        --sh-sm: 0 1px 3px rgba(23, 23, 23, 0.08);
+        --sh-lg: 0 8px 24px rgba(23, 23, 23, 0.06);
+        --focus: 0 0 0 2px var(--surface), 0 0 0 4px var(--green);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family:
+          sukhumvit, "Inter", "Noto Sans Thai", system-ui, sans-serif;
+        background: #ebebeb;
+        color: var(--ink);
+        -webkit-font-smoothing: antialiased;
+        line-height: 1.5;
+        min-height: 100vh;
+        padding: 24px 16px 64px;
+      }
+      button {
+        font-family: inherit;
+        cursor: pointer;
+      }
+      :focus-visible {
+        outline: none;
+        box-shadow: var(--focus);
+      }
+      .visually-hidden {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+      }
 
-  /* ---- Browser frame ---- */
-  .frame{
-    max-width:1180px; margin:0 auto;
-    background:var(--surface); border-radius:16px;
-    box-shadow:var(--sh-lg), 0 24px 60px rgba(23,23,23,.14);
-    overflow:hidden; border:1px solid var(--hair);
-  }
-  .chrome{
-    background:#e5e5e7; padding:11px 16px; display:flex; align-items:center; gap:14px;
-    border-bottom:1px solid var(--hair);
-  }
-  .dots{display:flex; gap:8px}
-  .dots i{width:12px;height:12px;border-radius:50%;display:block}
-  .dots i:nth-child(1){background:#FF5F57}
-  .dots i:nth-child(2){background:#FEBC2E}
-  .dots i:nth-child(3){background:#28C840}
-  .urlbar{
-    flex:1; background:var(--surface); border-radius:var(--r-pill);
-    padding:7px 16px; font-size:13px; color:var(--muted);
-    display:flex; align-items:center; gap:8px; max-width:520px; border:1px solid var(--hair);
-  }
-  .urlbar .lock{color:var(--green); font-size:12px}
-  .urlbar b{color:var(--ink); font-weight:500}
+      /* ---- Browser frame ---- */
+      .frame {
+        max-width: 1180px;
+        margin: 0 auto;
+        background: var(--surface);
+        border-radius: 16px;
+        box-shadow:
+          var(--sh-lg),
+          0 24px 60px rgba(23, 23, 23, 0.14);
+        overflow: hidden;
+        border: 1px solid var(--hair);
+      }
+      .chrome {
+        background: #e5e5e7;
+        padding: 11px 16px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        border-bottom: 1px solid var(--hair);
+      }
+      .dots {
+        display: flex;
+        gap: 8px;
+      }
+      .dots i {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        display: block;
+      }
+      .dots i:nth-child(1) {
+        background: #ff5f57;
+      }
+      .dots i:nth-child(2) {
+        background: #febc2e;
+      }
+      .dots i:nth-child(3) {
+        background: #28c840;
+      }
+      .urlbar {
+        flex: 1;
+        background: var(--surface);
+        border-radius: var(--r-pill);
+        padding: 7px 16px;
+        font-size: 13px;
+        color: var(--muted);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        max-width: 520px;
+        border: 1px solid var(--hair);
+      }
+      .urlbar .lock {
+        color: var(--green);
+        font-size: 12px;
+      }
+      .urlbar b {
+        color: var(--ink);
+        font-weight: 500;
+      }
 
-  /* ---- App shell ---- */
-  .app{min-height:660px; display:flex; flex-direction:column}
-  .topbar{
-    display:flex; align-items:center; justify-content:space-between;
-    padding:14px 28px; border-bottom:1px solid var(--hair); background:var(--surface);
-  }
-  .brand{display:flex; align-items:center; gap:11px; font-weight:700; font-size:17px}
-  .logo{
-    width:30px;height:30px;border-radius:9px;
-    background:linear-gradient(135deg,var(--primary),var(--primary-dark));
-    display:grid;place-items:center;color:#fff;font-weight:700;font-size:15px;
-    box-shadow:0 2px 6px rgba(227,35,33,.35);
-  }
-  .brand small{display:block;font-weight:500;font-size:11px;color:var(--muted);letter-spacing:.3px}
-  .tabs{display:flex; gap:4px; background:var(--canvas); padding:4px; border-radius:var(--r-pill)}
-  .tabs button{
-    border:none; background:transparent; padding:8px 18px; border-radius:var(--r-pill);
-    font-size:13px; font-weight:600; color:var(--muted); min-height:36px;
-  }
-  .tabs button[aria-selected="true"]{background:var(--surface); color:var(--ink); box-shadow:var(--sh-sm)}
-  .vendor-chip{display:flex;align-items:center;gap:9px;font-size:13px}
-  .vendor-chip .av{
-    width:32px;height:32px;border-radius:9px;background:var(--gold);color:#422006;
-    display:grid;place-items:center;font-weight:700;font-size:13px;
-  }
-  .vendor-chip b{font-weight:600}
-  .vendor-chip span{display:block;color:var(--muted);font-size:11px}
+      /* ---- App shell ---- */
+      .app {
+        min-height: 660px;
+        display: flex;
+        flex-direction: column;
+      }
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 28px;
+        border-bottom: 1px solid var(--hair);
+        background: var(--surface);
+        gap: 14px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        font-weight: 700;
+        font-size: 17px;
+        min-width: 0;
+        flex: 1;
+      }
+      .logo {
+        width: 30px;
+        height: 30px;
+        border-radius: 9px;
+        background: linear-gradient(
+          135deg,
+          var(--primary),
+          var(--primary-dark)
+        );
+        display: grid;
+        place-items: center;
+        color: #fff;
+        font-weight: 700;
+        font-size: 15px;
+        box-shadow: 0 2px 6px rgba(227, 35, 33, 0.35);
+      }
+      .brand small {
+        display: block;
+        font-weight: 500;
+        font-size: 11px;
+        color: var(--muted);
+        letter-spacing: 0.3px;
+      }
+      .profile-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        border-radius: var(--r-pill);
+        border: 1px solid var(--hair);
+        background: var(--surface);
+        color: var(--ink);
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 600;
+        box-shadow: var(--sh-sm);
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+      .profile-link svg {
+        width: 16px;
+        height: 16px;
+        fill: currentColor;
+      }
+      .tabs {
+        display: flex;
+        gap: 4px;
+        background: var(--canvas);
+        padding: 4px;
+        border-radius: var(--r-pill);
+        flex-shrink: 0;
+      }
+      .tabs button {
+        border: none;
+        background: transparent;
+        padding: 8px 18px;
+        border-radius: var(--r-pill);
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--muted);
+        min-height: 36px;
+      }
+      .tabs button[aria-selected="true"] {
+        background: var(--surface);
+        color: var(--ink);
+        box-shadow: var(--sh-sm);
+      }
+      .vendor-chip {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        font-size: 13px;
+        flex-shrink: 0;
+      }
+      .vendor-chip .av {
+        width: 32px;
+        height: 32px;
+        border-radius: 9px;
+        background: var(--gold);
+        color: #422006;
+        display: grid;
+        place-items: center;
+        font-weight: 700;
+        font-size: 13px;
+      }
+      .vendor-chip b {
+        font-weight: 600;
+      }
+      .vendor-chip span {
+        display: block;
+        color: var(--muted);
+        font-size: 11px;
+      }
 
-  .body{flex:1; display:flex; min-height:0}
-  /* ---- Stepper sidebar (proto) ---- */
-  .rail{
-    width:248px; flex-shrink:0; background:var(--canvas);
-    border-right:1px solid var(--hair); padding:24px 18px;
-  }
-  .rail h2{font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin:0 0 16px 6px}
-  .navitem{
-    display:flex; align-items:center; gap:12px; width:100%; text-align:left;
-    border:none; background:transparent; padding:11px 12px; border-radius:10px;
-    font-size:14px; font-weight:500; color:var(--ink); margin-bottom:4px; min-height:44px;
-  }
-  .navitem:hover{background:#fff}
-  .navitem[aria-current="true"]{background:#fff; box-shadow:var(--sh-sm); font-weight:600}
-  .navitem .num{
-    width:24px;height:24px;border-radius:50%;flex-shrink:0;
-    display:grid;place-items:center;font-size:12px;font-weight:700;
-    background:var(--hair); color:var(--muted);
-  }
-  .navitem[aria-current="true"] .num{background:var(--primary); color:#fff}
-  .navitem.done .num{background:var(--green); color:#fff}
-  .rail .pct-card{
-    margin-top:24px; background:#fff; border-radius:var(--r-card); padding:16px;
-    box-shadow:var(--sh-sm);
-  }
-  .rail .pct-card .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
-  .rail .pct-card .big{font-size:22px;font-weight:700;margin-top:2px}
-  .miniring{display:flex;align-items:center;gap:12px;margin-top:8px}
+      .body {
+        flex: 1;
+        display: flex;
+        min-height: 0;
+      }
+      /* ---- Stepper sidebar (proto) ---- */
+      .rail {
+        width: 248px;
+        flex-shrink: 0;
+        background: var(--canvas);
+        border-right: 1px solid var(--hair);
+        padding: 24px 18px;
+      }
+      .rail h2 {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        color: var(--muted);
+        margin: 0 0 16px 6px;
+      }
+      .navitem {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        text-align: left;
+        border: none;
+        background: transparent;
+        padding: 11px 12px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--ink);
+        margin-bottom: 4px;
+        min-height: 44px;
+      }
+      .navitem:hover {
+        background: #fff;
+      }
+      .navitem[aria-current="true"] {
+        background: #fff;
+        box-shadow: var(--sh-sm);
+        font-weight: 600;
+      }
+      .navitem .num {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        display: grid;
+        place-items: center;
+        font-size: 12px;
+        font-weight: 700;
+        background: var(--hair);
+        color: var(--muted);
+      }
+      .navitem[aria-current="true"] .num {
+        background: var(--primary);
+        color: #fff;
+      }
+      .navitem.done .num {
+        background: var(--green);
+        color: #fff;
+      }
+      .rail .pct-card {
+        margin-top: 24px;
+        background: #fff;
+        border-radius: var(--r-card);
+        padding: 16px;
+        box-shadow: var(--sh-sm);
+      }
+      .rail .pct-card .lbl {
+        font-size: 11px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .rail .pct-card .big {
+        font-size: 22px;
+        font-weight: 700;
+        margin-top: 2px;
+      }
+      .miniring {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 8px;
+      }
 
-  .main{flex:1; padding:32px 40px; overflow-y:auto; max-height:calc(660px - 0px)}
-  .screen{display:none; animation:fade .35s ease}
-  .screen.active{display:block}
-  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+      .main {
+        flex: 1;
+        padding: 32px 40px;
+        overflow-y: auto;
+        max-height: calc(660px - 0px);
+      }
+      .screen {
+        display: none;
+        animation: fade 0.35s ease;
+      }
+      .screen.active {
+        display: block;
+      }
+      @keyframes fade {
+        from {
+          opacity: 0;
+          transform: translateY(6px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
 
-  h1.title{font-size:24px;font-weight:700;margin:0 0 4px}
-  .sub{color:var(--muted);font-size:14px;margin:0 0 24px}
+      h1.title {
+        font-size: 24px;
+        font-weight: 700;
+        margin: 0 0 4px;
+      }
+      .sub {
+        color: var(--muted);
+        font-size: 14px;
+        margin: 0 0 24px;
+      }
 
-  /* ---- Forms ---- */
-  .field{margin-bottom:18px;max-width:520px}
-  .field.half{display:inline-block;width:calc(50% - 8px);max-width:none}
-  .field.half:nth-of-type(odd){margin-right:14px}
-  label{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
-  label .req{color:var(--primary)}
-  input,select{
-    width:100%; padding:12px 14px; border:1.5px solid var(--hair); border-radius:var(--r-input);
-    font-size:14px; font-family:inherit; background:var(--surface); color:var(--ink); min-height:44px;
-  }
-  input:focus,select:focus{border-color:var(--green); outline:none; box-shadow:0 0 0 3px rgba(0,166,62,.13)}
-  input.err,select.err{border-color:var(--primary); box-shadow:0 0 0 3px rgba(227,35,33,.12)}
-  .hint{font-size:12px;color:var(--muted);margin-top:5px}
-  .errmsg{font-size:12px;color:var(--primary-dark);margin-top:5px;display:none;font-weight:500}
-  .errmsg.show{display:block}
+      /* ---- Forms ---- */
+      .field {
+        margin-bottom: 18px;
+        max-width: 520px;
+      }
+      .field.half {
+        display: inline-block;
+        width: calc(50% - 8px);
+        max-width: none;
+      }
+      .field.half:nth-of-type(odd) {
+        margin-right: 14px;
+      }
+      label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 6px;
+      }
+      label .req {
+        color: var(--primary);
+      }
+      input,
+      select {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1.5px solid var(--hair);
+        border-radius: var(--r-input);
+        font-size: 14px;
+        font-family: inherit;
+        background: var(--surface);
+        color: var(--ink);
+        min-height: 44px;
+      }
+      input:focus,
+      select:focus {
+        border-color: var(--green);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(0, 166, 62, 0.13);
+      }
+      input.err,
+      select.err {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(227, 35, 33, 0.12);
+      }
+      .hint {
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 5px;
+      }
+      .errmsg {
+        font-size: 12px;
+        color: var(--primary-dark);
+        margin-top: 5px;
+        display: none;
+        font-weight: 500;
+      }
+      .errmsg.show {
+        display: block;
+      }
 
-  .btn{
-    border:none;border-radius:var(--r-input);padding:12px 22px;font-size:14px;font-weight:600;
-    min-height:44px; display:inline-flex;align-items:center;gap:8px;
-  }
-  .btn-primary{background:var(--primary);color:#fff;box-shadow:0 2px 8px rgba(227,35,33,.3)}
-  .btn-primary:hover{background:var(--primary-dark)}
-  .btn-primary:disabled{opacity:.55;cursor:not-allowed;box-shadow:none}
-  .btn-ghost{background:transparent;color:var(--ink);border:1.5px solid var(--hair)}
-  .btn-ghost:hover{background:var(--canvas)}
-  .btn-green{background:var(--green);color:#fff}
-  .btn-green:hover{filter:brightness(.94)}
-  .actions{display:flex;gap:12px;align-items:center;margin-top:28px;max-width:520px}
-  .actions .spacer{flex:1}
+      .btn {
+        border: none;
+        border-radius: var(--r-input);
+        padding: 12px 22px;
+        font-size: 14px;
+        font-weight: 600;
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .btn-primary {
+        background: var(--primary);
+        color: #fff;
+        box-shadow: 0 2px 8px rgba(227, 35, 33, 0.3);
+      }
+      .btn-primary:hover {
+        background: var(--primary-dark);
+      }
+      .btn-primary:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+        box-shadow: none;
+      }
+      .btn-ghost {
+        background: transparent;
+        color: var(--ink);
+        border: 1.5px solid var(--hair);
+      }
+      .btn-ghost:hover {
+        background: var(--canvas);
+      }
+      .btn-green {
+        background: var(--green);
+        color: #fff;
+      }
+      .btn-green:hover {
+        filter: brightness(0.94);
+      }
+      .actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        margin-top: 28px;
+        max-width: 520px;
+      }
+      .actions .spacer {
+        flex: 1;
+      }
 
-  .spinner{width:15px;height:15px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
-  @keyframes spin{to{transform:rotate(360deg)}}
+      .spinner {
+        width: 15px;
+        height: 15px;
+        border: 2px solid rgba(255, 255, 255, 0.4);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+        display: inline-block;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
 
-  /* ---- Cards / chips ---- */
-  .card{background:var(--surface);border:1px solid var(--hair);border-radius:var(--r-card);padding:22px;box-shadow:var(--sh-sm)}
-  .chip{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:var(--r-pill);font-size:12px;font-weight:600}
-  .chip.ready{background:rgba(0,166,62,.12);color:var(--green)}
-  .chip.review{background:rgba(245,158,11,.18);color:#b45309}
-  .chip.dot::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+      /* ---- Cards / chips ---- */
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--hair);
+        border-radius: var(--r-card);
+        padding: 22px;
+        box-shadow: var(--sh-sm);
+      }
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 12px;
+        border-radius: var(--r-pill);
+        font-size: 12px;
+        font-weight: 600;
+      }
+      .chip.ready {
+        background: rgba(0, 166, 62, 0.12);
+        color: var(--green);
+      }
+      .chip.review {
+        background: rgba(245, 158, 11, 0.18);
+        color: #b45309;
+      }
+      .chip.dot::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentColor;
+      }
 
-  /* ---- Dropzone ---- */
-  .dropzone{
-    border:2px dashed var(--hair); border-radius:var(--r-card); padding:46px 24px; text-align:center;
-    background:var(--canvas); transition:.18s; max-width:680px;
-  }
-  .dropzone.drag{border-color:var(--green);background:rgba(0,166,62,.06)}
-  .dropzone .ic{font-size:40px;margin-bottom:10px}
-  .dropzone h3{margin:0 0 4px;font-size:17px}
-  .dropzone p{margin:0;color:var(--muted);font-size:13px}
-  .filecard{display:flex;align-items:center;gap:14px;max-width:680px;background:#fff;border:1px solid var(--hair);border-radius:var(--r-input);padding:14px 18px;margin-bottom:8px}
-  .filecard .fic{width:40px;height:40px;border-radius:9px;background:rgba(0,166,62,.12);color:var(--green);display:grid;place-items:center;font-weight:700;font-size:13px}
-  .filecard b{font-size:14px}
-  .filecard small{color:var(--muted);font-size:12px}
+      /* ---- Dropzone ---- */
+      .dropzone {
+        border: 2px dashed var(--hair);
+        border-radius: var(--r-card);
+        padding: 46px 24px;
+        text-align: center;
+        background: var(--canvas);
+        transition: 0.18s;
+        max-width: 680px;
+      }
+      .dropzone.drag {
+        border-color: var(--green);
+        background: rgba(0, 166, 62, 0.06);
+      }
+      .dropzone .ic {
+        font-size: 40px;
+        margin-bottom: 10px;
+      }
+      .dropzone h3 {
+        margin: 0 0 4px;
+        font-size: 17px;
+      }
+      .dropzone p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .filecard {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        max-width: 680px;
+        background: #fff;
+        border: 1px solid var(--hair);
+        border-radius: var(--r-input);
+        padding: 14px 18px;
+        margin-bottom: 8px;
+      }
+      .filecard .fic {
+        width: 40px;
+        height: 40px;
+        border-radius: 9px;
+        background: rgba(0, 166, 62, 0.12);
+        color: var(--green);
+        display: grid;
+        place-items: center;
+        font-weight: 700;
+        font-size: 13px;
+      }
+      .filecard b {
+        font-size: 14px;
+      }
+      .filecard small {
+        color: var(--muted);
+        font-size: 12px;
+      }
 
-  .progress{height:8px;border-radius:var(--r-pill);background:var(--hair);overflow:hidden;max-width:680px;margin-top:18px}
-  .progress i{display:block;height:100%;background:linear-gradient(90deg,var(--primary),var(--gold));width:0;transition:width .25s}
+      .progress {
+        height: 8px;
+        border-radius: var(--r-pill);
+        background: var(--hair);
+        overflow: hidden;
+        max-width: 680px;
+        margin-top: 18px;
+      }
+      .progress i {
+        display: block;
+        height: 100%;
+        background: linear-gradient(90deg, var(--primary), var(--gold));
+        width: 0;
+        transition: width 0.25s;
+      }
 
-  /* ---- Tables ---- */
-  table{width:100%;border-collapse:collapse;font-size:13px}
-  thead th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);padding:0 14px 10px;font-weight:600;border-bottom:1px solid var(--hair)}
-  tbody td{padding:13px 14px;border-bottom:1px solid var(--hair);vertical-align:middle}
-  tbody tr:hover{background:var(--canvas)}
-  tbody tr:last-child td{border-bottom:none}
-  .conf{display:flex;align-items:center;gap:8px;min-width:120px}
-  .conf .bar{flex:1;height:6px;border-radius:var(--r-pill);background:var(--hair);overflow:hidden;max-width:80px}
-  .conf .bar i{display:block;height:100%;border-radius:var(--r-pill)}
-  .conf b{font-size:12px;font-variant-numeric:tabular-nums}
-  .arrow{color:var(--muted)}
-  .vendcol{font-family:'SF Mono',ui-monospace,monospace;font-size:12px;background:var(--canvas);padding:3px 8px;border-radius:6px;color:var(--ink)}
-  .tmfield{font-weight:600;color:var(--green)}
-  .price{font-variant-numeric:tabular-nums;font-weight:600}
+      /* ---- Tables ---- */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+      thead th {
+        text-align: left;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--muted);
+        padding: 0 14px 10px;
+        font-weight: 600;
+        border-bottom: 1px solid var(--hair);
+      }
+      tbody td {
+        padding: 13px 14px;
+        border-bottom: 1px solid var(--hair);
+        vertical-align: middle;
+      }
+      tbody tr:hover {
+        background: var(--canvas);
+      }
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+      .conf {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 120px;
+      }
+      .conf .bar {
+        flex: 1;
+        height: 6px;
+        border-radius: var(--r-pill);
+        background: var(--hair);
+        overflow: hidden;
+        max-width: 80px;
+      }
+      .conf .bar i {
+        display: block;
+        height: 100%;
+        border-radius: var(--r-pill);
+      }
+      .conf b {
+        font-size: 12px;
+        font-variant-numeric: tabular-nums;
+      }
+      .arrow {
+        color: var(--muted);
+      }
+      .vendcol {
+        font-family: "SF Mono", ui-monospace, monospace;
+        font-size: 12px;
+        background: var(--canvas);
+        padding: 3px 8px;
+        border-radius: 6px;
+        color: var(--ink);
+      }
+      .tmfield {
+        font-weight: 600;
+        color: var(--green);
+      }
+      .price {
+        font-variant-numeric: tabular-nums;
+        font-weight: 600;
+      }
 
-  .toolbar{display:flex;align-items:center;gap:12px;margin:0 0 16px;flex-wrap:wrap}
-  .toolbar .grow{flex:1}
-  .selinfo{font-size:13px;color:var(--muted)}
+      .toolbar {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 0 0 16px;
+        flex-wrap: wrap;
+      }
+      .toolbar .grow {
+        flex: 1;
+      }
+      .selinfo {
+        font-size: 13px;
+        color: var(--muted);
+      }
 
-  .linkbtn{background:none;border:none;color:var(--green);font-weight:600;font-size:13px;padding:4px 6px;border-radius:6px}
-  .linkbtn:hover{background:rgba(0,166,62,.1)}
+      .linkbtn {
+        background: none;
+        border: none;
+        color: var(--green);
+        font-weight: 600;
+        font-size: 13px;
+        padding: 4px 6px;
+        border-radius: 6px;
+      }
+      .linkbtn:hover {
+        background: rgba(0, 166, 62, 0.1);
+      }
 
-  /* ---- inline edit category select ---- */
-  td select.inline{padding:6px 8px;min-height:34px;font-size:12px;border-radius:8px;max-width:170px}
+      /* ---- inline edit category select ---- */
+      td select.inline {
+        padding: 6px 8px;
+        min-height: 34px;
+        font-size: 12px;
+        border-radius: 8px;
+        max-width: 170px;
+      }
 
-  /* ---- Dashboard ---- */
-  .dash-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:20px;align-items:start}
-  .ring-wrap{display:flex;align-items:center;gap:26px}
-  .ring{position:relative;width:140px;height:140px;flex-shrink:0}
-  .ring svg{transform:rotate(-90deg)}
-  .ring .lbl{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
-  .ring .lbl b{font-size:30px;font-weight:700;display:block}
-  .ring .lbl span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
-  .ttl{background:linear-gradient(135deg,#fff,var(--canvas));border:1px solid var(--hair)}
-  .ttl .big{font-size:32px;font-weight:700;color:var(--green);font-variant-numeric:tabular-nums}
-  .compare{display:flex;gap:10px;margin-top:14px}
-  .compare .pill{flex:1;border-radius:10px;padding:12px;text-align:center}
-  .compare .old{background:rgba(227,35,33,.08)}
-  .compare .new{background:rgba(0,166,62,.1)}
-  .compare .pill span{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
-  .compare .pill b{font-size:20px;font-weight:700}
-  .compare .old b{color:var(--primary-dark);text-decoration:line-through;opacity:.7}
-  .compare .new b{color:var(--green)}
-  .stat-row{display:flex;gap:14px;margin-top:18px}
-  .stat{flex:1;background:#fff;border:1px solid var(--hair);border-radius:var(--r-card);padding:16px}
-  .stat b{font-size:24px;font-weight:700;display:block}
-  .stat span{font-size:12px;color:var(--muted)}
-  .steps-list{list-style:none;margin:0;padding:0}
-  .steps-list li{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--hair);font-size:14px}
-  .steps-list li:last-child{border-bottom:none}
-  .steps-list .tick{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:13px;flex-shrink:0}
-  .steps-list .tick.ok{background:var(--green);color:#fff}
-  .steps-list .tick.pend{background:var(--canvas);border:1.5px solid var(--hair);color:var(--muted)}
-  .steps-list li.pend{color:var(--muted)}
+      /* ---- Dashboard ---- */
+      .dash-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: 20px;
+        align-items: start;
+      }
+      .ring-wrap {
+        display: flex;
+        align-items: center;
+        gap: 26px;
+      }
+      .ring {
+        position: relative;
+        width: 140px;
+        height: 140px;
+        flex-shrink: 0;
+      }
+      .ring svg {
+        transform: rotate(-90deg);
+      }
+      .ring .lbl {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        text-align: center;
+      }
+      .ring .lbl b {
+        font-size: 30px;
+        font-weight: 700;
+        display: block;
+      }
+      .ring .lbl span {
+        font-size: 11px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .ttl {
+        background: linear-gradient(135deg, #fff, var(--canvas));
+        border: 1px solid var(--hair);
+      }
+      .ttl .big {
+        font-size: 32px;
+        font-weight: 700;
+        color: var(--green);
+        font-variant-numeric: tabular-nums;
+      }
+      .compare {
+        display: flex;
+        gap: 10px;
+        margin-top: 14px;
+      }
+      .compare .pill {
+        flex: 1;
+        border-radius: 10px;
+        padding: 12px;
+        text-align: center;
+      }
+      .compare .old {
+        background: rgba(227, 35, 33, 0.08);
+      }
+      .compare .new {
+        background: rgba(0, 166, 62, 0.1);
+      }
+      .compare .pill span {
+        display: block;
+        font-size: 11px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .compare .pill b {
+        font-size: 20px;
+        font-weight: 700;
+      }
+      .compare .old b {
+        color: var(--primary-dark);
+        text-decoration: line-through;
+        opacity: 0.7;
+      }
+      .compare .new b {
+        color: var(--green);
+      }
+      .stat-row {
+        display: flex;
+        gap: 14px;
+        margin-top: 18px;
+      }
+      .stat {
+        flex: 1;
+        background: #fff;
+        border: 1px solid var(--hair);
+        border-radius: var(--r-card);
+        padding: 16px;
+      }
+      .stat b {
+        font-size: 24px;
+        font-weight: 700;
+        display: block;
+      }
+      .stat span {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .steps-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .steps-list li {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 0;
+        border-bottom: 1px solid var(--hair);
+        font-size: 14px;
+      }
+      .steps-list li:last-child {
+        border-bottom: none;
+      }
+      .steps-list .tick {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        font-size: 13px;
+        flex-shrink: 0;
+      }
+      .steps-list .tick.ok {
+        background: var(--green);
+        color: #fff;
+      }
+      .steps-list .tick.pend {
+        background: var(--canvas);
+        border: 1.5px solid var(--hair);
+        color: var(--muted);
+      }
+      .steps-list li.pend {
+        color: var(--muted);
+      }
 
-  .banner{
-    background:linear-gradient(135deg,#fff,#fef2f2);border:1px solid #fecaca;border-radius:var(--r-card);
-    padding:18px 22px;display:flex;align-items:center;gap:18px;margin-bottom:24px;
-  }
-  .banner .vp{font-size:15px;font-weight:600}
-  .banner .vp em{font-style:normal;color:var(--primary);font-weight:700}
-  .banner .arrowbig{font-size:22px;color:var(--gold)}
+      .banner {
+        background: linear-gradient(135deg, #fff, #fef2f2);
+        border: 1px solid #fecaca;
+        border-radius: var(--r-card);
+        padding: 18px 22px;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        margin-bottom: 24px;
+      }
+      .banner .vp {
+        font-size: 15px;
+        font-weight: 600;
+      }
+      .banner .vp em {
+        font-style: normal;
+        color: var(--primary);
+        font-weight: 700;
+      }
+      .banner .arrowbig {
+        font-size: 22px;
+        color: var(--gold);
+      }
 
-  /* ---- How it works ---- */
-  .how{padding:32px 44px;overflow-y:auto;max-height:660px}
-  .how h1{font-size:24px;margin:0 0 6px}
-  .how .lead{color:var(--muted);max-width:720px;margin:0 0 28px}
-  .how section{margin-bottom:30px}
-  .how h3{font-size:13px;text-transform:uppercase;letter-spacing:.7px;color:var(--primary);margin:0 0 12px}
-  .kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-  .kpi{background:var(--surface);border:1px solid var(--hair);border-radius:var(--r-card);padding:18px;box-shadow:var(--sh-sm)}
-  .kpi .num{font-size:26px;font-weight:700}
-  .kpi .num .from{color:var(--muted);font-size:15px;text-decoration:line-through;font-weight:600}
-  .kpi .num .to{color:var(--green)}
-  .kpi .k{font-size:12px;color:var(--muted);margin-top:4px}
-  .persona{display:flex;gap:16px;background:var(--surface);border:1px solid var(--hair);border-radius:var(--r-card);padding:18px;box-shadow:var(--sh-sm)}
-  .persona .av{width:48px;height:48px;border-radius:12px;background:var(--gold);color:#422006;display:grid;place-items:center;font-weight:700;font-size:18px;flex-shrink:0}
-  .persona b{font-size:15px}
-  .persona p{margin:4px 0 0;font-size:13px;color:var(--muted)}
-  .mermaid{background:var(--surface);border:1px solid var(--hair);border-radius:var(--r-card);padding:20px;box-shadow:var(--sh-sm);text-align:center}
-  .twocol{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-  .note-card{background:var(--surface);border:1px solid var(--hair);border-radius:var(--r-card);padding:18px;box-shadow:var(--sh-sm)}
-  .note-card h4{margin:0 0 10px;font-size:14px}
-  .note-card ul{margin:0;padding-left:18px;font-size:13px;color:var(--ink)}
-  .note-card li{margin-bottom:7px}
-  .tag{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:var(--r-pill);margin-right:4px}
-  .tag.auto{background:rgba(0,166,62,.12);color:var(--green)}
-  .tag.human{background:rgba(245,158,11,.18);color:#b45309}
-  .tag.reuse{background:rgba(227,35,33,.1);color:var(--primary-dark)}
+      /* ---- How it works ---- */
+      .how {
+        padding: 32px 44px;
+        overflow-y: auto;
+        max-height: 660px;
+      }
+      .how h1 {
+        font-size: 24px;
+        margin: 0 0 6px;
+      }
+      .how .lead {
+        color: var(--muted);
+        max-width: 720px;
+        margin: 0 0 28px;
+      }
+      .how section {
+        margin-bottom: 30px;
+      }
+      .how h3 {
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.7px;
+        color: var(--primary);
+        margin: 0 0 12px;
+      }
+      .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+      }
+      .kpi {
+        background: var(--surface);
+        border: 1px solid var(--hair);
+        border-radius: var(--r-card);
+        padding: 18px;
+        box-shadow: var(--sh-sm);
+      }
+      .kpi .num {
+        font-size: 26px;
+        font-weight: 700;
+      }
+      .kpi .num .from {
+        color: var(--muted);
+        font-size: 15px;
+        text-decoration: line-through;
+        font-weight: 600;
+      }
+      .kpi .num .to {
+        color: var(--green);
+      }
+      .kpi .k {
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 4px;
+      }
+      .persona {
+        display: flex;
+        gap: 16px;
+        background: var(--surface);
+        border: 1px solid var(--hair);
+        border-radius: var(--r-card);
+        padding: 18px;
+        box-shadow: var(--sh-sm);
+      }
+      .persona .av {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        background: var(--gold);
+        color: #422006;
+        display: grid;
+        place-items: center;
+        font-weight: 700;
+        font-size: 18px;
+        flex-shrink: 0;
+      }
+      .persona b {
+        font-size: 15px;
+      }
+      .persona p {
+        margin: 4px 0 0;
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .mermaid {
+        background: var(--surface);
+        border: 1px solid var(--hair);
+        border-radius: var(--r-card);
+        padding: 20px;
+        box-shadow: var(--sh-sm);
+        text-align: center;
+      }
+      .twocol {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+      }
+      .note-card {
+        background: var(--surface);
+        border: 1px solid var(--hair);
+        border-radius: var(--r-card);
+        padding: 18px;
+        box-shadow: var(--sh-sm);
+      }
+      .note-card h4 {
+        margin: 0 0 10px;
+        font-size: 14px;
+      }
+      .note-card ul {
+        margin: 0;
+        padding-left: 18px;
+        font-size: 13px;
+        color: var(--ink);
+      }
+      .note-card li {
+        margin-bottom: 7px;
+      }
+      .tag {
+        display: inline-block;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: var(--r-pill);
+        margin-right: 4px;
+      }
+      .tag.auto {
+        background: rgba(0, 166, 62, 0.12);
+        color: var(--green);
+      }
+      .tag.human {
+        background: rgba(245, 158, 11, 0.18);
+        color: #b45309;
+      }
+      .tag.reuse {
+        background: rgba(227, 35, 33, 0.1);
+        color: var(--primary-dark);
+      }
 
-  /* ---- Toast ---- */
-  .toast{
-    position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(80px);
-    background:var(--ink);color:#fff;padding:13px 22px;border-radius:var(--r-pill);
-    font-size:14px;font-weight:500;box-shadow:var(--sh-lg);opacity:0;transition:.3s;z-index:90;
-    display:flex;align-items:center;gap:9px;
-  }
-  .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
-  .toast.ok{background:var(--green)}
+      /* ---- Toast ---- */
+      .toast {
+        position: fixed;
+        left: 50%;
+        bottom: 28px;
+        transform: translateX(-50%) translateY(80px);
+        background: var(--ink);
+        color: #fff;
+        padding: 13px 22px;
+        border-radius: var(--r-pill);
+        font-size: 14px;
+        font-weight: 500;
+        box-shadow: var(--sh-lg);
+        opacity: 0;
+        transition: 0.3s;
+        z-index: 90;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+      }
+      .toast.show {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+      }
+      .toast.ok {
+        background: var(--green);
+      }
 
-  /* ---- Modal ---- */
-  .overlay{position:fixed;inset:0;background:rgba(23,23,23,.5);display:none;place-items:center;z-index:80;padding:20px}
-  .overlay.show{display:grid}
-  .modal{background:#fff;border-radius:var(--r-card);max-width:440px;width:100%;padding:28px;box-shadow:var(--sh-lg);animation:fade .25s ease}
-  .modal h3{margin:0 0 8px;font-size:19px}
-  .modal p{color:var(--muted);font-size:14px;margin:0 0 22px}
-  .modal .row{display:flex;gap:12px;justify-content:flex-end}
-  .modal .check{width:56px;height:56px;border-radius:50%;background:rgba(0,166,62,.12);color:var(--green);display:grid;place-items:center;font-size:28px;margin:0 auto 16px}
+      /* ---- Modal ---- */
+      .overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(23, 23, 23, 0.5);
+        display: none;
+        place-items: center;
+        z-index: 80;
+        padding: 20px;
+      }
+      .overlay.show {
+        display: grid;
+      }
+      .modal {
+        background: #fff;
+        border-radius: var(--r-card);
+        max-width: 440px;
+        width: 100%;
+        padding: 28px;
+        box-shadow: var(--sh-lg);
+        animation: fade 0.25s ease;
+      }
+      .modal h3 {
+        margin: 0 0 8px;
+        font-size: 19px;
+      }
+      .modal p {
+        color: var(--muted);
+        font-size: 14px;
+        margin: 0 0 22px;
+      }
+      .modal .row {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+      }
+      .modal .check {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: rgba(0, 166, 62, 0.12);
+        color: var(--green);
+        display: grid;
+        place-items: center;
+        font-size: 28px;
+        margin: 0 auto 16px;
+      }
 
-  @media(max-width:880px){
-    .rail{display:none}
-    .dash-grid,.twocol,.kpi-grid{grid-template-columns:1fr}
-    .field.half{width:100%;margin-right:0}
-  }
-</style>
-</head>
-<body>
-<div class="frame">
-  <!-- Browser chrome -->
-  <div class="chrome">
-    <div class="dots"><i></i><i></i><i></i></div>
-    <div class="urlbar"><span class="lock">&#00a63e;</span><b>vendor.thaimart.co</b>/onboarding</div>
-  </div>
-
-  <div class="app">
-    <!-- Top bar -->
-    <header class="topbar">
-      <div class="brand">
-        <span class="logo">TM</span>
-        <span>ThaiMart VendorExpress<small>ลงทะเบียนผู้ขายด้วยตนเอง</small></span>
-      </div>
-      <div class="tabs" role="tablist" aria-label="มุมมอง">
-        <button role="tab" id="tab-proto" aria-selected="true" onclick="setView('proto')">ตัวอย่างการใช้งาน</button>
-        <button role="tab" id="tab-how" aria-selected="false" onclick="setView('how')">วิธีการทำงาน</button>
-      </div>
-      <div class="vendor-chip">
-        <span class="av">BK</span>
-        <span><b>บ้านขนม</b><span>ผู้ขาย OTOP</span></span>
-      </div>
-    </header>
-
-    <!-- ============ PROTOTYPE VIEW ============ -->
-    <div class="body" id="view-proto">
-      <!-- Rail -->
-      <nav class="rail" aria-label="ขั้นตอนการตั้งค่าร้าน">
-        <h2>เริ่มตั้งค่าร้าน</h2>
-        <button class="navitem" id="nav-onboarding" onclick="goScreen('onboarding')"><span class="num">1</span>ข้อมูลธุรกิจ</button>
-        <button class="navitem" id="nav-upload" onclick="goScreen('upload')"><span class="num">2</span>อัปโหลดรายการสินค้า</button>
-        <button class="navitem" id="nav-review" onclick="goScreen('review')"><span class="num">3</span>ตรวจสอบสินค้า</button>
-        <button class="navitem" id="nav-dashboard" onclick="goScreen('dashboard')"><span class="num">4</span>สถานะการเปิดร้าน</button>
-        <div class="pct-card">
-          <div class="lbl">การตั้งค่าร้าน</div>
-          <div class="miniring">
-            <div class="ring" style="width:54px;height:54px">
-              <svg width="54" height="54" viewBox="0 0 54 54">
-                <circle cx="27" cy="27" r="23" fill="none" stroke="#e5e5e7" stroke-width="6"/>
-                <circle id="mini-ring" cx="27" cy="27" r="23" fill="none" stroke="#00a63e" stroke-width="6" stroke-linecap="round" stroke-dasharray="144.5" stroke-dashoffset="144.5"/>
-              </svg>
-              <div class="lbl" style="position:absolute;inset:0;display:grid;place-items:center"><b id="mini-pct" style="font-size:14px">0%</b></div>
-            </div>
-            <div><div class="big" id="rail-pct">0%</div><div class="lbl">เสร็จสิ้น</div></div>
-          </div>
+      @media (max-width: 880px) {
+        .rail {
+          display: none;
+        }
+        .dash-grid,
+        .twocol,
+        .kpi-grid {
+          grid-template-columns: 1fr;
+        }
+        .field.half {
+          width: 100%;
+          margin-right: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="frame">
+      <!-- Browser chrome -->
+      <div class="chrome">
+        <div class="dots"><i></i><i></i><i></i></div>
+        <div class="urlbar">
+          <span class="lock">&#00a63e;</span
+          ><b>vendor.thaimart.co</b>/onboarding
         </div>
-      </nav>
+      </div>
 
-      <!-- Main -->
-      <main class="main">
-        <!-- SCREEN 1: ONBOARDING -->
-        <section class="screen" id="screen-onboarding" role="region" aria-label="ข้อมูลธุรกิจ">
-          <h1 class="title" id="wiz-title">ข้อมูลธุรกิจ</h1>
-          <p class="sub" id="wiz-sub">ขั้นตอนที่ 1 จาก 3 — บอกข้อมูลร้านของคุณ ระบบบันทึกให้อัตโนมัติทุกขั้นตอน</p>
-
-          <!-- step 1 -->
-          <div id="step-1">
-            <div class="field">
-              <label for="b-name">ชื่อร้าน <span class="req">*</span></label>
-              <input id="b-name" type="text" placeholder="เช่น ร้านบ้านขนม ไทยสวีท" autocomplete="organization" />
-              <div class="errmsg" id="e-name">กรุณากรอกชื่อร้าน</div>
-            </div>
-            <div class="field">
-              <label for="b-tax">เลขประจำตัวผู้เสียภาษี (13 หลัก) <span class="req">*</span></label>
-              <input id="b-tax" type="text" inputmode="numeric" maxlength="13" placeholder="0 1055 12345 67 8" />
-              <div class="hint">เลขประจำตัวผู้เสียภาษี/นิติบุคคล 13 หลัก ใช้สำหรับยืนยันตัวตน (KYC)</div>
-              <div class="errmsg" id="e-tax">กรุณากรอกตัวเลขให้ครบ 13 หลัก</div>
-            </div>
-            <div class="field half">
-              <label for="b-type">ประเภทธุรกิจ <span class="req">*</span></label>
-              <select id="b-type">
-                <option value="">เลือก…</option>
-                <option>OTOP / ผู้ผลิตในท้องถิ่น</option>
-                <option>บุคคลธรรมดา</option>
-                <option>บริษัทจำกัด</option>
-                <option>วิสาหกิจชุมชน</option>
-              </select>
-              <div class="errmsg" id="e-type">กรุณาเลือกประเภทธุรกิจ</div>
-            </div>
-            <div class="field half">
-              <label for="b-phone">เบอร์ติดต่อ <span class="req">*</span></label>
-              <input id="b-phone" type="tel" placeholder="08X-XXX-XXXX" autocomplete="tel" />
-              <div class="errmsg" id="e-phone">กรุณากรอกเบอร์ติดต่อ</div>
-            </div>
-            <div class="field">
-              <label for="b-addr">ที่อยู่ร้าน</label>
-              <input id="b-addr" type="text" placeholder="123 หมู่ 4 ตำบลบางพลี สมุทรปราการ 10540" />
-            </div>
+      <div class="app">
+        <!-- Top bar -->
+        <header class="topbar">
+          <div class="brand">
+            <span class="logo">TM</span>
+            <span
+              >ThaiMart VendorExpress<small
+                >ลงทะเบียนผู้ขายด้วยตนเอง</small
+              ></span
+            >
           </div>
-
-          <!-- step 2 -->
-          <div id="step-2" style="display:none">
-            <div class="field" style="max-width:680px">
-              <label>เอกสารที่ต้องใช้ <span class="req">*</span></label>
-              <div class="hint" style="margin-top:0;margin-bottom:14px">อัปโหลดรูปถ่ายหรือไฟล์ PDF ที่ชัดเจน ระบบจะยืนยันกับเลขประจำตัวผู้เสียภาษีของคุณผ่านบริการยืนยันตัวตนโดยอัตโนมัติ</div>
-              <div id="doc-1" class="filecard" style="cursor:pointer" onclick="fakeUpload('doc-1','บัตรประชาชน / หนังสือรับรองบริษัท','PorPor20.pdf')">
-                <div class="fic">+</div><div style="flex:1"><b>บัตรประชาชน / หนังสือรับรองบริษัท</b><br><small>แตะเพื่ออัปโหลด — PDF หรือรูปภาพ</small></div>
-              </div>
-              <div id="doc-2" class="filecard" style="cursor:pointer" onclick="fakeUpload('doc-2','ใบอนุญาตผลิตอาหาร','OTOP-license.jpg')">
-                <div class="fic">+</div><div style="flex:1"><b>ใบอนุญาตผลิตอาหาร / OTOP</b><br><small>แตะเพื่ออัปโหลด — PDF หรือรูปภาพ</small></div>
-              </div>
-              <div class="errmsg" id="e-docs">กรุณาอัปโหลดเอกสารทั้งสองรายการเพื่อดำเนินการต่อ</div>
-            </div>
+          <a
+            class="profile-link"
+            href="https://zonxpk.github.io"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Go to zonxpk profile"
+          >
+            <svg viewBox="0 0 16 16" aria-hidden="true">
+              <path
+                d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.5-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.65 7.65 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8Z"
+              />
+            </svg>
+            <span>Zonxpk</span>
+          </a>
+          <div class="tabs" role="tablist" aria-label="มุมมอง">
+            <button
+              role="tab"
+              id="tab-proto"
+              aria-selected="true"
+              onclick="setView('proto')"
+            >
+              ตัวอย่างการใช้งาน
+            </button>
+            <button
+              role="tab"
+              id="tab-how"
+              aria-selected="false"
+              onclick="setView('how')"
+            >
+              วิธีการทำงาน
+            </button>
           </div>
-
-          <!-- step 3 -->
-          <div id="step-3" style="display:none">
-            <p class="sub" style="margin-top:-12px">ThaiMart จะโอนยอดขายของคุณไปที่บัญชีใด? โอนทุก 7 วัน</p>
-            <div class="field half">
-              <label for="b-bank">ธนาคาร <span class="req">*</span></label>
-              <select id="b-bank">
-                <option value="">เลือกธนาคาร…</option>
-                <option>Kasikornbank (KBank)</option>
-                <option>Siam Commercial Bank (SCB)</option>
-                <option>Bangkok Bank</option>
-                <option>Krungthai Bank</option>
-                <option>TMBThanachart (ttb)</option>
-              </select>
-              <div class="errmsg" id="e-bank">กรุณาเลือกธนาคาร</div>
-            </div>
-            <div class="field half">
-              <label for="b-acctname">ชื่อบัญชี <span class="req">*</span></label>
-              <input id="b-acctname" type="text" placeholder="ร้านบ้านขนม ไทยสวีท" />
-              <div class="errmsg" id="e-acctname">กรุณากรอกชื่อบัญชี</div>
-            </div>
-            <div class="field">
-              <label for="b-acct">เลขที่บัญชี <span class="req">*</span></label>
-              <input id="b-acct" type="text" inputmode="numeric" maxlength="12" placeholder="XXX-X-XXXXX-X" />
-              <div class="errmsg" id="e-acct">กรุณากรอกเลขที่บัญชีให้ถูกต้อง (10–12 หลัก)</div>
-            </div>
+          <div class="vendor-chip">
+            <span class="av">BK</span>
+            <span><b>บ้านขนม</b><span>ผู้ขาย OTOP</span></span>
           </div>
+        </header>
 
-          <div class="actions">
-            <button class="btn btn-ghost" id="wiz-back" onclick="wizPrev()" style="display:none">ย้อนกลับ</button>
-            <div class="spacer"></div>
-            <span class="hint" style="margin:0">บันทึกอัตโนมัติ</span>
-            <button class="btn btn-primary" id="wiz-next" onclick="wizNext()">ดำเนินการต่อ</button>
-          </div>
-        </section>
-
-        <!-- SCREEN 2: UPLOAD -->
-        <section class="screen" id="screen-upload" role="region" aria-label="อัปโหลดรายการสินค้า">
-          <h1 class="title">อัปโหลดสินค้าจำนวนมาก</h1>
-          <p class="sub">วางไฟล์รายการสินค้าที่คุณมีอยู่แล้ว VendorExpress จะตรวจจับคอลัมน์และจัดหมวดหมู่สินค้าทุกชิ้นด้วย AI ให้อัตโนมัติ ไม่ต้องกรอกข้อมูลเอง</p>
-
-          <!-- stage A: dropzone -->
-          <div id="up-drop">
-            <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="อัปโหลดไฟล์ CSV"
-                 onclick="pickFile()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();pickFile()}">
-              <div class="ic">&#00a63e;</div>
-              <h3>ลากไฟล์ CSV มาวางที่นี่</h3>
-              <p>หรือคลิกเพื่อเลือกไฟล์ — รองรับไฟล์ .csv และ .xlsx จากระบบ POS ทุกระบบ</p>
-            </div>
-            <p class="hint" style="max-width:680px">ยังไม่มีไฟล์? <button class="linkbtn" onclick="pickFile()">ลองใช้ไฟล์ตัวอย่างของเรา (บ้านขนม — 6 สินค้า)</button></p>
-          </div>
-
-          <!-- stage B: processing -->
-          <div id="up-proc" style="display:none">
-            <div class="filecard"><div class="fic">CSV</div><div style="flex:1"><b id="up-fname">baan_khanom_products.csv</b><br><small id="up-fmeta">6 แถว · 5 คอลัมน์ · 4.1 KB</small></div><span class="chip ready dot" id="up-fstatus">อัปโหลดแล้ว</span></div>
-            <div class="progress"><i id="up-bar"></i></div>
-            <p class="hint" id="up-status" style="max-width:680px;margin-top:10px">กำลังอ่านข้อมูล…</p>
-          </div>
-
-          <!-- stage C: mapping -->
-          <div id="up-map" style="display:none">
-            <div class="card" style="max-width:780px;margin-top:6px">
-              <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
-                <span class="chip ready dot">จับคู่ด้วย AI เสร็จแล้ว</span>
-                <span class="hint" style="margin:0">จับคู่อัตโนมัติ 5 จาก 5 คอลัมน์ · ความมั่นใจเฉลี่ย 94%</span>
-              </div>
-              <p class="sub" style="margin:10px 0 18px">ตรวจสอบการจับคู่คอลัมน์ในไฟล์ของคุณกับฟิลด์สินค้าของ ThaiMart และปรับแก้รายการที่ไม่ถูกต้อง</p>
-              <table>
-                <thead><tr><th>คอลัมน์ของคุณ</th><th></th><th>ฟิลด์ ThaiMart</th><th>ความมั่นใจ</th></tr></thead>
-                <tbody id="map-body"></tbody>
-              </table>
-              <div class="actions" style="margin-top:22px;max-width:none">
-                <div class="spacer"></div>
-                <button class="btn btn-ghost" onclick="resetUpload()">อัปโหลดใหม่</button>
-                <button class="btn btn-primary" id="map-confirm" onclick="confirmMapping()">ยืนยันการจับคู่และนำเข้า</button>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- SCREEN 3: REVIEW -->
-        <section class="screen" id="screen-review" role="region" aria-label="ตรวจสอบสินค้าที่นำเข้า">
-          <h1 class="title">ตรวจสอบสินค้าที่นำเข้า</h1>
-          <p class="sub">AI กำหนดหมวดหมู่และสถานะคุณภาพให้สินค้าทุกชิ้นแล้ว แก้ไขรายการที่ขึ้นว่า <span class="chip review dot" style="vertical-align:middle">ต้องตรวจสอบ</span> แล้วเผยแพร่ได้ในคลิกเดียว</p>
-
-          <div class="toolbar">
-            <label class="selinfo" style="display:flex;align-items:center;gap:8px;font-weight:600">
-              <input type="checkbox" id="sel-all" style="width:auto;min-height:0" onclick="toggleAll(this.checked)" /> เลือกทั้งหมด
-            </label>
-            <span class="grow"></span>
-            <span class="selinfo" id="review-summary"></span>
-            <button class="btn btn-green" id="publish-btn" onclick="openPublish()">เผยแพร่ที่เลือก</button>
-          </div>
-
-          <div class="card" style="padding:8px 0">
-            <table>
-              <thead><tr><th style="width:36px"></th><th>สินค้า</th><th>ราคา</th><th>หมวดหมู่จาก AI</th><th>สถานะ</th></tr></thead>
-              <tbody id="review-body"></tbody>
-            </table>
-          </div>
-        </section>
-
-        <!-- SCREEN 4: DASHBOARD -->
-        <section class="screen" id="screen-dashboard" role="region" aria-label="สถานะการเปิดร้าน">
-          <div class="banner">
-            <div class="vp">เวลาตั้งค่าร้าน: <em>14 วัน</em> <span class="arrowbig">&#8594;</span> <em>48 ชั่วโมง</em></div>
-            <span class="grow" style="flex:1"></span>
-            <span class="chip ready dot">อัตโนมัติด้วย VendorExpress</span>
-          </div>
-
-          <h1 class="title">ร้านบ้านขนม ไทยสวีท</h1>
-          <p class="sub">ใกล้เปิดร้านบน ThaiMart แล้ว นี่คือสถานะปัจจุบันของคุณ</p>
-
-          <div class="dash-grid">
-            <div class="card">
-              <div class="ring-wrap">
-                <div class="ring">
-                  <svg width="140" height="140" viewBox="0 0 140 140">
-                    <circle cx="70" cy="70" r="60" fill="none" stroke="#e5e5e7" stroke-width="12"/>
-                    <circle id="dash-ring" cx="70" cy="70" r="60" fill="none" stroke="#e32321" stroke-width="12" stroke-linecap="round" stroke-dasharray="377" stroke-dashoffset="377" style="transition:stroke-dashoffset .8s ease"/>
+        <!-- ============ PROTOTYPE VIEW ============ -->
+        <div class="body" id="view-proto">
+          <!-- Rail -->
+          <nav class="rail" aria-label="ขั้นตอนการตั้งค่าร้าน">
+            <h2>เริ่มตั้งค่าร้าน</h2>
+            <button
+              class="navitem"
+              id="nav-onboarding"
+              onclick="goScreen('onboarding')"
+            >
+              <span class="num">1</span>ข้อมูลธุรกิจ
+            </button>
+            <button
+              class="navitem"
+              id="nav-upload"
+              onclick="goScreen('upload')"
+            >
+              <span class="num">2</span>อัปโหลดรายการสินค้า
+            </button>
+            <button
+              class="navitem"
+              id="nav-review"
+              onclick="goScreen('review')"
+            >
+              <span class="num">3</span>ตรวจสอบสินค้า
+            </button>
+            <button
+              class="navitem"
+              id="nav-dashboard"
+              onclick="goScreen('dashboard')"
+            >
+              <span class="num">4</span>สถานะการเปิดร้าน
+            </button>
+            <div class="pct-card">
+              <div class="lbl">การตั้งค่าร้าน</div>
+              <div class="miniring">
+                <div class="ring" style="width: 54px; height: 54px">
+                  <svg width="54" height="54" viewBox="0 0 54 54">
+                    <circle
+                      cx="27"
+                      cy="27"
+                      r="23"
+                      fill="none"
+                      stroke="#e5e5e7"
+                      stroke-width="6"
+                    />
+                    <circle
+                      id="mini-ring"
+                      cx="27"
+                      cy="27"
+                      r="23"
+                      fill="none"
+                      stroke="#00a63e"
+                      stroke-width="6"
+                      stroke-linecap="round"
+                      stroke-dasharray="144.5"
+                      stroke-dashoffset="144.5"
+                    />
                   </svg>
-                  <div class="lbl"><b id="dash-pct">0%</b><span>ตั้งค่าร้าน</span></div>
+                  <div
+                    class="lbl"
+                    style="
+                      position: absolute;
+                      inset: 0;
+                      display: grid;
+                      place-items: center;
+                    "
+                  >
+                    <b id="mini-pct" style="font-size: 14px">0%</b>
+                  </div>
                 </div>
                 <div>
-                  <div class="stat" style="border:none;padding:0;background:none">
-                    <span style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">เวลาจนเปิดร้านโดยประมาณ</span>
-                    <div class="big" id="ttl-counter" style="font-size:32px;font-weight:700;color:var(--green);font-variant-numeric:tabular-nums">41h 12m</div>
+                  <div class="big" id="rail-pct">0%</div>
+                  <div class="lbl">เสร็จสิ้น</div>
+                </div>
+              </div>
+            </div>
+          </nav>
+
+          <!-- Main -->
+          <main class="main">
+            <!-- SCREEN 1: ONBOARDING -->
+            <section
+              class="screen"
+              id="screen-onboarding"
+              role="region"
+              aria-label="ข้อมูลธุรกิจ"
+            >
+              <h1 class="title" id="wiz-title">ข้อมูลธุรกิจ</h1>
+              <p class="sub" id="wiz-sub">
+                ขั้นตอนที่ 1 จาก 3 — บอกข้อมูลร้านของคุณ
+                ระบบบันทึกให้อัตโนมัติทุกขั้นตอน
+              </p>
+
+              <!-- step 1 -->
+              <div id="step-1">
+                <div class="field">
+                  <label for="b-name"
+                    >ชื่อร้าน <span class="req">*</span></label
+                  >
+                  <input
+                    id="b-name"
+                    type="text"
+                    placeholder="เช่น ร้านบ้านขนม ไทยสวีท"
+                    autocomplete="organization"
+                  />
+                  <div class="errmsg" id="e-name">กรุณากรอกชื่อร้าน</div>
+                </div>
+                <div class="field">
+                  <label for="b-tax"
+                    >เลขประจำตัวผู้เสียภาษี (13 หลัก)
+                    <span class="req">*</span></label
+                  >
+                  <input
+                    id="b-tax"
+                    type="text"
+                    inputmode="numeric"
+                    maxlength="13"
+                    placeholder="0 1055 12345 67 8"
+                  />
+                  <div class="hint">
+                    เลขประจำตัวผู้เสียภาษี/นิติบุคคล 13 หลัก
+                    ใช้สำหรับยืนยันตัวตน (KYC)
                   </div>
-                  <div class="compare">
-                    <div class="pill old"><span>ขั้นตอนเดิม (ทำมือ)</span><b>14 วัน</b></div>
-                    <div class="pill new"><span>VendorExpress</span><b>48 ชม.</b></div>
+                  <div class="errmsg" id="e-tax">
+                    กรุณากรอกตัวเลขให้ครบ 13 หลัก
+                  </div>
+                </div>
+                <div class="field half">
+                  <label for="b-type"
+                    >ประเภทธุรกิจ <span class="req">*</span></label
+                  >
+                  <select id="b-type">
+                    <option value="">เลือก…</option>
+                    <option>OTOP / ผู้ผลิตในท้องถิ่น</option>
+                    <option>บุคคลธรรมดา</option>
+                    <option>บริษัทจำกัด</option>
+                    <option>วิสาหกิจชุมชน</option>
+                  </select>
+                  <div class="errmsg" id="e-type">กรุณาเลือกประเภทธุรกิจ</div>
+                </div>
+                <div class="field half">
+                  <label for="b-phone"
+                    >เบอร์ติดต่อ <span class="req">*</span></label
+                  >
+                  <input
+                    id="b-phone"
+                    type="tel"
+                    placeholder="08X-XXX-XXXX"
+                    autocomplete="tel"
+                  />
+                  <div class="errmsg" id="e-phone">กรุณากรอกเบอร์ติดต่อ</div>
+                </div>
+                <div class="field">
+                  <label for="b-addr">ที่อยู่ร้าน</label>
+                  <input
+                    id="b-addr"
+                    type="text"
+                    placeholder="123 หมู่ 4 ตำบลบางพลี สมุทรปราการ 10540"
+                  />
+                </div>
+              </div>
+
+              <!-- step 2 -->
+              <div id="step-2" style="display: none">
+                <div class="field" style="max-width: 680px">
+                  <label>เอกสารที่ต้องใช้ <span class="req">*</span></label>
+                  <div class="hint" style="margin-top: 0; margin-bottom: 14px">
+                    อัปโหลดรูปถ่ายหรือไฟล์ PDF ที่ชัดเจน
+                    ระบบจะยืนยันกับเลขประจำตัวผู้เสียภาษีของคุณผ่านบริการยืนยันตัวตนโดยอัตโนมัติ
+                  </div>
+                  <div
+                    id="doc-1"
+                    class="filecard"
+                    style="cursor: pointer"
+                    onclick="
+                      fakeUpload(
+                        'doc-1',
+                        'บัตรประชาชน / หนังสือรับรองบริษัท',
+                        'PorPor20.pdf',
+                      )
+                    "
+                  >
+                    <div class="fic">+</div>
+                    <div style="flex: 1">
+                      <b>บัตรประชาชน / หนังสือรับรองบริษัท</b><br /><small
+                        >แตะเพื่ออัปโหลด — PDF หรือรูปภาพ</small
+                      >
+                    </div>
+                  </div>
+                  <div
+                    id="doc-2"
+                    class="filecard"
+                    style="cursor: pointer"
+                    onclick="
+                      fakeUpload(
+                        'doc-2',
+                        'ใบอนุญาตผลิตอาหาร',
+                        'OTOP-license.jpg',
+                      )
+                    "
+                  >
+                    <div class="fic">+</div>
+                    <div style="flex: 1">
+                      <b>ใบอนุญาตผลิตอาหาร / OTOP</b><br /><small
+                        >แตะเพื่ออัปโหลด — PDF หรือรูปภาพ</small
+                      >
+                    </div>
+                  </div>
+                  <div class="errmsg" id="e-docs">
+                    กรุณาอัปโหลดเอกสารทั้งสองรายการเพื่อดำเนินการต่อ
                   </div>
                 </div>
               </div>
-              <div class="stat-row">
-                <div class="stat"><b id="stat-total">6</b><span>สินค้าที่นำเข้า</span></div>
-                <div class="stat"><b id="stat-ready" style="color:var(--green)">5</b><span>พร้อมขาย</span></div>
-                <div class="stat"><b id="stat-review" style="color:var(--gold)">1</b><span>ต้องตรวจสอบ</span></div>
+
+              <!-- step 3 -->
+              <div id="step-3" style="display: none">
+                <p class="sub" style="margin-top: -12px">
+                  ThaiMart จะโอนยอดขายของคุณไปที่บัญชีใด? โอนทุก 7 วัน
+                </p>
+                <div class="field half">
+                  <label for="b-bank">ธนาคาร <span class="req">*</span></label>
+                  <select id="b-bank">
+                    <option value="">เลือกธนาคาร…</option>
+                    <option>Kasikornbank (KBank)</option>
+                    <option>Siam Commercial Bank (SCB)</option>
+                    <option>Bangkok Bank</option>
+                    <option>Krungthai Bank</option>
+                    <option>TMBThanachart (ttb)</option>
+                  </select>
+                  <div class="errmsg" id="e-bank">กรุณาเลือกธนาคาร</div>
+                </div>
+                <div class="field half">
+                  <label for="b-acctname"
+                    >ชื่อบัญชี <span class="req">*</span></label
+                  >
+                  <input
+                    id="b-acctname"
+                    type="text"
+                    placeholder="ร้านบ้านขนม ไทยสวีท"
+                  />
+                  <div class="errmsg" id="e-acctname">กรุณากรอกชื่อบัญชี</div>
+                </div>
+                <div class="field">
+                  <label for="b-acct"
+                    >เลขที่บัญชี <span class="req">*</span></label
+                  >
+                  <input
+                    id="b-acct"
+                    type="text"
+                    inputmode="numeric"
+                    maxlength="12"
+                    placeholder="XXX-X-XXXXX-X"
+                  />
+                  <div class="errmsg" id="e-acct">
+                    กรุณากรอกเลขที่บัญชีให้ถูกต้อง (10–12 หลัก)
+                  </div>
+                </div>
+              </div>
+
+              <div class="actions">
+                <button
+                  class="btn btn-ghost"
+                  id="wiz-back"
+                  onclick="wizPrev()"
+                  style="display: none"
+                >
+                  ย้อนกลับ
+                </button>
+                <div class="spacer"></div>
+                <span class="hint" style="margin: 0">บันทึกอัตโนมัติ</span>
+                <button
+                  class="btn btn-primary"
+                  id="wiz-next"
+                  onclick="wizNext()"
+                >
+                  ดำเนินการต่อ
+                </button>
+              </div>
+            </section>
+
+            <!-- SCREEN 2: UPLOAD -->
+            <section
+              class="screen"
+              id="screen-upload"
+              role="region"
+              aria-label="อัปโหลดรายการสินค้า"
+            >
+              <h1 class="title">อัปโหลดสินค้าจำนวนมาก</h1>
+              <p class="sub">
+                วางไฟล์รายการสินค้าที่คุณมีอยู่แล้ว VendorExpress
+                จะตรวจจับคอลัมน์และจัดหมวดหมู่สินค้าทุกชิ้นด้วย AI ให้อัตโนมัติ
+                ไม่ต้องกรอกข้อมูลเอง
+              </p>
+
+              <!-- stage A: dropzone -->
+              <div id="up-drop">
+                <div
+                  class="dropzone"
+                  id="dropzone"
+                  tabindex="0"
+                  role="button"
+                  aria-label="อัปโหลดไฟล์ CSV"
+                  onclick="pickFile()"
+                  onkeydown="
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault();
+                      pickFile();
+                    }
+                  "
+                >
+                  <div class="ic">&#00a63e;</div>
+                  <h3>ลากไฟล์ CSV มาวางที่นี่</h3>
+                  <p>
+                    หรือคลิกเพื่อเลือกไฟล์ — รองรับไฟล์ .csv และ .xlsx จากระบบ
+                    POS ทุกระบบ
+                  </p>
+                </div>
+                <p class="hint" style="max-width: 680px">
+                  ยังไม่มีไฟล์?
+                  <button class="linkbtn" onclick="pickFile()">
+                    ลองใช้ไฟล์ตัวอย่างของเรา (บ้านขนม — 6 สินค้า)
+                  </button>
+                </p>
+              </div>
+
+              <!-- stage B: processing -->
+              <div id="up-proc" style="display: none">
+                <div class="filecard">
+                  <div class="fic">CSV</div>
+                  <div style="flex: 1">
+                    <b id="up-fname">baan_khanom_products.csv</b><br /><small
+                      id="up-fmeta"
+                      >6 แถว · 5 คอลัมน์ · 4.1 KB</small
+                    >
+                  </div>
+                  <span class="chip ready dot" id="up-fstatus"
+                    >อัปโหลดแล้ว</span
+                  >
+                </div>
+                <div class="progress"><i id="up-bar"></i></div>
+                <p
+                  class="hint"
+                  id="up-status"
+                  style="max-width: 680px; margin-top: 10px"
+                >
+                  กำลังอ่านข้อมูล…
+                </p>
+              </div>
+
+              <!-- stage C: mapping -->
+              <div id="up-map" style="display: none">
+                <div class="card" style="max-width: 780px; margin-top: 6px">
+                  <div
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 10px;
+                      margin-bottom: 6px;
+                    "
+                  >
+                    <span class="chip ready dot">จับคู่ด้วย AI เสร็จแล้ว</span>
+                    <span class="hint" style="margin: 0"
+                      >จับคู่อัตโนมัติ 5 จาก 5 คอลัมน์ · ความมั่นใจเฉลี่ย
+                      94%</span
+                    >
+                  </div>
+                  <p class="sub" style="margin: 10px 0 18px">
+                    ตรวจสอบการจับคู่คอลัมน์ในไฟล์ของคุณกับฟิลด์สินค้าของ
+                    ThaiMart และปรับแก้รายการที่ไม่ถูกต้อง
+                  </p>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>คอลัมน์ของคุณ</th>
+                        <th></th>
+                        <th>ฟิลด์ ThaiMart</th>
+                        <th>ความมั่นใจ</th>
+                      </tr>
+                    </thead>
+                    <tbody id="map-body"></tbody>
+                  </table>
+                  <div
+                    class="actions"
+                    style="margin-top: 22px; max-width: none"
+                  >
+                    <div class="spacer"></div>
+                    <button class="btn btn-ghost" onclick="resetUpload()">
+                      อัปโหลดใหม่
+                    </button>
+                    <button
+                      class="btn btn-primary"
+                      id="map-confirm"
+                      onclick="confirmMapping()"
+                    >
+                      ยืนยันการจับคู่และนำเข้า
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- SCREEN 3: REVIEW -->
+            <section
+              class="screen"
+              id="screen-review"
+              role="region"
+              aria-label="ตรวจสอบสินค้าที่นำเข้า"
+            >
+              <h1 class="title">ตรวจสอบสินค้าที่นำเข้า</h1>
+              <p class="sub">
+                AI กำหนดหมวดหมู่และสถานะคุณภาพให้สินค้าทุกชิ้นแล้ว
+                แก้ไขรายการที่ขึ้นว่า
+                <span class="chip review dot" style="vertical-align: middle"
+                  >ต้องตรวจสอบ</span
+                >
+                แล้วเผยแพร่ได้ในคลิกเดียว
+              </p>
+
+              <div class="toolbar">
+                <label
+                  class="selinfo"
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    font-weight: 600;
+                  "
+                >
+                  <input
+                    type="checkbox"
+                    id="sel-all"
+                    style="width: auto; min-height: 0"
+                    onclick="toggleAll(this.checked)"
+                  />
+                  เลือกทั้งหมด
+                </label>
+                <span class="grow"></span>
+                <span class="selinfo" id="review-summary"></span>
+                <button
+                  class="btn btn-green"
+                  id="publish-btn"
+                  onclick="openPublish()"
+                >
+                  เผยแพร่ที่เลือก
+                </button>
+              </div>
+
+              <div class="card" style="padding: 8px 0">
+                <table>
+                  <thead>
+                    <tr>
+                      <th style="width: 36px"></th>
+                      <th>สินค้า</th>
+                      <th>ราคา</th>
+                      <th>หมวดหมู่จาก AI</th>
+                      <th>สถานะ</th>
+                    </tr>
+                  </thead>
+                  <tbody id="review-body"></tbody>
+                </table>
+              </div>
+            </section>
+
+            <!-- SCREEN 4: DASHBOARD -->
+            <section
+              class="screen"
+              id="screen-dashboard"
+              role="region"
+              aria-label="สถานะการเปิดร้าน"
+            >
+              <div class="banner">
+                <div class="vp">
+                  เวลาตั้งค่าร้าน: <em>14 วัน</em>
+                  <span class="arrowbig">&#8594;</span> <em>48 ชั่วโมง</em>
+                </div>
+                <span class="grow" style="flex: 1"></span>
+                <span class="chip ready dot">อัตโนมัติด้วย VendorExpress</span>
+              </div>
+
+              <h1 class="title">ร้านบ้านขนม ไทยสวีท</h1>
+              <p class="sub">
+                ใกล้เปิดร้านบน ThaiMart แล้ว นี่คือสถานะปัจจุบันของคุณ
+              </p>
+
+              <div class="dash-grid">
+                <div class="card">
+                  <div class="ring-wrap">
+                    <div class="ring">
+                      <svg width="140" height="140" viewBox="0 0 140 140">
+                        <circle
+                          cx="70"
+                          cy="70"
+                          r="60"
+                          fill="none"
+                          stroke="#e5e5e7"
+                          stroke-width="12"
+                        />
+                        <circle
+                          id="dash-ring"
+                          cx="70"
+                          cy="70"
+                          r="60"
+                          fill="none"
+                          stroke="#e32321"
+                          stroke-width="12"
+                          stroke-linecap="round"
+                          stroke-dasharray="377"
+                          stroke-dashoffset="377"
+                          style="transition: stroke-dashoffset 0.8s ease"
+                        />
+                      </svg>
+                      <div class="lbl">
+                        <b id="dash-pct">0%</b><span>ตั้งค่าร้าน</span>
+                      </div>
+                    </div>
+                    <div>
+                      <div
+                        class="stat"
+                        style="border: none; padding: 0; background: none"
+                      >
+                        <span
+                          style="
+                            font-size: 12px;
+                            color: var(--muted);
+                            text-transform: uppercase;
+                            letter-spacing: 0.5px;
+                          "
+                          >เวลาจนเปิดร้านโดยประมาณ</span
+                        >
+                        <div
+                          class="big"
+                          id="ttl-counter"
+                          style="
+                            font-size: 32px;
+                            font-weight: 700;
+                            color: var(--green);
+                            font-variant-numeric: tabular-nums;
+                          "
+                        >
+                          41h 12m
+                        </div>
+                      </div>
+                      <div class="compare">
+                        <div class="pill old">
+                          <span>ขั้นตอนเดิม (ทำมือ)</span><b>14 วัน</b>
+                        </div>
+                        <div class="pill new">
+                          <span>VendorExpress</span><b>48 ชม.</b>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="stat-row">
+                    <div class="stat">
+                      <b id="stat-total">6</b><span>สินค้าที่นำเข้า</span>
+                    </div>
+                    <div class="stat">
+                      <b id="stat-ready" style="color: var(--green)">5</b
+                      ><span>พร้อมขาย</span>
+                    </div>
+                    <div class="stat">
+                      <b id="stat-review" style="color: var(--gold)">1</b
+                      ><span>ต้องตรวจสอบ</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card">
+                  <h3
+                    style="
+                      font-size: 13px;
+                      text-transform: uppercase;
+                      letter-spacing: 0.7px;
+                      color: var(--primary);
+                      margin: 0 0 8px;
+                    "
+                  >
+                    ขั้นตอนถัดไป
+                  </h3>
+                  <ul class="steps-list" id="next-steps"></ul>
+                  <button
+                    class="btn btn-primary"
+                    style="
+                      margin-top: 16px;
+                      width: 100%;
+                      justify-content: center;
+                    "
+                    id="dash-cta"
+                    onclick="dashCta()"
+                  >
+                    ทำขั้นตอนที่เหลือให้เสร็จ
+                  </button>
+                </div>
+              </div>
+            </section>
+          </main>
+        </div>
+
+        <!-- ============ HOW IT WORKS VIEW ============ -->
+        <div class="how" id="view-how" style="display: none">
+          <h1>VendorExpress ทำงานอย่างไร</h1>
+          <p class="lead">
+            กรณีศึกษาจากมุมมอง PM VendorExpress
+            เปลี่ยนการตั้งค่าร้านแบบทำมือที่ใช้เวลา 14 วันและพึ่งทีมปฏิบัติการ
+            ให้กลายเป็นขั้นตอนแบบทำเองภายใน 48 ชั่วโมง โดยใช้ API ยืนยันตัวตนและ
+            API สินค้าเดิมของ ThaiMart ที่มีอยู่แล้ว และเพิ่ม AI pipeline
+            สำหรับนำเข้าข้อมูลแทนงานคัดลอกข้อมูลที่เคยใช้คนทำ
+          </p>
+
+          <section>
+            <h3>ปัญหา</h3>
+            <div class="note-card" style="max-width: 820px">
+              การตั้งค่าร้านให้ผู้ขายในท้องถิ่นรายหนึ่งทำให้ทีมปฏิบัติการต้อง
+              <b>กรอกข้อมูลด้วยมือนานถึง 14 วัน</b> ทั้งพิมพ์ชื่อสินค้าใหม่
+              เดาหมวดหมู่ ตามเอกสาร KYC ทางอีเมล และคีย์ข้อมูลบัญชีธนาคาร
+              วิธีนี้ขยายขนาดไม่ได้
+              ทีมปฏิบัติการกลายเป็นคอขวดที่ขวางการเพิ่มจำนวนผู้ขายบนแพลตฟอร์ม
+              และผู้ขายจำนวนมากเลิกล้มระหว่างรอ
+            </div>
+          </section>
+
+          <section>
+            <h3>เหมาะกับใคร</h3>
+            <div class="twocol">
+              <div class="persona">
+                <div class="av">PJ</div>
+                <div>
+                  <b>คุณพลอย — ผู้ขาย OTOP</b>
+                  <p>
+                    เจ้าของร้านบ้านขนม ไทยสวีท มีไฟล์รายการสินค้าจากระบบ POS
+                    อยู่แล้ว แต่ไม่มีเวลาและไม่ค่อยถนัดเทคโนโลยี
+                    อยากเริ่มขายภายในสัปดาห์นี้ ไม่ใช่เดือนหน้า
+                  </p>
+                </div>
+              </div>
+              <div class="persona">
+                <div
+                  class="av"
+                  style="
+                    background: rgba(227, 35, 33, 0.12);
+                    color: var(--primary-dark);
+                  "
+                >
+                  NA
+                </div>
+                <div>
+                  <b>คุณนัท — หัวหน้าทีมปฏิบัติการ ThaiMart</b>
+                  <p>
+                    ดูแลคิวการตั้งค่าร้านของผู้ขาย
+                    จมอยู่กับการกรอกข้อมูลสินค้าด้วยมือ
+                    ต้องการเพิ่มปริมาณงานและลดข้อผิดพลาดโดยไม่เพิ่มจำนวนพนักงาน
+                  </p>
+                </div>
               </div>
             </div>
+          </section>
 
-            <div class="card">
-              <h3 style="font-size:13px;text-transform:uppercase;letter-spacing:.7px;color:var(--primary);margin:0 0 8px">ขั้นตอนถัดไป</h3>
-              <ul class="steps-list" id="next-steps"></ul>
-              <button class="btn btn-primary" style="margin-top:16px;width:100%;justify-content:center" id="dash-cta" onclick="dashCta()">ทำขั้นตอนที่เหลือให้เสร็จ</button>
+          <section>
+            <h3>ตัวชี้วัดเป้าหมาย — ก่อน &rarr; หลัง</h3>
+            <div class="kpi-grid">
+              <div class="kpi">
+                <div class="num">
+                  <span class="from">14 วัน</span> &rarr;
+                  <span class="to">48 ชม.</span>
+                </div>
+                <div class="k">เวลาตั้งค่าร้านต่อผู้ขายหนึ่งราย (−86%)</div>
+              </div>
+              <div class="kpi">
+                <div class="num">
+                  <span class="from">~6 ชม.</span> &rarr;
+                  <span class="to">12 นาที</span>
+                </div>
+                <div class="k">
+                  เวลาที่ทีมปฏิบัติการต้องลงมือต่อผู้ขายหนึ่งราย
+                </div>
+              </div>
+              <div class="kpi">
+                <div class="num">
+                  <span class="from">42%</span> &rarr;
+                  <span class="to">85%</span>
+                </div>
+                <div class="k">อัตราการตั้งค่าร้านสำเร็จ</div>
+              </div>
             </div>
-          </div>
-        </section>
-      </main>
+          </section>
+
+          <section>
+            <h3>สถาปัตยกรรมระบบ</h3>
+            <div class="mermaid" id="diagram">
+              flowchart TB V["🧑‍🍳 หน้าจอผู้ขาย<br />(ทำเอง)"] subgraph LEGACY["❌
+              ขั้นตอนเดิมแบบทำมือ — 14 วัน"] OPS["เจ้าหน้าที่ปฏิบัติการ"] -->
+              XLS["กรอกข้อมูลด้วยมือ<br />+ เดาหมวดหมู่"] --> EMAIL["ตาม KYC
+              ทางอีเมล"] end subgraph VX["✅ ขั้นตอนอัตโนมัติด้วย VendorExpress
+              — 48 ชม."] ONB["บริการตั้งค่าร้าน<br />KYC + ตรวจสอบข้อมูล"]
+              ING["pipeline นำเข้าสินค้า"] PARSE["อ่านไฟล์ CSV"]
+              AI["จัดหมวดหมู่อัตโนมัติด้วย AI<br />+ จับคู่คอลัมน์"]
+              RULES["กฎตรวจสอบ<br />(ราคา, รายการซ้ำ, ฟิลด์)"]
+              APPR["ขั้นตอนอนุมัติ<br />ใช้คนตรวจเฉพาะรายการที่ความมั่นใจต่ำ"]
+              ONB --> ING --> PARSE --> AI --> RULES --> APPR end V --> ONB V -.
+              "วิธีเดิม" .-> OPS APPR --> DB[("ฐานข้อมูลสินค้าของแพลตฟอร์ม")] DB
+              --> SEARCH["🔎 ดัชนีการค้นหา<br />(แสดงให้ผู้ซื้อ)"] ONB -.
+              ใช้ของเดิม .-> IDAPI["Identity / KYC API"] DB -. ใช้ของเดิม .->
+              CATAPI["Catalog API"]
+            </div>
+          </section>
+
+          <section>
+            <h3>ขอบเขต MVP</h3>
+            <div class="twocol">
+              <div class="note-card">
+                <h4>เปิดตัวเร็วด้วยการใช้ของเดิมที่มีอยู่</h4>
+                <ul>
+                  <li>
+                    <span class="tag reuse">ใช้ของเดิม</span>
+                    <b>Identity / KYC API</b> —
+                    การยืนยันเลขประจำตัวผู้เสียภาษีและตรวจเอกสารใช้ในระบบ KYC
+                    ของผู้ซื้ออยู่แล้ว ไม่ต้องสร้างระบบ compliance ใหม่
+                  </li>
+                  <li>
+                    <span class="tag reuse">ใช้ของเดิม</span>
+                    <b>Catalog API</b> — ใช้ endpoint
+                    เผยแพร่ตัวเดียวกับที่ทีมปฏิบัติการใช้อยู่ทุกวันนี้ pipeline
+                    แค่เรียกใช้แบบอัตโนมัติ
+                  </li>
+                  <li>
+                    <span class="tag reuse">ใช้ของเดิม</span>
+                    <b>บริการรับเงิน</b> —
+                    การยืนยันบัญชีธนาคารและการโอนเงินคงเดิม
+                  </li>
+                </ul>
+              </div>
+              <div class="note-card">
+                <h4>ทำอัตโนมัติ vs ยังต้องใช้คนตรวจ</h4>
+                <ul>
+                  <li>
+                    <span class="tag auto">อัตโนมัติ</span> การอ่านไฟล์ CSV
+                    จับคู่คอลัมน์ กำหนดหมวดหมู่ด้วย AI และกฎตรวจสอบ
+                  </li>
+                  <li>
+                    <span class="tag auto">อัตโนมัติ</span>
+                    เผยแพร่รายการที่ความมั่นใจ ≥ 90% เข้าสู่ระบบสินค้าโดยตรง
+                  </li>
+                  <li>
+                    <span class="tag human">ใช้คนตรวจ</span>
+                    เฉพาะรายการที่ถูกทำเครื่องหมาย
+                    <em>ต้องตรวจสอบ</em> (ความมั่นใจต่ำ / หมวดหมู่ที่จำกัด)
+                    จึงจะถึงมือเจ้าหน้าที่ปฏิบัติการ — ราว 10% ของทั้งหมด
+                    เทียบกับ 100% ในปัจจุบัน
+                  </li>
+                  <li>
+                    <span class="tag human">ใช้คนตรวจ</span> กรณีพิเศษของ KYC
+                    สำหรับผู้ขายรายใหม่
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div class="note-card" style="margin-top: 18px; max-width: 820px">
+              <h4>นอกขอบเขต MVP</h4>
+              <p style="margin: 0; font-size: 13px; color: var(--muted)">
+                การแปลรายการสินค้าหลายภาษา การติดแท็กรูปภาพอัตโนมัติ
+                และการซิงก์กับ POS แบบเรียลไทม์ เป็นงานที่จะตามมาทีหลัง v1
+                พิสูจน์ผลด้านเวลาจนเปิดร้านจากการนำเข้าไฟล์ CSV เพียงไฟล์เดียว
+              </p>
+            </div>
+          </section>
+        </div>
+      </div>
     </div>
 
-    <!-- ============ HOW IT WORKS VIEW ============ -->
-    <div class="how" id="view-how" style="display:none">
-      <h1>VendorExpress ทำงานอย่างไร</h1>
-      <p class="lead">กรณีศึกษาจากมุมมอง PM VendorExpress เปลี่ยนการตั้งค่าร้านแบบทำมือที่ใช้เวลา 14 วันและพึ่งทีมปฏิบัติการ ให้กลายเป็นขั้นตอนแบบทำเองภายใน 48 ชั่วโมง โดยใช้ API ยืนยันตัวตนและ API สินค้าเดิมของ ThaiMart ที่มีอยู่แล้ว และเพิ่ม AI pipeline สำหรับนำเข้าข้อมูลแทนงานคัดลอกข้อมูลที่เคยใช้คนทำ</p>
-
-      <section>
-        <h3>ปัญหา</h3>
-        <div class="note-card" style="max-width:820px">
-          การตั้งค่าร้านให้ผู้ขายในท้องถิ่นรายหนึ่งทำให้ทีมปฏิบัติการต้อง <b>กรอกข้อมูลด้วยมือนานถึง 14 วัน</b> ทั้งพิมพ์ชื่อสินค้าใหม่ เดาหมวดหมู่ ตามเอกสาร KYC ทางอีเมล และคีย์ข้อมูลบัญชีธนาคาร วิธีนี้ขยายขนาดไม่ได้ ทีมปฏิบัติการกลายเป็นคอขวดที่ขวางการเพิ่มจำนวนผู้ขายบนแพลตฟอร์ม และผู้ขายจำนวนมากเลิกล้มระหว่างรอ
+    <!-- Toast + Modal -->
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <div
+      class="overlay"
+      id="overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
+    >
+      <div class="modal">
+        <div class="check">&#10003;</div>
+        <h3 id="modal-title">เผยแพร่ขึ้นแพลตฟอร์ม?</h3>
+        <p id="modal-body">
+          สินค้าที่พร้อมขาย 5 รายการจะแสดงในการค้นหาของ ThaiMart ภายในไม่กี่นาที
+          ส่วนสินค้า 1 รายการที่ต้องตรวจสอบจะถูกเก็บเป็นฉบับร่าง
+        </p>
+        <div class="row">
+          <button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button>
+          <button
+            class="btn btn-green"
+            id="modal-confirm"
+            onclick="doPublish()"
+          >
+            เผยแพร่เลย
+          </button>
         </div>
-      </section>
-
-      <section>
-        <h3>เหมาะกับใคร</h3>
-        <div class="twocol">
-          <div class="persona">
-            <div class="av">PJ</div>
-            <div><b>คุณพลอย — ผู้ขาย OTOP</b><p>เจ้าของร้านบ้านขนม ไทยสวีท มีไฟล์รายการสินค้าจากระบบ POS อยู่แล้ว แต่ไม่มีเวลาและไม่ค่อยถนัดเทคโนโลยี อยากเริ่มขายภายในสัปดาห์นี้ ไม่ใช่เดือนหน้า</p></div>
-          </div>
-          <div class="persona">
-            <div class="av" style="background:rgba(227,35,33,.12);color:var(--primary-dark)">NA</div>
-            <div><b>คุณนัท — หัวหน้าทีมปฏิบัติการ ThaiMart</b><p>ดูแลคิวการตั้งค่าร้านของผู้ขาย จมอยู่กับการกรอกข้อมูลสินค้าด้วยมือ ต้องการเพิ่มปริมาณงานและลดข้อผิดพลาดโดยไม่เพิ่มจำนวนพนักงาน</p></div>
-          </div>
-        </div>
-      </section>
-
-      <section>
-        <h3>ตัวชี้วัดเป้าหมาย — ก่อน &rarr; หลัง</h3>
-        <div class="kpi-grid">
-          <div class="kpi"><div class="num"><span class="from">14 วัน</span> &rarr; <span class="to">48 ชม.</span></div><div class="k">เวลาตั้งค่าร้านต่อผู้ขายหนึ่งราย (−86%)</div></div>
-          <div class="kpi"><div class="num"><span class="from">~6 ชม.</span> &rarr; <span class="to">12 นาที</span></div><div class="k">เวลาที่ทีมปฏิบัติการต้องลงมือต่อผู้ขายหนึ่งราย</div></div>
-          <div class="kpi"><div class="num"><span class="from">42%</span> &rarr; <span class="to">85%</span></div><div class="k">อัตราการตั้งค่าร้านสำเร็จ</div></div>
-        </div>
-      </section>
-
-      <section>
-        <h3>สถาปัตยกรรมระบบ</h3>
-        <div class="mermaid" id="diagram">
-flowchart TB
-  V["🧑‍🍳 หน้าจอผู้ขาย<br/>(ทำเอง)"]
-
-  subgraph LEGACY["❌ ขั้นตอนเดิมแบบทำมือ — 14 วัน"]
-    OPS["เจ้าหน้าที่ปฏิบัติการ"] --> XLS["กรอกข้อมูลด้วยมือ<br/>+ เดาหมวดหมู่"] --> EMAIL["ตาม KYC ทางอีเมล"]
-  end
-
-  subgraph VX["✅ ขั้นตอนอัตโนมัติด้วย VendorExpress — 48 ชม."]
-    ONB["บริการตั้งค่าร้าน<br/>KYC + ตรวจสอบข้อมูล"]
-    ING["pipeline นำเข้าสินค้า"]
-    PARSE["อ่านไฟล์ CSV"]
-    AI["จัดหมวดหมู่อัตโนมัติด้วย AI<br/>+ จับคู่คอลัมน์"]
-    RULES["กฎตรวจสอบ<br/>(ราคา, รายการซ้ำ, ฟิลด์)"]
-    APPR["ขั้นตอนอนุมัติ<br/>ใช้คนตรวจเฉพาะรายการที่ความมั่นใจต่ำ"]
-    ONB --> ING --> PARSE --> AI --> RULES --> APPR
-  end
-
-  V --> ONB
-  V -. "วิธีเดิม" .-> OPS
-  APPR --> DB[("ฐานข้อมูลสินค้าของแพลตฟอร์ม")]
-  DB --> SEARCH["🔎 ดัชนีการค้นหา<br/>(แสดงให้ผู้ซื้อ)"]
-
-  ONB -. ใช้ของเดิม .-> IDAPI["Identity / KYC API"]
-  DB -. ใช้ของเดิม .-> CATAPI["Catalog API"]
-        </div>
-      </section>
-
-      <section>
-        <h3>ขอบเขต MVP</h3>
-        <div class="twocol">
-          <div class="note-card">
-            <h4>เปิดตัวเร็วด้วยการใช้ของเดิมที่มีอยู่</h4>
-            <ul>
-              <li><span class="tag reuse">ใช้ของเดิม</span> <b>Identity / KYC API</b> — การยืนยันเลขประจำตัวผู้เสียภาษีและตรวจเอกสารใช้ในระบบ KYC ของผู้ซื้ออยู่แล้ว ไม่ต้องสร้างระบบ compliance ใหม่</li>
-              <li><span class="tag reuse">ใช้ของเดิม</span> <b>Catalog API</b> — ใช้ endpoint เผยแพร่ตัวเดียวกับที่ทีมปฏิบัติการใช้อยู่ทุกวันนี้ pipeline แค่เรียกใช้แบบอัตโนมัติ</li>
-              <li><span class="tag reuse">ใช้ของเดิม</span> <b>บริการรับเงิน</b> — การยืนยันบัญชีธนาคารและการโอนเงินคงเดิม</li>
-            </ul>
-          </div>
-          <div class="note-card">
-            <h4>ทำอัตโนมัติ vs ยังต้องใช้คนตรวจ</h4>
-            <ul>
-              <li><span class="tag auto">อัตโนมัติ</span> การอ่านไฟล์ CSV จับคู่คอลัมน์ กำหนดหมวดหมู่ด้วย AI และกฎตรวจสอบ</li>
-              <li><span class="tag auto">อัตโนมัติ</span> เผยแพร่รายการที่ความมั่นใจ ≥ 90% เข้าสู่ระบบสินค้าโดยตรง</li>
-              <li><span class="tag human">ใช้คนตรวจ</span> เฉพาะรายการที่ถูกทำเครื่องหมาย <em>ต้องตรวจสอบ</em> (ความมั่นใจต่ำ / หมวดหมู่ที่จำกัด) จึงจะถึงมือเจ้าหน้าที่ปฏิบัติการ — ราว 10% ของทั้งหมด เทียบกับ 100% ในปัจจุบัน</li>
-              <li><span class="tag human">ใช้คนตรวจ</span> กรณีพิเศษของ KYC สำหรับผู้ขายรายใหม่</li>
-            </ul>
-          </div>
-        </div>
-        <div class="note-card" style="margin-top:18px;max-width:820px">
-          <h4>นอกขอบเขต MVP</h4>
-          <p style="margin:0;font-size:13px;color:var(--muted)">การแปลรายการสินค้าหลายภาษา การติดแท็กรูปภาพอัตโนมัติ และการซิงก์กับ POS แบบเรียลไทม์ เป็นงานที่จะตามมาทีหลัง v1 พิสูจน์ผลด้านเวลาจนเปิดร้านจากการนำเข้าไฟล์ CSV เพียงไฟล์เดียว</p>
-        </div>
-      </section>
+      </div>
     </div>
-  </div>
-</div>
 
-<!-- Toast + Modal -->
-<div class="toast" id="toast" role="status" aria-live="polite"></div>
-<div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-  <div class="modal">
-    <div class="check">&#10003;</div>
-    <h3 id="modal-title">เผยแพร่ขึ้นแพลตฟอร์ม?</h3>
-    <p id="modal-body">สินค้าที่พร้อมขาย 5 รายการจะแสดงในการค้นหาของ ThaiMart ภายในไม่กี่นาที ส่วนสินค้า 1 รายการที่ต้องตรวจสอบจะถูกเก็บเป็นฉบับร่าง</p>
-    <div class="row">
-      <button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button>
-      <button class="btn btn-green" id="modal-confirm" onclick="doPublish()">เผยแพร่เลย</button>
-    </div>
-  </div>
-</div>
+    <script>
+      /* ===================== STATE ===================== */
+      const SCREENS = ["onboarding", "upload", "review", "dashboard"];
+      const KEY = "tm_vx_state";
+      const seedProducts = () => [
+        {
+          id: 1,
+          name: "ขนมชั้น (ใบเตย)",
+          price: 45,
+          vendorCat: "desserts",
+          aiCat: "ขนมไทย",
+          conf: 97,
+          status: "ready",
+        },
+        {
+          id: 2,
+          name: "ทองหยิบ",
+          price: 60,
+          vendorCat: "sweets",
+          aiCat: "ขนมไทย",
+          conf: 95,
+          status: "ready",
+        },
+        {
+          id: 3,
+          name: "มะม่วงอบแห้ง (พรีเมียม)",
+          price: 120,
+          vendorCat: "dried fruit",
+          aiCat: "ผลไม้อบแห้งและของว่าง",
+          conf: 96,
+          status: "ready",
+        },
+        {
+          id: 4,
+          name: "มะพร้าวอบกรอบ (เค็มน้อย)",
+          price: 55,
+          vendorCat: "snack",
+          aiCat: "ผลไม้อบแห้งและของว่าง",
+          conf: 93,
+          status: "ready",
+        },
+        {
+          id: 5,
+          name: "ขนมตาล",
+          price: 40,
+          vendorCat: "desserts",
+          aiCat: "ขนมไทย",
+          conf: 98,
+          status: "ready",
+        },
+        {
+          id: 6,
+          name: "น้ำพริกกะปิ (กระปุกของขวัญ)",
+          price: 95,
+          vendorCat: "misc",
+          aiCat: "",
+          conf: 58,
+          status: "review",
+        },
+      ];
 
-<script>
-/* ===================== STATE ===================== */
-const SCREENS = ['onboarding','upload','review','dashboard'];
-const KEY = 'tm_vx_state';
-const seedProducts = () => ([
-  {id:1, name:'ขนมชั้น (ใบเตย)',          price:45,  vendorCat:'desserts',    aiCat:'ขนมไทย',     conf:97, status:'ready'},
-  {id:2, name:'ทองหยิบ',                   price:60,  vendorCat:'sweets',      aiCat:'ขนมไทย',     conf:95, status:'ready'},
-  {id:3, name:'มะม่วงอบแห้ง (พรีเมียม)',    price:120, vendorCat:'dried fruit', aiCat:'ผลไม้อบแห้งและของว่าง', conf:96, status:'ready'},
-  {id:4, name:'มะพร้าวอบกรอบ (เค็มน้อย)',   price:55,  vendorCat:'snack',       aiCat:'ผลไม้อบแห้งและของว่าง', conf:93, status:'ready'},
-  {id:5, name:'ขนมตาล',                    price:40,  vendorCat:'desserts',    aiCat:'ขนมไทย',     conf:98, status:'ready'},
-  {id:6, name:'น้ำพริกกะปิ (กระปุกของขวัญ)', price:95,  vendorCat:'misc',        aiCat:'',                  conf:58, status:'review'},
-]);
+      let state = {
+        currentView: "proto",
+        currentScreen: "onboarding",
+        wizardStep: 1,
+        business: {
+          name: "",
+          taxId: "",
+          type: "",
+          phone: "",
+          addr: "",
+          bank: "",
+          acctName: "",
+          acct: "",
+        },
+        docs: { "doc-1": false, "doc-2": false },
+        kycDone: false,
+        bankDone: false,
+        uploadDone: false,
+        published: false,
+        products: [],
+        onboardingPct: 0,
+      };
 
-let state = {
-  currentView:'proto', currentScreen:'onboarding', wizardStep:1,
-  business:{name:'',taxId:'',type:'',phone:'',addr:'',bank:'',acctName:'',acct:''},
-  docs:{'doc-1':false,'doc-2':false},
-  kycDone:false, bankDone:false, uploadDone:false, published:false,
-  products:[], onboardingPct:0,
-};
+      function load() {
+        try {
+          const s = JSON.parse(localStorage.getItem(KEY));
+          if (s) state = Object.assign(state, s);
+        } catch (e) {}
+        if (!state.products || !state.products.length)
+          state.products = seedProducts();
+      }
+      function save() {
+        localStorage.setItem(KEY, JSON.stringify(state));
+      }
 
-function load(){
-  try{ const s = JSON.parse(localStorage.getItem(KEY)); if(s) state = Object.assign(state,s); }catch(e){}
-  if(!state.products || !state.products.length) state.products = seedProducts();
-}
-function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+      /* ===================== VIEW SWITCH ===================== */
+      let mermaidInit = false;
+      function setView(v) {
+        state.currentView = v;
+        save();
+        const proto = v === "proto";
+        document.getElementById("view-proto").style.display = proto
+          ? "flex"
+          : "none";
+        document.getElementById("view-how").style.display = proto
+          ? "none"
+          : "block";
+        document
+          .getElementById("tab-proto")
+          .setAttribute("aria-selected", proto);
+        document
+          .getElementById("tab-how")
+          .setAttribute("aria-selected", !proto);
+        if (!proto && !mermaidInit) {
+          mermaidInit = true;
+          import("https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js").then(
+            (m) => {
+              const mermaid = m.default;
+              mermaid.initialize({
+                startOnLoad: false,
+                theme: "base",
+                themeVariables: {
+                  primaryColor: "#fef2f2",
+                  primaryBorderColor: "#e32321",
+                  primaryTextColor: "#171717",
+                  lineColor: "#72757e",
+                  fontFamily: "sukhumvit, Inter, sans-serif",
+                  fontSize: "13px",
+                  clusterBkg: "#f5f5f7",
+                  clusterBorder: "#e5e5e7",
+                },
+              });
+              mermaid.run({ nodes: [document.getElementById("diagram")] });
+            },
+          );
+        }
+      }
 
-/* ===================== VIEW SWITCH ===================== */
-let mermaidInit = false;
-function setView(v){
-  state.currentView = v; save();
-  const proto = v==='proto';
-  document.getElementById('view-proto').style.display = proto ? 'flex':'none';
-  document.getElementById('view-how').style.display = proto ? 'none':'block';
-  document.getElementById('tab-proto').setAttribute('aria-selected', proto);
-  document.getElementById('tab-how').setAttribute('aria-selected', !proto);
-  if(!proto && !mermaidInit){
-    mermaidInit = true;
-    import('https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js').then(m=>{
-      const mermaid = m.default;
-      mermaid.initialize({startOnLoad:false, theme:'base', themeVariables:{
-        primaryColor:'#fef2f2', primaryBorderColor:'#e32321', primaryTextColor:'#171717',
-        lineColor:'#72757e', fontFamily:'sukhumvit, Inter, sans-serif', fontSize:'13px',
-        clusterBkg:'#f5f5f7', clusterBorder:'#e5e5e7'
-      }});
-      mermaid.run({nodes:[document.getElementById('diagram')]});
-    });
-  }
-}
+      /* ===================== SCREEN NAV ===================== */
+      function goScreen(s) {
+        state.currentScreen = s;
+        save();
+        SCREENS.forEach((x) => {
+          document
+            .getElementById("screen-" + x)
+            .classList.toggle("active", x === s);
+          document
+            .getElementById("nav-" + x)
+            .setAttribute("aria-current", x === s);
+        });
+        document.querySelector(".urlbar").lastElementChild.remove();
+        const u = document.createElement("span");
+        u.textContent = "/" + s; // not styled-bold; keep path
+        // restore styled path
+        const bar = document.querySelector(".urlbar");
+        bar.innerHTML =
+          '<span class="lock">&#00a63e;</span><b>vendor.thaimart.co</b>/' + s;
+        if (s === "review") renderReview();
+        if (s === "dashboard") renderDashboard();
+        if (s === "upload") restoreUploadStage();
+        document.querySelector(".main").scrollTop = 0;
+      }
 
-/* ===================== SCREEN NAV ===================== */
-function goScreen(s){
-  state.currentScreen = s; save();
-  SCREENS.forEach(x=>{
-    document.getElementById('screen-'+x).classList.toggle('active', x===s);
-    document.getElementById('nav-'+x).setAttribute('aria-current', x===s);
-  });
-  document.querySelector('.urlbar').lastElementChild.remove();
-  const u=document.createElement('span'); u.textContent='/'+s; // not styled-bold; keep path
-  // restore styled path
-  const bar=document.querySelector('.urlbar');
-  bar.innerHTML = '<span class="lock">&#00a63e;</span><b>vendor.thaimart.co</b>/'+s;
-  if(s==='review') renderReview();
-  if(s==='dashboard') renderDashboard();
-  if(s==='upload') restoreUploadStage();
-  document.querySelector('.main').scrollTop = 0;
-}
+      /* ===================== WIZARD ===================== */
+      const wizMeta = {
+        1: {
+          title: "ข้อมูลธุรกิจ",
+          sub: "ขั้นตอนที่ 1 จาก 3 — บอกข้อมูลร้านของคุณ ระบบบันทึกให้อัตโนมัติทุกขั้นตอน",
+        },
+        2: {
+          title: "ยืนยันตัวตน (KYC)",
+          sub: "ขั้นตอนที่ 2 จาก 3 — อัปโหลดเอกสารของคุณ ระบบยืนยันให้อัตโนมัติ",
+        },
+        3: {
+          title: "ข้อมูลการรับเงิน",
+          sub: "ขั้นตอนที่ 3 จาก 3 — บัญชีที่เราจะโอนยอดขายของคุณเข้าไป",
+        },
+      };
+      function showStep(n) {
+        state.wizardStep = n;
+        save();
+        for (let i = 1; i <= 3; i++)
+          document.getElementById("step-" + i).style.display =
+            i === n ? "block" : "none";
+        document.getElementById("wiz-title").textContent = wizMeta[n].title;
+        document.getElementById("wiz-sub").textContent = wizMeta[n].sub;
+        document.getElementById("wiz-back").style.display =
+          n > 1 ? "inline-flex" : "none";
+        document.getElementById("wiz-next").innerHTML =
+          n < 3 ? "ดำเนินการต่อ" : "เสร็จสิ้นและเริ่มลงสินค้า";
+      }
+      function clearErr() {
+        document
+          .querySelectorAll(".errmsg")
+          .forEach((e) => e.classList.remove("show"));
+        document
+          .querySelectorAll("input,select")
+          .forEach((e) => e.classList.remove("err"));
+      }
+      function fail(id, msgId) {
+        document.getElementById(id).classList.add("err");
+        document.getElementById(msgId).classList.add("show");
+      }
 
-/* ===================== WIZARD ===================== */
-const wizMeta = {
-  1:{title:'ข้อมูลธุรกิจ', sub:'ขั้นตอนที่ 1 จาก 3 — บอกข้อมูลร้านของคุณ ระบบบันทึกให้อัตโนมัติทุกขั้นตอน'},
-  2:{title:'ยืนยันตัวตน (KYC)', sub:'ขั้นตอนที่ 2 จาก 3 — อัปโหลดเอกสารของคุณ ระบบยืนยันให้อัตโนมัติ'},
-  3:{title:'ข้อมูลการรับเงิน', sub:'ขั้นตอนที่ 3 จาก 3 — บัญชีที่เราจะโอนยอดขายของคุณเข้าไป'},
-};
-function showStep(n){
-  state.wizardStep = n; save();
-  for(let i=1;i<=3;i++) document.getElementById('step-'+i).style.display = i===n?'block':'none';
-  document.getElementById('wiz-title').textContent = wizMeta[n].title;
-  document.getElementById('wiz-sub').textContent = wizMeta[n].sub;
-  document.getElementById('wiz-back').style.display = n>1?'inline-flex':'none';
-  document.getElementById('wiz-next').innerHTML = n<3 ? 'ดำเนินการต่อ' : 'เสร็จสิ้นและเริ่มลงสินค้า';
-}
-function clearErr(){ document.querySelectorAll('.errmsg').forEach(e=>e.classList.remove('show')); document.querySelectorAll('input,select').forEach(e=>e.classList.remove('err')); }
-function fail(id,msgId){ document.getElementById(id).classList.add('err'); document.getElementById(msgId).classList.add('show'); }
+      function validateStep(n) {
+        clearErr();
+        let ok = true;
+        if (n === 1) {
+          const name = document.getElementById("b-name").value.trim();
+          const tax = document.getElementById("b-tax").value.replace(/\D/g, "");
+          const type = document.getElementById("b-type").value;
+          const phone = document.getElementById("b-phone").value.trim();
+          if (!name) {
+            fail("b-name", "e-name");
+            ok = false;
+          }
+          if (tax.length !== 13) {
+            fail("b-tax", "e-tax");
+            ok = false;
+          }
+          if (!type) {
+            fail("b-type", "e-type");
+            ok = false;
+          }
+          if (!phone) {
+            fail("b-phone", "e-phone");
+            ok = false;
+          }
+          if (ok) {
+            state.business.name = name;
+            state.business.taxId = tax;
+            state.business.type = type;
+            state.business.phone = phone;
+            state.business.addr = document
+              .getElementById("b-addr")
+              .value.trim();
+          }
+        }
+        if (n === 2) {
+          if (!state.docs["doc-1"] || !state.docs["doc-2"]) {
+            document.getElementById("e-docs").classList.add("show");
+            ok = false;
+          } else state.kycDone = true;
+        }
+        if (n === 3) {
+          const bank = document.getElementById("b-bank").value;
+          const an = document.getElementById("b-acctname").value.trim();
+          const ac = document.getElementById("b-acct").value.replace(/\D/g, "");
+          if (!bank) {
+            fail("b-bank", "e-bank");
+            ok = false;
+          }
+          if (!an) {
+            fail("b-acctname", "e-acctname");
+            ok = false;
+          }
+          if (ac.length < 10 || ac.length > 12) {
+            fail("b-acct", "e-acct");
+            ok = false;
+          }
+          if (ok) {
+            state.business.bank = bank;
+            state.business.acctName = an;
+            state.business.acct = ac;
+            state.bankDone = true;
+          }
+        }
+        save();
+        return ok;
+      }
 
-function validateStep(n){
-  clearErr(); let ok=true;
-  if(n===1){
-    const name=document.getElementById('b-name').value.trim();
-    const tax=document.getElementById('b-tax').value.replace(/\D/g,'');
-    const type=document.getElementById('b-type').value;
-    const phone=document.getElementById('b-phone').value.trim();
-    if(!name){fail('b-name','e-name');ok=false}
-    if(tax.length!==13){fail('b-tax','e-tax');ok=false}
-    if(!type){fail('b-type','e-type');ok=false}
-    if(!phone){fail('b-phone','e-phone');ok=false}
-    if(ok){ state.business.name=name; state.business.taxId=tax; state.business.type=type;
-            state.business.phone=phone; state.business.addr=document.getElementById('b-addr').value.trim(); }
-  }
-  if(n===2){
-    if(!state.docs['doc-1'] || !state.docs['doc-2']){ document.getElementById('e-docs').classList.add('show'); ok=false; }
-    else state.kycDone=true;
-  }
-  if(n===3){
-    const bank=document.getElementById('b-bank').value;
-    const an=document.getElementById('b-acctname').value.trim();
-    const ac=document.getElementById('b-acct').value.replace(/\D/g,'');
-    if(!bank){fail('b-bank','e-bank');ok=false}
-    if(!an){fail('b-acctname','e-acctname');ok=false}
-    if(ac.length<10||ac.length>12){fail('b-acct','e-acct');ok=false}
-    if(ok){ state.business.bank=bank; state.business.acctName=an; state.business.acct=ac; state.bankDone=true; }
-  }
-  save(); return ok;
-}
+      function wizNext() {
+        const n = state.wizardStep;
+        if (!validateStep(n)) return;
+        const btn = document.getElementById("wiz-next");
+        const orig = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span> กำลังบันทึก…';
+        setTimeout(() => {
+          btn.disabled = false;
+          btn.innerHTML = orig;
+          if (n < 3) {
+            showStep(n + 1);
+            recalcPct();
+          } else {
+            recalcPct();
+            toast("ข้อมูลธุรกิจครบแล้ว — มาลงสินค้ากันต่อ", "ok");
+            goScreen("upload");
+          }
+        }, 700);
+      }
+      function wizPrev() {
+        if (state.wizardStep > 1) {
+          clearErr();
+          showStep(state.wizardStep - 1);
+        }
+      }
 
-function wizNext(){
-  const n=state.wizardStep;
-  if(!validateStep(n)) return;
-  const btn=document.getElementById('wiz-next');
-  const orig=btn.innerHTML;
-  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> กำลังบันทึก…';
-  setTimeout(()=>{
-    btn.disabled=false; btn.innerHTML=orig;
-    if(n<3){ showStep(n+1); recalcPct(); }
-    else{ recalcPct(); toast('ข้อมูลธุรกิจครบแล้ว — มาลงสินค้ากันต่อ','ok'); goScreen('upload'); }
-  },700);
-}
-function wizPrev(){ if(state.wizardStep>1){ clearErr(); showStep(state.wizardStep-1); } }
+      function fakeUpload(slot, label, fname) {
+        if (state.docs[slot]) return;
+        const el = document.getElementById(slot);
+        el.querySelector(".fic").innerHTML =
+          '<span class="spinner" style="border-color:rgba(0,166,62,.4);border-top-color:#00a63e"></span>';
+        el.querySelector("div b").nextSibling; // noop
+        setTimeout(() => {
+          state.docs[slot] = true;
+          save();
+          el.querySelector(".fic").textContent = "✓";
+          el.innerHTML =
+            '<div class="fic">✓</div><div style="flex:1"><b>' +
+            label +
+            "</b><br><small>" +
+            fname +
+            ' · ยืนยันแล้วผ่าน Identity API</small></div><span class="chip ready dot">ยืนยันแล้ว</span>';
+          document.getElementById("e-docs").classList.remove("show");
+        }, 800);
+      }
 
-function fakeUpload(slot,label,fname){
-  if(state.docs[slot]) return;
-  const el=document.getElementById(slot);
-  el.querySelector('.fic').innerHTML='<span class="spinner" style="border-color:rgba(0,166,62,.4);border-top-color:#00a63e"></span>';
-  el.querySelector('div b').nextSibling; // noop
-  setTimeout(()=>{
-    state.docs[slot]=true; save();
-    el.querySelector('.fic').textContent='✓';
-    el.innerHTML = '<div class="fic">✓</div><div style="flex:1"><b>'+label+'</b><br><small>'+fname+' · ยืนยันแล้วผ่าน Identity API</small></div><span class="chip ready dot">ยืนยันแล้ว</span>';
-    document.getElementById('e-docs').classList.remove('show');
-  },800);
-}
+      /* ===================== UPLOAD ===================== */
+      function pickFile() {
+        startProcessing();
+      }
+      function startProcessing() {
+        document.getElementById("up-drop").style.display = "none";
+        document.getElementById("up-map").style.display = "none";
+        document.getElementById("up-proc").style.display = "block";
+        const bar = document.getElementById("up-bar");
+        const status = document.getElementById("up-status");
+        const steps = [
+          [18, "กำลังอ่านข้อมูล 6 แถว…"],
+          [42, "กำลังตรวจหาโครงสร้างคอลัมน์…"],
+          [68, "AI กำลังจัดหมวดหมู่สินค้า…"],
+          [88, "กำลังตรวจสอบตามกฎ…"],
+          [100, "เสร็จแล้ว — กำลังสร้างตัวอย่างการจับคู่"],
+        ];
+        let i = 0;
+        const tick = () => {
+          if (i >= steps.length) {
+            setTimeout(showMapping, 400);
+            return;
+          }
+          bar.style.width = steps[i][0] + "%";
+          status.textContent = steps[i][1];
+          i++;
+          setTimeout(tick, 560);
+        };
+        tick();
+      }
+      const mapping = [
+        { v: "product_name", f: "ชื่อสินค้า", c: 99 },
+        { v: "price_thb", f: "ราคา (฿)", c: 98 },
+        { v: "category", f: "หมวดหมู่", c: 88 },
+        { v: "sku", f: "SKU / รหัสสินค้า", c: 95 },
+        { v: "description", f: "รายละเอียด", c: 90 },
+      ];
+      function showMapping() {
+        document.getElementById("up-proc").style.display = "none";
+        document.getElementById("up-map").style.display = "block";
+        const body = document.getElementById("map-body");
+        body.innerHTML = "";
+        mapping.forEach((m) => {
+          const col = m.c >= 90 ? "#00a63e" : m.c >= 75 ? "#f59e0b" : "#e32321";
+          body.insertAdjacentHTML(
+            "beforeend",
+            `<tr><td><span class="vendcol">${m.v}</span></td><td class="arrow">&rarr;</td>` +
+              `<td class="tmfield">${m.f}</td>` +
+              `<td><div class="conf"><div class="bar"><i style="width:${m.c}%;background:${col}"></i></div><b>${m.c}%</b></div></td></tr>`,
+          );
+        });
+      }
+      function confirmMapping() {
+        const btn = document.getElementById("map-confirm");
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span> กำลังนำเข้า…';
+        setTimeout(() => {
+          state.uploadDone = true;
+          save();
+          recalcPct();
+          toast("นำเข้าสินค้า 6 รายการแล้ว — ตรวจสอบและเผยแพร่", "ok");
+          goScreen("review");
+        }, 700);
+      }
+      function resetUpload() {
+        state.uploadDone = false;
+        save();
+        document.getElementById("up-map").style.display = "none";
+        document.getElementById("up-proc").style.display = "none";
+        document.getElementById("up-drop").style.display = "block";
+      }
+      function restoreUploadStage() {
+        if (state.uploadDone) {
+          document.getElementById("up-drop").style.display = "none";
+          document.getElementById("up-proc").style.display = "none";
+          document.getElementById("up-map").style.display = "block";
+          document.getElementById("up-bar").style.width = "100%";
+          showMapping();
+        } else {
+          document.getElementById("up-drop").style.display = "block";
+          document.getElementById("up-proc").style.display = "none";
+          document.getElementById("up-map").style.display = "none";
+        }
+      }
 
-/* ===================== UPLOAD ===================== */
-function pickFile(){ startProcessing(); }
-function startProcessing(){
-  document.getElementById('up-drop').style.display='none';
-  document.getElementById('up-map').style.display='none';
-  document.getElementById('up-proc').style.display='block';
-  const bar=document.getElementById('up-bar'); const status=document.getElementById('up-status');
-  const steps=[
-    [18,'กำลังอ่านข้อมูล 6 แถว…'],
-    [42,'กำลังตรวจหาโครงสร้างคอลัมน์…'],
-    [68,'AI กำลังจัดหมวดหมู่สินค้า…'],
-    [88,'กำลังตรวจสอบตามกฎ…'],
-    [100,'เสร็จแล้ว — กำลังสร้างตัวอย่างการจับคู่']
-  ];
-  let i=0;
-  const tick=()=>{
-    if(i>=steps.length){ setTimeout(showMapping,400); return; }
-    bar.style.width=steps[i][0]+'%'; status.textContent=steps[i][1]; i++; setTimeout(tick,560);
-  };
-  tick();
-}
-const mapping=[
-  {v:'product_name', f:'ชื่อสินค้า',     c:99},
-  {v:'price_thb',    f:'ราคา (฿)',      c:98},
-  {v:'category',     f:'หมวดหมู่',       c:88},
-  {v:'sku',          f:'SKU / รหัสสินค้า', c:95},
-  {v:'description',  f:'รายละเอียด',     c:90},
-];
-function showMapping(){
-  document.getElementById('up-proc').style.display='none';
-  document.getElementById('up-map').style.display='block';
-  const body=document.getElementById('map-body'); body.innerHTML='';
-  mapping.forEach(m=>{
-    const col = m.c>=90?'#00a63e':(m.c>=75?'#f59e0b':'#e32321');
-    body.insertAdjacentHTML('beforeend',
-      `<tr><td><span class="vendcol">${m.v}</span></td><td class="arrow">&rarr;</td>`+
-      `<td class="tmfield">${m.f}</td>`+
-      `<td><div class="conf"><div class="bar"><i style="width:${m.c}%;background:${col}"></i></div><b>${m.c}%</b></div></td></tr>`);
-  });
-}
-function confirmMapping(){
-  const btn=document.getElementById('map-confirm');
-  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> กำลังนำเข้า…';
-  setTimeout(()=>{
-    state.uploadDone=true; save(); recalcPct();
-    toast('นำเข้าสินค้า 6 รายการแล้ว — ตรวจสอบและเผยแพร่','ok');
-    goScreen('review');
-  },700);
-}
-function resetUpload(){
-  state.uploadDone=false; save();
-  document.getElementById('up-map').style.display='none';
-  document.getElementById('up-proc').style.display='none';
-  document.getElementById('up-drop').style.display='block';
-}
-function restoreUploadStage(){
-  if(state.uploadDone){
-    document.getElementById('up-drop').style.display='none';
-    document.getElementById('up-proc').style.display='none';
-    document.getElementById('up-map').style.display='block';
-    document.getElementById('up-bar').style.width='100%';
-    showMapping();
-  }else{
-    document.getElementById('up-drop').style.display='block';
-    document.getElementById('up-proc').style.display='none';
-    document.getElementById('up-map').style.display='none';
-  }
-}
-
-/* ===================== REVIEW ===================== */
-const CATS=['ขนมไทย','ผลไม้อบแห้งและของว่าง','น้ำจิ้มและเครื่องปรุง','ชุดของขวัญ','เครื่องดื่ม'];
-let selected = new Set();
-function renderReview(){
-  const body=document.getElementById('review-body'); body.innerHTML='';
-  state.products.forEach(p=>{
-    const ready = p.status==='ready';
-    const checked = selected.has(p.id) ? 'checked' : '';
-    const catCell = ready
-      ? `<span>${p.aiCat}</span>`
-      : `<select class="inline" onchange="fixCategory(${p.id}, this.value)">
+      /* ===================== REVIEW ===================== */
+      const CATS = [
+        "ขนมไทย",
+        "ผลไม้อบแห้งและของว่าง",
+        "น้ำจิ้มและเครื่องปรุง",
+        "ชุดของขวัญ",
+        "เครื่องดื่ม",
+      ];
+      let selected = new Set();
+      function renderReview() {
+        const body = document.getElementById("review-body");
+        body.innerHTML = "";
+        state.products.forEach((p) => {
+          const ready = p.status === "ready";
+          const checked = selected.has(p.id) ? "checked" : "";
+          const catCell = ready
+            ? `<span>${p.aiCat}</span>`
+            : `<select class="inline" onchange="fixCategory(${p.id}, this.value)">
            <option value="">เลือกหมวดหมู่…</option>
-           ${CATS.map(c=>`<option ${c===p.aiCat?'selected':''}>${c}</option>`).join('')}
+           ${CATS.map((c) => `<option ${c === p.aiCat ? "selected" : ""}>${c}</option>`).join("")}
          </select>`;
-    const statusChip = ready
-      ? `<span class="chip ready dot">พร้อมขาย</span>`
-      : `<span class="chip review dot">ต้องตรวจสอบ</span>`;
-    body.insertAdjacentHTML('beforeend',
-      `<tr data-id="${p.id}">
-        <td><input type="checkbox" style="width:auto;min-height:0" ${ready?'':'disabled'} ${checked} onclick="toggleOne(${p.id},this.checked)"></td>
+          const statusChip = ready
+            ? `<span class="chip ready dot">พร้อมขาย</span>`
+            : `<span class="chip review dot">ต้องตรวจสอบ</span>`;
+          body.insertAdjacentHTML(
+            "beforeend",
+            `<tr data-id="${p.id}">
+        <td><input type="checkbox" style="width:auto;min-height:0" ${ready ? "" : "disabled"} ${checked} onclick="toggleOne(${p.id},this.checked)"></td>
         <td><b>${p.name}</b></td>
         <td class="price">฿${p.price}</td>
         <td>${catCell}</td>
         <td>${statusChip}</td>
-      </tr>`);
-  });
-  updateReviewSummary();
-}
-function fixCategory(id,val){
-  if(!val) return;
-  const p=state.products.find(x=>x.id===id);
-  p.aiCat=val; p.status='ready'; p.conf=92; save();
-  toast('จัดหมวดหมู่แล้ว — '+p.name+' พร้อมขาย','ok');
-  renderReview();
-}
-function toggleOne(id,on){ if(on)selected.add(id); else selected.delete(id); updateReviewSummary(); }
-function toggleAll(on){
-  selected.clear();
-  if(on) state.products.filter(p=>p.status==='ready').forEach(p=>selected.add(p.id));
-  renderReview();
-}
-function updateReviewSummary(){
-  const ready=state.products.filter(p=>p.status==='ready').length;
-  const review=state.products.length-ready;
-  document.getElementById('review-summary').textContent =
-    `เลือกแล้ว ${selected.size} · พร้อมขาย ${ready} · ต้องตรวจสอบ ${review}`;
-  document.getElementById('publish-btn').disabled = selected.size===0;
-}
+      </tr>`,
+          );
+        });
+        updateReviewSummary();
+      }
+      function fixCategory(id, val) {
+        if (!val) return;
+        const p = state.products.find((x) => x.id === id);
+        p.aiCat = val;
+        p.status = "ready";
+        p.conf = 92;
+        save();
+        toast("จัดหมวดหมู่แล้ว — " + p.name + " พร้อมขาย", "ok");
+        renderReview();
+      }
+      function toggleOne(id, on) {
+        if (on) selected.add(id);
+        else selected.delete(id);
+        updateReviewSummary();
+      }
+      function toggleAll(on) {
+        selected.clear();
+        if (on)
+          state.products
+            .filter((p) => p.status === "ready")
+            .forEach((p) => selected.add(p.id));
+        renderReview();
+      }
+      function updateReviewSummary() {
+        const ready = state.products.filter((p) => p.status === "ready").length;
+        const review = state.products.length - ready;
+        document.getElementById("review-summary").textContent =
+          `เลือกแล้ว ${selected.size} · พร้อมขาย ${ready} · ต้องตรวจสอบ ${review}`;
+        document.getElementById("publish-btn").disabled = selected.size === 0;
+      }
 
-/* ===================== PUBLISH MODAL ===================== */
-function openPublish(){
-  if(selected.size===0) return;
-  const review=state.products.filter(p=>p.status==='review').length;
-  document.getElementById('modal-body').textContent =
-    `สินค้าที่เลือก ${selected.size} รายการจะแสดงในการค้นหาของ ThaiMart ภายในไม่กี่นาที`+
-    (review?` ส่วนสินค้า ${review} รายการที่ต้องตรวจสอบจะถูกเก็บเป็นฉบับร่าง`:'');
-  document.getElementById('overlay').classList.add('show');
-  document.getElementById('modal-confirm').focus();
-}
-function closeModal(){ document.getElementById('overlay').classList.remove('show'); }
-function doPublish(){
-  const btn=document.getElementById('modal-confirm');
-  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> กำลังเผยแพร่…';
-  setTimeout(()=>{
-    btn.disabled=false; btn.innerHTML='เผยแพร่เลย';
-    state.published=true; save(); recalcPct();
-    closeModal();
-    toast('เผยแพร่แล้ว! สินค้า '+selected.size+' รายการเปิดขายแล้ว 🎉','ok');
-    goScreen('dashboard');
-  },700);
-}
+      /* ===================== PUBLISH MODAL ===================== */
+      function openPublish() {
+        if (selected.size === 0) return;
+        const review = state.products.filter(
+          (p) => p.status === "review",
+        ).length;
+        document.getElementById("modal-body").textContent =
+          `สินค้าที่เลือก ${selected.size} รายการจะแสดงในการค้นหาของ ThaiMart ภายในไม่กี่นาที` +
+          (review
+            ? ` ส่วนสินค้า ${review} รายการที่ต้องตรวจสอบจะถูกเก็บเป็นฉบับร่าง`
+            : "");
+        document.getElementById("overlay").classList.add("show");
+        document.getElementById("modal-confirm").focus();
+      }
+      function closeModal() {
+        document.getElementById("overlay").classList.remove("show");
+      }
+      function doPublish() {
+        const btn = document.getElementById("modal-confirm");
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span> กำลังเผยแพร่…';
+        setTimeout(() => {
+          btn.disabled = false;
+          btn.innerHTML = "เผยแพร่เลย";
+          state.published = true;
+          save();
+          recalcPct();
+          closeModal();
+          toast(
+            "เผยแพร่แล้ว! สินค้า " + selected.size + " รายการเปิดขายแล้ว 🎉",
+            "ok",
+          );
+          goScreen("dashboard");
+        }, 700);
+      }
 
-/* ===================== DASHBOARD ===================== */
-let ttlTimer=null;
-function renderDashboard(){
-  const total=state.products.length;
-  const ready=state.products.filter(p=>p.status==='ready').length;
-  const review=total-ready;
-  document.getElementById('stat-total').textContent=total;
-  document.getElementById('stat-ready').textContent=ready;
-  document.getElementById('stat-review').textContent=review;
+      /* ===================== DASHBOARD ===================== */
+      let ttlTimer = null;
+      function renderDashboard() {
+        const total = state.products.length;
+        const ready = state.products.filter((p) => p.status === "ready").length;
+        const review = total - ready;
+        document.getElementById("stat-total").textContent = total;
+        document.getElementById("stat-ready").textContent = ready;
+        document.getElementById("stat-review").textContent = review;
 
-  const pct=state.onboardingPct;
-  document.getElementById('dash-pct').textContent=pct+'%';
-  const circ=377; document.getElementById('dash-ring').style.strokeDashoffset = circ*(1-pct/100);
+        const pct = state.onboardingPct;
+        document.getElementById("dash-pct").textContent = pct + "%";
+        const circ = 377;
+        document.getElementById("dash-ring").style.strokeDashoffset =
+          circ * (1 - pct / 100);
 
-  // next steps
-  const steps=[
-    {label:'ส่งข้อมูลธุรกิจแล้ว', done: !!state.business.name && state.bankDone},
-    {label:'ยืนยันตัวตนแล้ว (KYC)', done: state.kycDone},
-    {label:'นำเข้าและจับคู่สินค้าแล้ว', done: state.uploadDone},
-    {label:'เผยแพร่สินค้าขึ้นแพลตฟอร์มแล้ว', done: state.published},
-    {label:'ตรวจสอบ compliance ขั้นสุดท้าย (ทีมปฏิบัติการ ThaiMart — '+review+' รายการ)', done:false},
-  ];
-  const ul=document.getElementById('next-steps'); ul.innerHTML='';
-  steps.forEach(s=>{
-    ul.insertAdjacentHTML('beforeend',
-      `<li class="${s.done?'':'pend'}"><span class="tick ${s.done?'ok':'pend'}">${s.done?'✓':'○'}</span>${s.label}</li>`);
-  });
+        // next steps
+        const steps = [
+          {
+            label: "ส่งข้อมูลธุรกิจแล้ว",
+            done: !!state.business.name && state.bankDone,
+          },
+          { label: "ยืนยันตัวตนแล้ว (KYC)", done: state.kycDone },
+          { label: "นำเข้าและจับคู่สินค้าแล้ว", done: state.uploadDone },
+          { label: "เผยแพร่สินค้าขึ้นแพลตฟอร์มแล้ว", done: state.published },
+          {
+            label:
+              "ตรวจสอบ compliance ขั้นสุดท้าย (ทีมปฏิบัติการ ThaiMart — " +
+              review +
+              " รายการ)",
+            done: false,
+          },
+        ];
+        const ul = document.getElementById("next-steps");
+        ul.innerHTML = "";
+        steps.forEach((s) => {
+          ul.insertAdjacentHTML(
+            "beforeend",
+            `<li class="${s.done ? "" : "pend"}"><span class="tick ${s.done ? "ok" : "pend"}">${s.done ? "✓" : "○"}</span>${s.label}</li>`,
+          );
+        });
 
-  // CTA depends on progress
-  const cta=document.getElementById('dash-cta');
-  if(!state.uploadDone){ cta.textContent='อัปโหลดรายการสินค้า'; }
-  else if(!state.published){ cta.textContent='ตรวจสอบและเผยแพร่สินค้า'; }
-  else{ cta.textContent='ดูหน้าร้านที่เปิดขายแล้ว'; }
+        // CTA depends on progress
+        const cta = document.getElementById("dash-cta");
+        if (!state.uploadDone) {
+          cta.textContent = "อัปโหลดรายการสินค้า";
+        } else if (!state.published) {
+          cta.textContent = "ตรวจสอบและเผยแพร่สินค้า";
+        } else {
+          cta.textContent = "ดูหน้าร้านที่เปิดขายแล้ว";
+        }
 
-  startTtl();
-}
-function dashCta(){
-  if(!state.uploadDone) goScreen('upload');
-  else if(!state.published) goScreen('review');
-  else toast('ร้านของคุณเปิดขายแล้วที่ thaimart.co/baan-khanom','ok');
-}
-function startTtl(){
-  if(ttlTimer) clearInterval(ttlTimer);
-  // base ~41h12m, tick down slowly for liveliness
-  let totalMin = state.published ? 41*60+12 : 47*60+30;
-  const el=document.getElementById('ttl-counter');
-  const draw=()=>{ const h=Math.floor(totalMin/60), m=totalMin%60; el.textContent=h+'h '+String(m).padStart(2,'0')+'m'; };
-  draw();
-  ttlTimer=setInterval(()=>{ totalMin=Math.max(0,totalMin-1); draw(); if(totalMin<=0)clearInterval(ttlTimer); },4000);
-}
+        startTtl();
+      }
+      function dashCta() {
+        if (!state.uploadDone) goScreen("upload");
+        else if (!state.published) goScreen("review");
+        else toast("ร้านของคุณเปิดขายแล้วที่ thaimart.co/baan-khanom", "ok");
+      }
+      function startTtl() {
+        if (ttlTimer) clearInterval(ttlTimer);
+        // base ~41h12m, tick down slowly for liveliness
+        let totalMin = state.published ? 41 * 60 + 12 : 47 * 60 + 30;
+        const el = document.getElementById("ttl-counter");
+        const draw = () => {
+          const h = Math.floor(totalMin / 60),
+            m = totalMin % 60;
+          el.textContent = h + "h " + String(m).padStart(2, "0") + "m";
+        };
+        draw();
+        ttlTimer = setInterval(() => {
+          totalMin = Math.max(0, totalMin - 1);
+          draw();
+          if (totalMin <= 0) clearInterval(ttlTimer);
+        }, 4000);
+      }
 
-/* ===================== PROGRESS ===================== */
-function recalcPct(){
-  let p=0;
-  if(state.business.name) p+=25;     // step1
-  if(state.kycDone) p+=20;           // step2
-  if(state.bankDone) p+=15;          // step3
-  if(state.uploadDone) p+=20;        // catalog
-  if(state.published) p+=20;         // published
-  state.onboardingPct=Math.min(100,p); save();
-  // rail mini-ring
-  const C=144.5;
-  document.getElementById('mini-ring').style.strokeDashoffset = C*(1-state.onboardingPct/100);
-  document.getElementById('mini-pct').textContent=state.onboardingPct+'%';
-  document.getElementById('rail-pct').textContent=state.onboardingPct+'%';
-  // mark nav done
-  document.getElementById('nav-onboarding').classList.toggle('done', state.bankDone);
-  document.getElementById('nav-upload').classList.toggle('done', state.uploadDone);
-  document.getElementById('nav-review').classList.toggle('done', state.published);
-}
+      /* ===================== PROGRESS ===================== */
+      function recalcPct() {
+        let p = 0;
+        if (state.business.name) p += 25; // step1
+        if (state.kycDone) p += 20; // step2
+        if (state.bankDone) p += 15; // step3
+        if (state.uploadDone) p += 20; // catalog
+        if (state.published) p += 20; // published
+        state.onboardingPct = Math.min(100, p);
+        save();
+        // rail mini-ring
+        const C = 144.5;
+        document.getElementById("mini-ring").style.strokeDashoffset =
+          C * (1 - state.onboardingPct / 100);
+        document.getElementById("mini-pct").textContent =
+          state.onboardingPct + "%";
+        document.getElementById("rail-pct").textContent =
+          state.onboardingPct + "%";
+        // mark nav done
+        document
+          .getElementById("nav-onboarding")
+          .classList.toggle("done", state.bankDone);
+        document
+          .getElementById("nav-upload")
+          .classList.toggle("done", state.uploadDone);
+        document
+          .getElementById("nav-review")
+          .classList.toggle("done", state.published);
+      }
 
-/* ===================== TOAST ===================== */
-let toastTimer=null;
-function toast(msg,kind){
-  const t=document.getElementById('toast');
-  t.innerHTML=(kind==='ok'?'<span>✓</span> ':'')+msg;
-  t.className='toast show'+(kind==='ok'?' ok':'');
-  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),2600);
-}
+      /* ===================== TOAST ===================== */
+      let toastTimer = null;
+      function toast(msg, kind) {
+        const t = document.getElementById("toast");
+        t.innerHTML = (kind === "ok" ? "<span>✓</span> " : "") + msg;
+        t.className = "toast show" + (kind === "ok" ? " ok" : "");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => t.classList.remove("show"), 2600);
+      }
 
-/* ===================== INPUT RESTORE / FORMATTING ===================== */
-function restoreForm(){
-  const b=state.business;
-  if(b.name) document.getElementById('b-name').value=b.name;
-  if(b.taxId) document.getElementById('b-tax').value=b.taxId;
-  if(b.type) document.getElementById('b-type').value=b.type;
-  if(b.phone) document.getElementById('b-phone').value=b.phone;
-  if(b.addr) document.getElementById('b-addr').value=b.addr;
-  if(b.bank) document.getElementById('b-bank').value=b.bank;
-  if(b.acctName) document.getElementById('b-acctname').value=b.acctName;
-  if(b.acct) document.getElementById('b-acct').value=b.acct;
-  ['doc-1','doc-2'].forEach(slot=>{
-    if(state.docs[slot]){
-      const lbl = slot==='doc-1'?['บัตรประชาชน / หนังสือรับรองบริษัท','PorPor20.pdf']:['ใบอนุญาตผลิตอาหาร / OTOP','OTOP-license.jpg'];
-      document.getElementById(slot).innerHTML =
-        '<div class="fic">✓</div><div style="flex:1"><b>'+lbl[0]+'</b><br><small>'+lbl[1]+' · ยืนยันแล้วผ่าน Identity API</small></div><span class="chip ready dot">ยืนยันแล้ว</span>';
-    }
-  });
-}
+      /* ===================== INPUT RESTORE / FORMATTING ===================== */
+      function restoreForm() {
+        const b = state.business;
+        if (b.name) document.getElementById("b-name").value = b.name;
+        if (b.taxId) document.getElementById("b-tax").value = b.taxId;
+        if (b.type) document.getElementById("b-type").value = b.type;
+        if (b.phone) document.getElementById("b-phone").value = b.phone;
+        if (b.addr) document.getElementById("b-addr").value = b.addr;
+        if (b.bank) document.getElementById("b-bank").value = b.bank;
+        if (b.acctName)
+          document.getElementById("b-acctname").value = b.acctName;
+        if (b.acct) document.getElementById("b-acct").value = b.acct;
+        ["doc-1", "doc-2"].forEach((slot) => {
+          if (state.docs[slot]) {
+            const lbl =
+              slot === "doc-1"
+                ? ["บัตรประชาชน / หนังสือรับรองบริษัท", "PorPor20.pdf"]
+                : ["ใบอนุญาตผลิตอาหาร / OTOP", "OTOP-license.jpg"];
+            document.getElementById(slot).innerHTML =
+              '<div class="fic">✓</div><div style="flex:1"><b>' +
+              lbl[0] +
+              "</b><br><small>" +
+              lbl[1] +
+              ' · ยืนยันแล้วผ่าน Identity API</small></div><span class="chip ready dot">ยืนยันแล้ว</span>';
+          }
+        });
+      }
 
-/* ===================== INIT ===================== */
-function init(){
-  load();
-  restoreForm();
-  showStep(state.wizardStep);
-  recalcPct();
-  goScreen(state.currentScreen);
-  setView(state.currentView);
+      /* ===================== INIT ===================== */
+      function init() {
+        load();
+        restoreForm();
+        showStep(state.wizardStep);
+        recalcPct();
+        goScreen(state.currentScreen);
+        setView(state.currentView);
 
-  // Escape closes modal
-  document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
+        // Escape closes modal
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape") closeModal();
+        });
 
-  // dropzone drag visuals (faked drop -> process)
-  const dz=document.getElementById('dropzone');
-  ['dragenter','dragover'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add('drag')}));
-  ['dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove('drag')}));
-  dz.addEventListener('drop',()=>startProcessing());
-}
-init();
-</script>
-</body>
+        // dropzone drag visuals (faked drop -> process)
+        const dz = document.getElementById("dropzone");
+        ["dragenter", "dragover"].forEach((ev) =>
+          dz.addEventListener(ev, (e) => {
+            e.preventDefault();
+            dz.classList.add("drag");
+          }),
+        );
+        ["dragleave", "drop"].forEach((ev) =>
+          dz.addEventListener(ev, (e) => {
+            e.preventDefault();
+            dz.classList.remove("drag");
+          }),
+        );
+        dz.addEventListener("drop", () => startProcessing());
+      }
+      init();
+    </script>
+  </body>
 </html>
