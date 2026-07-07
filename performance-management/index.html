@@ -161,7 +161,51 @@
   @media(max-width:720px){
     .two,.syn,.dec-grid{grid-template-columns:1fr}
     .hero-top{flex-wrap:wrap}.hero .score-big{text-align:left}
+    .cycle-row{flex-wrap:wrap}
   }
+
+  /* ---- tooltips ---- */
+  [data-tip]{position:relative}
+  [data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 9px);left:50%;
+    transform:translateX(-50%);background:#1F2430;color:#fff;font-size:11.5px;font-weight:500;line-height:1.45;
+    padding:7px 10px;border-radius:8px;white-space:normal;width:max-content;max-width:230px;z-index:60;
+    box-shadow:0 8px 22px rgba(0,0,0,.28);pointer-events:none;animation:tipin .12s ease}
+  [data-tip]:hover::before{content:'';position:absolute;bottom:calc(100% + 3px);left:50%;
+    transform:translateX(-50%);border:5px solid transparent;border-top-color:#1F2430;z-index:60;pointer-events:none}
+  @keyframes tipin{from{opacity:0;transform:translateX(-50%) translateY(3px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+  /* ---- entrance + bar/marker motion (the wow) ---- */
+  @keyframes growx{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+  @keyframes pop{from{opacity:0;transform:translate(-50%,-50%) scale(.2)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+  @keyframes fadeup{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+  .track-bar{transform-origin:left;animation:growx .7s cubic-bezier(.2,.8,.2,1)}
+  .marker{position:absolute;z-index:3;animation:pop .38s cubic-bezier(.2,1.5,.4,1) backwards}
+  body:not(.loaded) .hero,body:not(.loaded) .card{animation:fadeup .55s cubic-bezier(.2,.8,.2,1) backwards}
+  body:not(.loaded) .card:nth-of-type(2){animation-delay:.06s}
+  body:not(.loaded) .card:nth-of-type(3){animation-delay:.1s}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important}}
+
+  /* ---- hero gloss ---- */
+  .hero{position:relative;overflow:hidden}
+  .hero::after{content:'';position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(130% 130% at 100% 0,rgba(255,255,255,.30),transparent 46%)}
+  .hero-top,.hero .synth,.hero .rec{position:relative;z-index:1}
+
+  /* ---- year-over-year compare ---- */
+  .cmp-toggle{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:#fff;
+    border-radius:999px;padding:5px 13px;cursor:pointer;font:inherit;font-size:12.5px;font-weight:600;color:var(--ink);
+    transition:.15s}
+  .cmp-toggle:hover{border-color:var(--brand1)}
+  .cmp-toggle.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .delta{font-size:12px;font-weight:700;border-radius:999px;padding:1px 8px;margin-left:8px;cursor:help}
+  .delta.up{background:var(--green-bg);color:var(--green)}
+  .delta.down{background:var(--red-bg);color:var(--red)}
+  .delta.flat{background:#EEF0F3;color:var(--muted)}
+  .yoy-badge{display:inline-block;margin-top:8px;font-size:12px;font-weight:700;
+    background:rgba(255,255,255,.24);border-radius:999px;padding:3px 11px}
+  .ghost{position:absolute;top:50%;width:13px;height:13px;border-radius:50%;transform:translate(-50%,-50%);
+    border:2px dashed rgba(31,36,48,.4);background:#fff;z-index:2;cursor:help;animation:pop .38s ease backwards}
+  .connector{position:absolute;top:50%;height:3px;transform:translateY(-50%);border-radius:3px;opacity:.5;z-index:1}
 </style>
 </head>
 <body>
@@ -333,6 +377,7 @@ const DATA = {employees:{
 const STATE = {
   emp:'bank',
   cycle:'2025',
+  compare:false,
   visible:{self:true, manager:true, peer:true, org:true},
   decision:{merit:null, bonus:null, notes:''},
 };
@@ -359,6 +404,11 @@ const GRADE_TH = {Excellence:'ดีเยี่ยม', Exceeds:'เกิน�
 function trendDir(){ // slope over available cycles
   const t = emp().trend; const d = t[t.length-1].pct - t[0].pct;
   return d>=4 ? 'up' : d<=-4 ? 'down' : 'flat';
+}
+
+function prevCycleKey(){ // previous cycle that has dimension data, else null
+  const prev = String(+STATE.cycle - 1);
+  return emp().cycles[prev] ? prev : null;
 }
 
 function gapFlag(dim){
@@ -402,11 +452,20 @@ function renderHeader(){
   const synth = c.synth;
   const empTabs = Object.keys(DATA.employees).map(k=>
     `<button class="${k===STATE.emp?'on':''}" onclick="setEmp('${k}')">${DATA.employees[k].employee.name.split(' (')[0]}</button>`).join('');
+  const prevKey = prevCycleKey();
+  const cmpBtn = prevKey
+    ? `<button class="cmp-toggle ${STATE.compare?'on':''}" onclick="toggleCompare()">⇄ เทียบกับปี ${prevKey}</button>` : '';
+  let yoy = '';
+  if(STATE.compare && prevKey){
+    const diff = r.pct - overallPct(prevKey);
+    yoy = `<div class="yoy-badge">${diff>=0?'▲ +':'▼ '}${diff} จากปี ${prevKey}</div>`;
+  }
   return `
   <div class="cycle-row">
     <span class="sub">พนักงาน</span>
     <span class="seg">${empTabs}</span>
     <span style="flex:1"></span>
+    ${cmpBtn}
     <span class="sub">รอบการประเมิน</span>
     <span class="seg">
       ${Object.keys(emp().cycles).sort().map(k=>
@@ -425,6 +484,7 @@ function renderHeader(){
       <div class="score-big">
         <div class="pct">${r.pct}%</div>
         <div class="gd">${r.band} · ${GRADE_TH[r.band]}</div>
+        ${yoy}
       </div>
     </div>
     <div class="synth">${synth}</div>
@@ -444,31 +504,50 @@ function renderScorecard(){
   const legend = SOURCES.map(s=>
     `<button class="src-toggle ${STATE.visible[s.key]?'':'off'}" onclick="toggleSrc('${s.key}')">
        <span class="dot" style="background:${s.color}"></span>${s.label}</button>`).join('');
+  const prevKey = prevCycleKey();
+  const cmp = STATE.compare && prevKey;
   const rows = c.dims.map(d=>{
     const g = gapFlag(d);
-    const markers = SOURCES.filter(s=>STATE.visible[s.key]).map(s=>{
+    const markers = SOURCES.filter(s=>STATE.visible[s.key]).map((s,i)=>{
       const v = d.src[s.key];
-      return `<span class="marker" style="left:${v/5*100}%;background:${s.color}"
+      return `<span class="marker" style="left:${v/5*100}%;background:${s.color};animation-delay:${i*0.05}s"
               data-tip="${s.label} ${round1(v)}/5"></span>`;
     }).join('');
+    let ghost='', connector='', delta='';
+    if(cmp){
+      const pd = emp().cycles[prevKey].dims.find(x=>x.name===d.name);
+      if(pd){
+        const a = pd.final/5*100, b = d.final/5*100, lo=Math.min(a,b), hi=Math.max(a,b);
+        const diff = round1(d.final - pd.final);
+        const dc = diff>0?'up':diff<0?'down':'flat';
+        const col = diff>0?'var(--green)':diff<0?'var(--red)':'var(--muted)';
+        connector = `<div class="connector" style="left:${lo}%;width:${hi-lo}%;background:${col}"></div>`;
+        ghost = `<span class="ghost" style="left:${a}%" data-tip="ปี ${prevKey}: ${round1(pd.final)}/5"></span>`;
+        delta = `<span class="delta ${dc}" data-tip="เปลี่ยนแปลงจากปี ${prevKey}">${diff>0?'+':''}${diff}</span>`;
+      }
+    }
     const badge = g.label ? `<span class="badge ${g.cls}" data-tip="${g.tip}">${g.label}</span>` : '';
     return `<div class="dim">
       <div class="dim-head">
         <span class="dim-name">${d.name}</span>
         <span class="dim-weight">น้ำหนัก ${d.weight}%</span>
         ${badge}
-        <span class="dim-score">${round1(d.final)}<span style="color:var(--muted);font-weight:400;font-size:12px">/5</span></span>
+        <span class="dim-score">${round1(d.final)}<span style="color:var(--muted);font-weight:400;font-size:12px">/5</span>${delta}</span>
       </div>
       <div class="track">
         <div class="track-line"></div>
         <div class="track-bar" style="width:${d.final/5*100}%"></div>
+        ${connector}${ghost}
         ${markers}
         <div class="track-scale"><span>0</span><span>5</span></div>
       </div>
     </div>`;
   }).join('');
+  const hint = cmp
+    ? `วงกลมเส้นประ = ปี ${prevKey} · เส้นเชื่อม = ทิศทางการเปลี่ยนแปลง`
+    : 'เปรียบเทียบทุกแหล่งประเมินพร้อมกัน · ระยะห่างของจุด = ความเห็นตรง/ต่างกัน';
   return `<div class="card">
-    <div class="sec-title"><h2>ผลการประเมินแบบ 360° ทุกมิติ</h2><small>เปรียบเทียบทุกแหล่งประเมินพร้อมกัน · ระยะห่างของจุด = ความเห็นตรง/ต่างกัน</small></div>
+    <div class="sec-title"><h2>ผลการประเมินแบบ 360° ทุกมิติ</h2><small>${hint}</small></div>
     <div class="legend">${legend}</div>
     ${rows}
   </div>`;
@@ -598,11 +677,28 @@ function render(){
     `<div class="two">${renderTrend()}${renderPeer()}</div>` +
     renderSynthesis() + renderDetail() + renderDecision();
   syncSticky();
+  animatePct();
+  if(!window._loaded){ window._loaded=true; setTimeout(()=>document.body.classList.add('loaded'), 900); }
+}
+
+let _lastPct=null;
+function animatePct(){ // count-up the big % only when the value changes
+  const el = document.querySelector('.hero .pct'); if(!el) return;
+  const target = recommend(STATE.cycle).pct;
+  if(_lastPct===target){ el.textContent=target+'%'; return; }
+  const from = _lastPct==null?0:_lastPct; _lastPct=target;
+  const t0 = performance.now(), dur=650;
+  (function step(now){
+    const p = Math.min(1,(now-t0)/dur), e=1-Math.pow(1-p,3);
+    el.textContent = Math.round(from+(target-from)*e)+'%';
+    if(p<1) requestAnimationFrame(step);
+  })(t0);
 }
 
 /* ---------------- INTERACTIONS ---------------- */
 function setEmp(k){ STATE.emp=k; STATE.cycle='2025'; STATE.decision={merit:null,bonus:null,notes:''}; render(); }
 function setCycle(k){ STATE.cycle=k; STATE.decision={merit:null,bonus:null,notes:''}; render(); }
+function toggleCompare(){ STATE.compare=!STATE.compare; render(); }
 function toggleSrc(k){ STATE.visible[k]=!STATE.visible[k]; render(); }
 function setDec(field,val){
   STATE.decision[field] = field==='notes' ? val : parseFloat(val);
