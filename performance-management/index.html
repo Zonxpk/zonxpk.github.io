@@ -209,8 +209,11 @@
     border:2px dashed rgba(31,36,48,.4);background:#fff;z-index:2;cursor:help;animation:pop .38s ease backwards}
   .connector{position:absolute;top:50%;height:3px;transform:translateY(-50%);border-radius:3px;opacity:.5;z-index:1}
 
-  /* ---- employee compare (calibration) ---- */
-  .ec-grid{display:grid;gap:14px}
+  /* ---- employee compare (calibration): symmetric diverging layout ---- */
+  .ec-row{display:grid;grid-template-columns:1fr 150px 1fr;gap:16px;align-items:center}
+  .ec-heads{align-items:stretch;margin-bottom:4px}
+  .ec-vs{justify-self:center;align-self:center;width:42px;height:42px;border-radius:50%;background:#F0EFED;
+    color:var(--muted);font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center}
   .ec-head{background:#FBFBFA;border:1px solid var(--line);border-radius:12px;padding:16px;text-align:center}
   .ec-head .av{width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;
     font-size:30px;line-height:1;margin:0 auto 10px}
@@ -220,18 +223,18 @@
   .ec-trend{font-size:12px;font-weight:600;margin-top:8px}
   .ec-trend.up{color:var(--green)} .ec-trend.down{color:var(--red)} .ec-trend.flat{color:var(--muted)}
   .ec-dims{margin-top:18px}
-  .ec-dim{display:grid;grid-template-columns:160px 1fr;align-items:center;gap:16px;
-    padding:11px 0;border-bottom:1px solid var(--line)}
+  .ec-dim{padding:11px 0;border-bottom:1px solid var(--line)}
   .ec-dim:last-child{border-bottom:0}
-  .ec-dim-name{font-weight:600;font-size:13px}
-  .ec-cells{display:grid;gap:16px}
-  .ec-bar-wrap{position:relative;background:#EEF0F3;border-radius:7px;height:26px;display:flex;align-items:center;overflow:hidden}
-  .ec-bar{position:absolute;left:0;top:0;height:26px;border-radius:7px;opacity:.85;
-    transform-origin:left;animation:growx .7s cubic-bezier(.2,.8,.2,1)}
-  .ec-val{position:relative;z-index:1;margin-left:auto;padding:0 10px;font-weight:700;font-size:12.5px}
+  .ec-dim-name{text-align:center;font-weight:600;font-size:13px}
+  .ec-side{display:flex;align-items:center;gap:10px}
+  .ec-bar-wrap{position:relative;flex:1;background:#EEF0F3;border-radius:7px;height:26px;overflow:hidden}
+  .ec-bar{position:absolute;top:0;height:26px;border-radius:7px;opacity:.9;animation:growx .7s cubic-bezier(.2,.8,.2,1)}
+  .ec-bar.l{left:0;transform-origin:left}
+  .ec-bar.r{right:0;transform-origin:right}
+  .ec-val{font-weight:700;font-size:13px;white-space:nowrap}
   .ec-rec{background:#FBFBFA;border:1px solid var(--line);border-radius:12px;padding:13px 15px;
     font-size:12.5px;display:flex;flex-direction:column;gap:6px}
-  @media(max-width:720px){.ec-dim{grid-template-columns:1fr;gap:8px}}
+  @media(max-width:720px){.ec-row{grid-template-columns:1fr;gap:8px}.ec-vs{display:none}}
 </style>
 </head>
 <body>
@@ -535,14 +538,14 @@ function renderHero(){
 function forEmp(k, fn){ const p=STATE.emp; STATE.emp=k; try{ return fn(); } finally{ STATE.emp=p; } }
 
 function renderEmployeeCompare(){
-  const data = Object.keys(DATA.employees).map(k=> forEmp(k, ()=>{
+  // ponytail: built for exactly two employees (the diverging layout is symmetric); extra employees are ignored
+  const [a, b] = Object.keys(DATA.employees).slice(0,2).map(k=> forEmp(k, ()=>{
     const e = DATA.employees[k].employee, r = recommend(STATE.cycle);
     return {accent:DATA.employees[k].accent, emoji:e.avatar, name:e.name.split(' (')[0], role:e.role,
       pct:r.pct, band:r.band, dir:trendDir(), merit:r.merit, bonus:r.bonus, promo:r.promo,
       dims:cyc().dims.map(d=>({name:d.name, final:d.final}))};
   }));
-  const n = data.length, cols = `repeat(${n},1fr)`;
-  const heads = data.map(d=>`
+  const card = d=>`
     <div class="ec-head" style="border-top:3px solid ${d.accent}">
       <div class="av" style="background:${d.accent}22">${d.emoji}</div>
       <div class="ec-nm">${d.name}</div>
@@ -550,32 +553,33 @@ function renderEmployeeCompare(){
       <div class="ec-pct" style="color:${d.accent}">${d.pct}%</div>
       <span class="chip grade-${d.band}">${d.band} · ${GRADE_TH[d.band]}</span>
       <div class="ec-trend ${d.dir}">${DIRTXT[d.dir]}</div>
-    </div>`).join('');
-  const dimNames = data[0].dims.map(x=>x.name);
-  const dimRows = dimNames.map((nm,i)=>{
-    const vals = data.map(d=>d.dims[i].final), max = Math.max(...vals), tie = vals.every(v=>v===max);
-    const cells = data.map(d=>{
-      const v = d.dims[i].final, lead = v===max && !tie;
-      return `<div class="ec-bar-wrap">
-        <div class="ec-bar" style="width:${v/5*100}%;background:${d.accent}"></div>
-        <span class="ec-val">${round1(v)}${lead?' 🏆':''}</span>
-      </div>`;
-    }).join('');
-    return `<div class="ec-dim"><div class="ec-dim-name">${nm}</div>
-      <div class="ec-cells" style="grid-template-columns:${cols}">${cells}</div></div>`;
+    </div>`;
+  const dimRows = a.dims.map((_,i)=>{
+    const va = a.dims[i].final, vb = b.dims[i].final;
+    return `<div class="ec-row ec-dim">
+      <div class="ec-side" style="justify-content:flex-start">
+        <span class="ec-val">${round1(va)}${va>vb?' 🏆':''}</span>
+        <div class="ec-bar-wrap"><div class="ec-bar r" style="width:${va/5*100}%;background:${a.accent}"></div></div>
+      </div>
+      <div class="ec-dim-name">${a.dims[i].name}</div>
+      <div class="ec-side">
+        <div class="ec-bar-wrap"><div class="ec-bar l" style="width:${vb/5*100}%;background:${b.accent}"></div></div>
+        <span class="ec-val">${vb>va?'🏆 ':''}${round1(vb)}</span>
+      </div>
+    </div>`;
   }).join('');
-  const recs = data.map(d=>`
+  const rec = d=>`
     <div class="ec-rec" style="border-top:3px solid ${d.accent}">
       <div>💰 ปรับเงินเดือน <b>${d.merit}%</b></div>
       <div>🎁 โบนัส <b>${d.bonus}×</b> เป้าหมาย</div>
       <div>🚀 ${d.promo}</div>
-    </div>`).join('');
+    </div>`;
   return `<div class="card">
     <div class="sec-title"><h2>เปรียบเทียบพนักงาน · Calibration</h2>
       <small>รอบ ${cyc().label} · ดูภาพรวมเคียงข้างกันเพื่อจัดลำดับและตัดสินใจอย่างเป็นธรรม</small></div>
-    <div class="ec-grid" style="grid-template-columns:${cols}">${heads}</div>
+    <div class="ec-row ec-heads">${card(a)}<div class="ec-vs">VS</div>${card(b)}</div>
     <div class="ec-dims">${dimRows}</div>
-    <div class="ec-grid" style="grid-template-columns:${cols};margin-top:16px">${recs}</div>
+    <div class="ec-row" style="margin-top:16px">${rec(a)}<div></div>${rec(b)}</div>
   </div>`;
 }
 
