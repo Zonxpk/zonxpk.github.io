@@ -2301,13 +2301,12 @@
                       <path
                         class="proto-route"
                         style="--dash: 500"
-                        d="M142 86h36M142 174h36M262 130h38M262 130c18 0 18-36 38-36M262 130c18 0 18 50 38 50"
+                        d="M142 86c18 0 18 32 36 32M142 174c18 0 18-32 36-32M262 130c18 0 18-36 38-36M262 130c18 0 18 50 38 50"
                       />
                     </g>
                     <g fill="#7bd88f">
                       <circle class="proto-node" cx="142" cy="86" r="5" />
                       <circle class="proto-node" cx="142" cy="174" r="5" />
-                      <circle class="proto-node" cx="262" cy="130" r="5" />
                       <circle class="proto-active" cx="300" cy="94" r="5" />
                       <circle class="proto-active" cx="300" cy="180" r="5" />
                     </g>
@@ -2354,7 +2353,7 @@
                     <path
                       class="proto-line"
                       style="--dash: 420"
-                      d="M92 78h96M92 138h140M92 198h114"
+                      d="M92 73h96M92 133h140M92 193h114"
                       stroke="#dce5dd"
                       stroke-width="2"
                     />
@@ -2392,9 +2391,9 @@
                       font-size="10"
                       fill="#a9b1b8"
                     >
-                      <text x="92" y="93">ASSIGNED</text>
-                      <text x="92" y="153">SLA WATCH</text>
-                      <text x="92" y="213">VISIT LOGGED</text>
+                      <text x="92" y="88">ASSIGNED</text>
+                      <text x="92" y="148">SLA WATCH</text>
+                      <text x="92" y="208">VISIT LOGGED</text>
                     </g>
                   </svg>
                 </div>
@@ -2417,11 +2416,11 @@
                   </ul>
                 </div>
                 <div class="prototype" aria-hidden="true">
-                  <svg viewBox="0 0 420 260">
+                  <svg viewBox="-30 0 420 260">
                     <path
                       class="proto-line"
-                      style="--dash: 360"
-                      d="M58 130h304"
+                      style="--dash: 220"
+                      d="M78 130h304"
                       stroke="#75b4d5"
                       stroke-width="2"
                     />
@@ -2430,6 +2429,7 @@
                       style="--dash: 900"
                       fill="rgba(47,111,159,.16)"
                       stroke="#75b4d5"
+                      d="M20"
                       stroke-width="2"
                     >
                       <rect x="48" y="82" width="76" height="96" rx="4" />
@@ -2439,7 +2439,7 @@
                     <path
                       class="proto-route"
                       style="--dash: 260"
-                      d="M124 130h26M226 130h26M328 130h34"
+                      d="M124 130h26M226 130h26M328"
                       stroke="#7bd88f"
                       stroke-width="4"
                       stroke-linecap="round"
@@ -2902,7 +2902,11 @@
                 </svg>
               </div>
 
-              <div class="lab-bets" aria-label="Performance Results prototype surfaces" style="grid-template-columns: repeat(2, 1fr);">
+              <div
+                class="lab-bets"
+                aria-label="Performance Results prototype surfaces"
+                style="grid-template-columns: repeat(2, 1fr)"
+              >
                 <a class="lab-bet" href="performance-management/index.html">
                   <span>
                     <b>Results report</b>
@@ -3051,13 +3055,7 @@
                   <circle cx="60" cy="48" r="4" fill="var(--draft-light)" />
                   <circle cx="74" cy="48" r="4" fill="var(--signal)" />
                   <text class="lab-label" x="92" y="52">solve.py · LIVE</text>
-                  <line
-                    x1="58"
-                    y1="66"
-                    x2="58"
-                    y2="212"
-                    stroke="var(--line)"
-                  />
+                  <line x1="58" y1="66" x2="58" y2="212" stroke="var(--line)" />
 
                   <!-- line-number gutter -->
                   <g class="lab-label" fill="var(--steel)" text-anchor="end">
@@ -3145,12 +3143,7 @@
                     r="6"
                     fill="var(--coral)"
                   />
-                  <text
-                    class="lab-label"
-                    x="198"
-                    y="158"
-                    fill="var(--coral)"
-                  >
+                  <text class="lab-label" x="198" y="158" fill="var(--coral)">
                     SUPPORT
                   </text>
 
