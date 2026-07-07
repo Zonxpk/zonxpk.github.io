@@ -34,7 +34,8 @@
     border-bottom:1px solid var(--line);box-shadow:0 4px 14px rgba(24,29,45,.06)}
   #sticky.show{transform:translateY(0)}
   #sticky .inner{max-width:960px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:12px}
-  #sticky .av{width:30px;height:30px;border-radius:50%;object-fit:cover}
+  #sticky .av{width:30px;height:30px;border-radius:50%;background:#F0EFED;
+    display:inline-flex;align-items:center;justify-content:center;font-size:17px;line-height:1}
   #sticky .nm{font-weight:600}
   #sticky .cyc{color:var(--muted);font-size:12.5px}
   #sticky .spacer{flex:1}
@@ -50,7 +51,8 @@
     color:#fff;border-radius:var(--r);padding:22px 24px;margin-bottom:16px;
     box-shadow:0 10px 30px rgba(255,90,110,.28)}
   .hero-top{display:flex;gap:16px;align-items:center}
-  .hero .av{width:60px;height:60px;border-radius:50%;border:3px solid rgba(255,255,255,.5);object-fit:cover;background:#fff}
+  .hero .av{width:60px;height:60px;border-radius:50%;border:3px solid rgba(255,255,255,.6);background:#fff;
+    display:flex;align-items:center;justify-content:center;font-size:32px;line-height:1}
   .hero .nm{font-size:20px;font-weight:800;line-height:1.2}
   .hero .role{opacity:.92;font-size:13px;margin-top:2px}
   .hero .spacer{flex:1}
@@ -206,11 +208,35 @@
   .ghost{position:absolute;top:50%;width:13px;height:13px;border-radius:50%;transform:translate(-50%,-50%);
     border:2px dashed rgba(31,36,48,.4);background:#fff;z-index:2;cursor:help;animation:pop .38s ease backwards}
   .connector{position:absolute;top:50%;height:3px;transform:translateY(-50%);border-radius:3px;opacity:.5;z-index:1}
+
+  /* ---- employee compare (calibration) ---- */
+  .ec-grid{display:grid;gap:14px}
+  .ec-head{background:#FBFBFA;border:1px solid var(--line);border-radius:12px;padding:16px;text-align:center}
+  .ec-head .av{width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:30px;line-height:1;margin:0 auto 10px}
+  .ec-nm{font-weight:700;font-size:15px}
+  .ec-role{color:var(--muted);font-size:12px;margin-bottom:10px}
+  .ec-pct{font-size:30px;font-weight:800;line-height:1;margin-bottom:6px}
+  .ec-trend{font-size:12px;font-weight:600;margin-top:8px}
+  .ec-trend.up{color:var(--green)} .ec-trend.down{color:var(--red)} .ec-trend.flat{color:var(--muted)}
+  .ec-dims{margin-top:18px}
+  .ec-dim{display:grid;grid-template-columns:160px 1fr;align-items:center;gap:16px;
+    padding:11px 0;border-bottom:1px solid var(--line)}
+  .ec-dim:last-child{border-bottom:0}
+  .ec-dim-name{font-weight:600;font-size:13px}
+  .ec-cells{display:grid;gap:16px}
+  .ec-bar-wrap{position:relative;background:#EEF0F3;border-radius:7px;height:26px;display:flex;align-items:center;overflow:hidden}
+  .ec-bar{position:absolute;left:0;top:0;height:26px;border-radius:7px;opacity:.85;
+    transform-origin:left;animation:growx .7s cubic-bezier(.2,.8,.2,1)}
+  .ec-val{position:relative;z-index:1;margin-left:auto;padding:0 10px;font-weight:700;font-size:12.5px}
+  .ec-rec{background:#FBFBFA;border:1px solid var(--line);border-radius:12px;padding:13px 15px;
+    font-size:12.5px;display:flex;flex-direction:column;gap:6px}
+  @media(max-width:720px){.ec-dim{grid-template-columns:1fr;gap:8px}}
 </style>
 </head>
 <body>
 <div id="sticky"><div class="inner">
-  <img class="av" id="sk-av"><span class="nm" id="sk-nm"></span>
+  <span class="av" id="sk-av"></span><span class="nm" id="sk-nm"></span>
   <span class="cyc" id="sk-cyc"></span><span id="sk-grade"></span>
   <span class="spacer"></span>
   <button class="jump" onclick="jumpDecision()">ไปที่การตัดสินใจ ↓</button>
@@ -220,9 +246,6 @@
 
 <script>
 /* ---------------- MOCK DATA ---------------- */
-const AV = "data:image/svg+xml;utf8,"+encodeURIComponent(
-  `<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><rect width='120' height='120' fill='#FFE3D6'/><circle cx='60' cy='46' r='24' fill='#FF7E3D'/><rect x='24' y='78' width='72' height='46' rx='24' fill='#FF7E3D'/></svg>`);
-
 const SOURCES = [
   {key:'self',   label:'ตนเอง',       color:'var(--self)'},
   {key:'manager',label:'หัวหน้า',      color:'var(--mgr)'},
@@ -232,8 +255,9 @@ const SOURCES = [
 
 const DATA = {employees:{
  bank:{
+  accent:'#FF6B35',
   employee:{name:'ณัฐพงษ์ วัฒนธนินท์กุล (แบงค์)', role:'UX Designer (O1)',
-    team:'Product Development › Product Team', tenure:'อายุงาน 2 ปี 6 เดือน', avatar:AV},
+    team:'Product Development › Product Team', tenure:'อายุงาน 2 ปี 6 เดือน', avatar:'🧑‍🎨'},
   trend:[{c:'2023',pct:72},{c:'2024',pct:78},{c:'2025',pct:84}],
   cycles:{
     '2025':{
@@ -302,8 +326,9 @@ const DATA = {employees:{
     },
   }},
  oat:{
+  accent:'#0EA5E9',
   employee:{name:'สมชาย ทองดี (โอ๊ต)', role:'Frontend Developer (O1)',
-    team:'Engineering › Web Team', tenure:'อายุงาน 1 ปี 2 เดือน', avatar:AV},
+    team:'Engineering › Web Team', tenure:'อายุงาน 1 ปี 2 เดือน', avatar:'🧑‍💻'},
   trend:[{c:'2023',pct:68},{c:'2024',pct:65},{c:'2025',pct:61}],
   cycles:{
     '2025':{
@@ -376,6 +401,7 @@ const DATA = {employees:{
 /* ---------------- STATE ---------------- */
 const STATE = {
   emp:'bank',
+  mode:'single',
   cycle:'2025',
   compare:false,
   visible:{self:true, manager:true, peer:true, org:true},
@@ -447,34 +473,41 @@ function recommend(cycleKey){
 const DIRTXT = {up:'แนวโน้มดีขึ้น ↗', down:'แนวโน้มลดลง ↘', flat:'แนวโน้มคงที่ →'};
 
 /* ---------------- RENDER ---------------- */
-function renderHeader(){
-  const e = emp().employee, r = recommend(STATE.cycle), c = cyc();
-  const synth = c.synth;
+function renderControls(){
+  const cmp = STATE.mode==='compareEmp';
   const empTabs = Object.keys(DATA.employees).map(k=>
-    `<button class="${k===STATE.emp?'on':''}" onclick="setEmp('${k}')">${DATA.employees[k].employee.name.split(' (')[0]}</button>`).join('');
+    `<button class="${!cmp && k===STATE.emp?'on':''}" onclick="setEmp('${k}')">${DATA.employees[k].employee.name.split(' (')[0]}</button>`).join('');
   const prevKey = prevCycleKey();
-  const cmpBtn = prevKey
+  const empCmpBtn = `<button class="cmp-toggle ${cmp?'on':''}" onclick="toggleEmpCompare()">${cmp?'← มุมมองรายคน':'⇄ เทียบพนักงาน'}</button>`;
+  const yearBtn = (!cmp && prevKey)
     ? `<button class="cmp-toggle ${STATE.compare?'on':''}" onclick="toggleCompare()">⇄ เทียบกับปี ${prevKey}</button>` : '';
+  return `
+  <div class="cycle-row">
+    <span class="sub">พนักงาน</span>
+    <span class="seg">${empTabs}</span>
+    ${empCmpBtn}
+    <span style="flex:1"></span>
+    ${yearBtn}
+    <span class="sub">รอบการประเมิน</span>
+    <span class="seg">
+      ${Object.keys(emp().cycles).sort().map(k=>
+        `<button class="${k===STATE.cycle?'on':''}" onclick="setCycle('${k}')">${emp().cycles[k].label}</button>`).join('')}
+    </span>
+  </div>`;
+}
+
+function renderHero(){
+  const e = emp().employee, r = recommend(STATE.cycle), c = cyc();
+  const synth = c.synth, prevKey = prevCycleKey();
   let yoy = '';
   if(STATE.compare && prevKey){
     const diff = r.pct - overallPct(prevKey);
     yoy = `<div class="yoy-badge">${diff>=0?'▲ +':'▼ '}${diff} จากปี ${prevKey}</div>`;
   }
   return `
-  <div class="cycle-row">
-    <span class="sub">พนักงาน</span>
-    <span class="seg">${empTabs}</span>
-    <span style="flex:1"></span>
-    ${cmpBtn}
-    <span class="sub">รอบการประเมิน</span>
-    <span class="seg">
-      ${Object.keys(emp().cycles).sort().map(k=>
-        `<button class="${k===STATE.cycle?'on':''}" onclick="setCycle('${k}')">${emp().cycles[k].label}</button>`).join('')}
-    </span>
-  </div>
   <div class="hero">
     <div class="hero-top">
-      <img class="av" src="${e.avatar}">
+      <div class="av">${e.avatar}</div>
       <div>
         <div class="nm">${e.name}</div>
         <div class="role">${e.role} · ${e.team}</div>
@@ -496,6 +529,53 @@ function renderHeader(){
       <span class="spacer"></span>
       <button class="jump" onclick="jumpDecision()">ตัดสินใจ ↓</button>
     </div>
+  </div>`;
+}
+
+function forEmp(k, fn){ const p=STATE.emp; STATE.emp=k; try{ return fn(); } finally{ STATE.emp=p; } }
+
+function renderEmployeeCompare(){
+  const data = Object.keys(DATA.employees).map(k=> forEmp(k, ()=>{
+    const e = DATA.employees[k].employee, r = recommend(STATE.cycle);
+    return {accent:DATA.employees[k].accent, emoji:e.avatar, name:e.name.split(' (')[0], role:e.role,
+      pct:r.pct, band:r.band, dir:trendDir(), merit:r.merit, bonus:r.bonus, promo:r.promo,
+      dims:cyc().dims.map(d=>({name:d.name, final:d.final}))};
+  }));
+  const n = data.length, cols = `repeat(${n},1fr)`;
+  const heads = data.map(d=>`
+    <div class="ec-head" style="border-top:3px solid ${d.accent}">
+      <div class="av" style="background:${d.accent}22">${d.emoji}</div>
+      <div class="ec-nm">${d.name}</div>
+      <div class="ec-role">${d.role}</div>
+      <div class="ec-pct" style="color:${d.accent}">${d.pct}%</div>
+      <span class="chip grade-${d.band}">${d.band} · ${GRADE_TH[d.band]}</span>
+      <div class="ec-trend ${d.dir}">${DIRTXT[d.dir]}</div>
+    </div>`).join('');
+  const dimNames = data[0].dims.map(x=>x.name);
+  const dimRows = dimNames.map((nm,i)=>{
+    const vals = data.map(d=>d.dims[i].final), max = Math.max(...vals), tie = vals.every(v=>v===max);
+    const cells = data.map(d=>{
+      const v = d.dims[i].final, lead = v===max && !tie;
+      return `<div class="ec-bar-wrap">
+        <div class="ec-bar" style="width:${v/5*100}%;background:${d.accent}"></div>
+        <span class="ec-val">${round1(v)}${lead?' 🏆':''}</span>
+      </div>`;
+    }).join('');
+    return `<div class="ec-dim"><div class="ec-dim-name">${nm}</div>
+      <div class="ec-cells" style="grid-template-columns:${cols}">${cells}</div></div>`;
+  }).join('');
+  const recs = data.map(d=>`
+    <div class="ec-rec" style="border-top:3px solid ${d.accent}">
+      <div>💰 ปรับเงินเดือน <b>${d.merit}%</b></div>
+      <div>🎁 โบนัส <b>${d.bonus}×</b> เป้าหมาย</div>
+      <div>🚀 ${d.promo}</div>
+    </div>`).join('');
+  return `<div class="card">
+    <div class="sec-title"><h2>เปรียบเทียบพนักงาน · Calibration</h2>
+      <small>รอบ ${cyc().label} · ดูภาพรวมเคียงข้างกันเพื่อจัดลำดับและตัดสินใจอย่างเป็นธรรม</small></div>
+    <div class="ec-grid" style="grid-template-columns:${cols}">${heads}</div>
+    <div class="ec-dims">${dimRows}</div>
+    <div class="ec-grid" style="grid-template-columns:${cols};margin-top:16px">${recs}</div>
   </div>`;
 }
 
@@ -672,10 +752,15 @@ function whyLine(){
 }
 
 function render(){
-  document.getElementById('app').innerHTML =
-    renderHeader() + renderScorecard() +
-    `<div class="two">${renderTrend()}${renderPeer()}</div>` +
-    renderSynthesis() + renderDetail() + renderDecision();
+  const app = document.getElementById('app');
+  if(STATE.mode==='compareEmp'){
+    app.innerHTML = renderControls() + renderEmployeeCompare();
+  } else {
+    app.innerHTML =
+      renderControls() + renderHero() + renderScorecard() +
+      `<div class="two">${renderTrend()}${renderPeer()}</div>` +
+      renderSynthesis() + renderDetail() + renderDecision();
+  }
   syncSticky();
   animatePct();
   if(!window._loaded){ window._loaded=true; setTimeout(()=>document.body.classList.add('loaded'), 900); }
@@ -696,19 +781,20 @@ function animatePct(){ // count-up the big % only when the value changes
 }
 
 /* ---------------- INTERACTIONS ---------------- */
-function setEmp(k){ STATE.emp=k; STATE.cycle='2025'; STATE.decision={merit:null,bonus:null,notes:''}; render(); }
+function setEmp(k){ STATE.emp=k; STATE.mode='single'; STATE.cycle='2025'; STATE.decision={merit:null,bonus:null,notes:''}; render(); }
 function setCycle(k){ STATE.cycle=k; STATE.decision={merit:null,bonus:null,notes:''}; render(); }
 function toggleCompare(){ STATE.compare=!STATE.compare; render(); }
+function toggleEmpCompare(){ STATE.mode = STATE.mode==='compareEmp'?'single':'compareEmp'; render(); }
 function toggleSrc(k){ STATE.visible[k]=!STATE.visible[k]; render(); }
 function setDec(field,val){
   STATE.decision[field] = field==='notes' ? val : parseFloat(val);
   document.getElementById('whyline').innerHTML = whyLine(); // surgical, keeps input focus
 }
-function jumpDecision(){ document.getElementById('decision').scrollIntoView({behavior:'smooth'}); }
+function jumpDecision(){ const el=document.getElementById('decision'); if(el) el.scrollIntoView({behavior:'smooth'}); }
 
 function syncSticky(){
   const e = emp().employee, r = recommend(STATE.cycle);
-  document.getElementById('sk-av').src = e.avatar;
+  document.getElementById('sk-av').textContent = e.avatar;
   document.getElementById('sk-nm').textContent = e.name;
   document.getElementById('sk-cyc').textContent = cyc().label;
   document.getElementById('sk-grade').innerHTML = `<span class="chip grade-${r.band}">${r.pct}% · ${r.band}</span>`;
