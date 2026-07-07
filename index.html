@@ -1551,23 +1551,29 @@
       .motion-ok .feature-panel.in .proto-line,
       .motion-ok .feature-panel.in .proto-route,
       .motion-ok .project.in .proto-line,
-      .motion-ok .project.in .proto-route {
+      .motion-ok .project.in .proto-route,
+      .motion-ok .lab-panel.in .proto-line,
+      .motion-ok .lab-panel.in .proto-route {
         animation: draw-line 0.82s 0.18s var(--ease-out-quart) both;
       }
       .motion-ok .feature-panel.in .proto-node,
       .motion-ok .feature-panel.in .proto-active,
       .motion-ok .project.in .proto-node,
-      .motion-ok .project.in .proto-active {
+      .motion-ok .project.in .proto-active,
+      .motion-ok .lab-panel.in .proto-node,
+      .motion-ok .lab-panel.in .proto-active {
         opacity: 0;
         transform-box: fill-box;
         transform-origin: center;
         animation: node-online 0.34s 0.68s var(--ease-out-expo) both;
       }
       .motion-ok .feature-panel.in .proto-active,
-      .motion-ok .project.in .proto-active {
+      .motion-ok .project.in .proto-active,
+      .motion-ok .lab-panel.in .proto-active {
         animation-delay: 0.78s;
       }
-      .motion-ok .project.in .proto-pulse {
+      .motion-ok .project.in .proto-pulse,
+      .motion-ok .lab-panel.in .proto-pulse {
         animation: soft-pulse 3.8s var(--ease-out-quart) infinite;
       }
 
@@ -2735,10 +2741,187 @@
           <p class="section-kicker reveal">Prototype Lab</p>
           <h2 class="section-title reveal">Product bets, made clickable.</h2>
           <p class="section-copy reveal">
-            Two product explorations turned into runnable interfaces: ThaiMart
-            tests marketplace leverage, while EduSight translates coding-class
-            telemetry into one combined insight loop.
+            Three product explorations turned into runnable interfaces: empeo
+            Performance Results tries a 360° review as a manager decision
+            report, ThaiMart pokes at marketplace leverage, and EduSight watches
+            how students write code to spot where they get stuck.
           </p>
+
+          <div class="lab-panel reveal">
+            <div class="lab-copy">
+              <div>
+                <h3>empeo Performance Results.</h3>
+                <p>
+                  An attempt to turn a 360° review into a manager decision
+                  report: weighted self, manager, peer, and org scores become
+                  gap flags, a trend read, and merit, bonus, and promotion
+                  suggestions for one employee.
+                </p>
+              </div>
+              <div class="lab-actions">
+                <a
+                  href="performance-management/index.html"
+                  class="btn btn-primary"
+                >
+                  Open Results report
+                </a>
+                <a href="performance-management/handoff.html" class="btn">
+                  Open engineering handoff
+                </a>
+              </div>
+            </div>
+
+            <div class="lab-board">
+              <div class="lab-diagram" aria-hidden="true">
+                <svg viewBox="0 0 360 300">
+                  <rect
+                    x="24"
+                    y="24"
+                    width="312"
+                    height="252"
+                    rx="12"
+                    fill="rgba(16, 18, 22, 0.55)"
+                    stroke="var(--line-strong)"
+                  />
+                  <text class="lab-label" x="44" y="52">
+                    360° RESULTS · 4 WEIGHTED TOPICS
+                  </text>
+                  <line
+                    class="proto-line"
+                    style="--dash: 272"
+                    x1="44"
+                    y1="62"
+                    x2="316"
+                    y2="62"
+                    stroke="var(--line)"
+                  />
+
+                  <!-- Exceeds threshold (80%) -->
+                  <line
+                    x1="262"
+                    y1="78"
+                    x2="262"
+                    y2="212"
+                    stroke="var(--line-strong)"
+                    stroke-dasharray="3 4"
+                  />
+                  <text class="lab-label" x="262" y="228" text-anchor="middle">
+                    80
+                  </text>
+
+                  <!-- topic score bars: track + filled proto-route -->
+                  <g stroke-linecap="round">
+                    <g stroke="var(--line)" stroke-width="12">
+                      <line x1="112" y1="92" x2="300" y2="92" />
+                      <line x1="112" y1="124" x2="300" y2="124" />
+                      <line x1="112" y1="156" x2="300" y2="156" />
+                      <line x1="112" y1="188" x2="300" y2="188" />
+                    </g>
+                    <line
+                      class="proto-route"
+                      style="--dash: 170"
+                      x1="112"
+                      y1="92"
+                      x2="277"
+                      y2="92"
+                      stroke="var(--signal)"
+                      stroke-width="12"
+                    />
+                    <line
+                      class="proto-route"
+                      style="--dash: 155"
+                      x1="112"
+                      y1="124"
+                      x2="262"
+                      y2="124"
+                      stroke="var(--draft-light)"
+                      stroke-width="12"
+                    />
+                    <line
+                      class="proto-route"
+                      style="--dash: 125"
+                      x1="112"
+                      y1="156"
+                      x2="232"
+                      y2="156"
+                      stroke="var(--coral)"
+                      stroke-width="12"
+                    />
+                    <line
+                      class="proto-route"
+                      style="--dash: 178"
+                      x1="112"
+                      y1="188"
+                      x2="285"
+                      y2="188"
+                      stroke="var(--signal)"
+                      stroke-width="12"
+                    />
+                  </g>
+
+                  <!-- blind-spot flag on LEAD -->
+                  <circle
+                    class="proto-active proto-pulse"
+                    cx="232"
+                    cy="156"
+                    r="6"
+                    fill="var(--coral)"
+                  />
+
+                  <g class="lab-label">
+                    <text x="44" y="96">WORK</text>
+                    <text x="44" y="128">TEAM</text>
+                    <text x="44" y="160">LEAD</text>
+                    <text x="44" y="192">VALUE</text>
+                  </g>
+
+                  <!-- decision summary -->
+                  <text class="lab-hub-label" x="44" y="262">84%</text>
+                  <text class="lab-label" x="104" y="252" fill="var(--signal)">
+                    EXCEEDS ↗
+                  </text>
+                  <text class="lab-label" x="104" y="266">OVERALL · +5</text>
+                  <rect
+                    x="234"
+                    y="242"
+                    width="82"
+                    height="26"
+                    rx="13"
+                    fill="none"
+                    stroke="var(--signal)"
+                  />
+                  <text
+                    class="lab-label"
+                    x="275"
+                    y="259"
+                    text-anchor="middle"
+                    fill="var(--signal)"
+                  >
+                    MERIT 7%
+                  </text>
+                </svg>
+              </div>
+
+              <div class="lab-bets" aria-label="Performance Results prototype surfaces" style="grid-template-columns: repeat(2, 1fr);">
+                <a class="lab-bet" href="performance-management/index.html">
+                  <span>
+                    <b>Results report</b>
+                    Manager decision view: weighted scores, gap flags, trend,
+                    and merit, bonus, and promotion guidance.
+                  </span>
+                  <em>DECISION</em>
+                </a>
+                <a class="lab-bet" href="performance-management/handoff.html">
+                  <span>
+                    <b>Engineering handoff</b>
+                    Datasheet of the domain model, business-logic formulas, and
+                    REST API behind the report.
+                  </span>
+                  <em>SPEC</em>
+                </a>
+              </div>
+            </div>
+          </div>
 
           <div class="lab-panel reveal">
             <div class="lab-copy">
@@ -2785,27 +2968,6 @@
                     style="--dash: 220"
                     d="M90.2 190A100 100 0 0 1 172 48.3"
                   />
-                  <circle
-                    class="proto-node"
-                    cx="267"
-                    cy="91"
-                    r="6"
-                    fill="#75b4d5"
-                  />
-                  <circle
-                    class="proto-node"
-                    cx="180"
-                    cy="248"
-                    r="6"
-                    fill="#7bd88f"
-                  />
-                  <circle
-                    class="proto-active"
-                    cx="93"
-                    cy="91"
-                    r="6"
-                    fill="#ff6b5f"
-                  />
                   <circle class="lab-hub" cx="180" cy="148" r="46" />
                   <text
                     class="lab-hub-label"
@@ -2818,13 +2980,13 @@
                   <text class="lab-label" x="180" y="164" text-anchor="middle">
                     MARKETPLACE LOOP
                   </text>
-                  <text class="lab-label" x="252" y="82" text-anchor="middle">
+                  <text class="lab-label" x="290" y="58" text-anchor="middle">
                     SUPPLY
                   </text>
-                  <text class="lab-label" x="180" y="270" text-anchor="middle">
+                  <text class="lab-label" x="180" y="286" text-anchor="middle">
                     FULFILLMENT
                   </text>
-                  <text class="lab-label" x="108" y="82" text-anchor="middle">
+                  <text class="lab-label" x="70" y="58" text-anchor="middle">
                     DEMAND
                   </text>
                 </svg>
@@ -2876,63 +3038,152 @@
             <div class="lab-board">
               <div class="lab-diagram" aria-hidden="true">
                 <svg viewBox="0 0 360 300">
-                  <circle class="lab-track" cx="180" cy="148" r="100" />
-                  <path
-                    class="lab-arc lab-arc-supply proto-line"
-                    style="--dash: 220"
-                    d="M188 48.3A100 100 0 0 1 269.8 190"
+                  <rect
+                    x="24"
+                    y="24"
+                    width="312"
+                    height="252"
+                    rx="12"
+                    fill="rgba(16, 18, 22, 0.55)"
+                    stroke="var(--line-strong)"
                   />
-                  <path
-                    class="lab-arc lab-arc-fulfillment proto-line"
-                    style="--dash: 220"
-                    d="M259.6 207.1A100 100 0 0 1 100.4 207.1"
+                  <circle cx="46" cy="48" r="4" fill="var(--coral)" />
+                  <circle cx="60" cy="48" r="4" fill="var(--draft-light)" />
+                  <circle cx="74" cy="48" r="4" fill="var(--signal)" />
+                  <text class="lab-label" x="92" y="52">solve.py · LIVE</text>
+                  <line
+                    x1="58"
+                    y1="66"
+                    x2="58"
+                    y2="212"
+                    stroke="var(--line)"
                   />
-                  <path
-                    class="lab-arc lab-arc-demand proto-line"
-                    style="--dash: 220"
-                    d="M90.2 190A100 100 0 0 1 172 48.3"
+
+                  <!-- line-number gutter -->
+                  <g class="lab-label" fill="var(--steel)" text-anchor="end">
+                    <text x="50" y="86">1</text>
+                    <text x="50" y="110">2</text>
+                    <text x="50" y="134">3</text>
+                    <text x="50" y="158">4</text>
+                    <text x="50" y="182">5</text>
+                    <text x="50" y="206">6</text>
+                  </g>
+
+                  <!-- code skeleton: lines type in on scroll -->
+                  <g stroke-width="6" stroke-linecap="round">
+                    <line
+                      class="proto-route"
+                      style="--dash: 90; animation-delay: 0.14s"
+                      x1="70"
+                      y1="82"
+                      x2="156"
+                      y2="82"
+                      stroke="var(--draft-light)"
+                    />
+                    <line
+                      class="proto-route"
+                      style="--dash: 70; animation-delay: 0.26s"
+                      x1="86"
+                      y1="106"
+                      x2="154"
+                      y2="106"
+                      stroke="var(--steel)"
+                    />
+                    <line
+                      class="proto-route"
+                      style="--dash: 90; animation-delay: 0.38s"
+                      x1="86"
+                      y1="130"
+                      x2="174"
+                      y2="130"
+                      stroke="var(--draft-light)"
+                    />
+                    <line
+                      class="proto-route"
+                      style="--dash: 82; animation-delay: 0.5s"
+                      x1="102"
+                      y1="154"
+                      x2="182"
+                      y2="154"
+                      stroke="var(--coral)"
+                    />
+                    <line
+                      class="proto-route"
+                      style="--dash: 96; animation-delay: 0.62s"
+                      x1="86"
+                      y1="178"
+                      x2="180"
+                      y2="178"
+                      stroke="var(--draft-light)"
+                    />
+                    <line
+                      class="proto-route"
+                      style="--dash: 40; animation-delay: 0.74s"
+                      x1="86"
+                      y1="202"
+                      x2="124"
+                      y2="202"
+                      stroke="var(--steel)"
+                    />
+                  </g>
+
+                  <!-- blinking cursor at typing head -->
+                  <rect
+                    class="proto-pulse"
+                    x="130"
+                    y="196"
+                    width="3"
+                    height="12"
+                    fill="var(--draft-light)"
                   />
+
+                  <!-- support moment: stuck line detected -->
                   <circle
-                    class="proto-node"
-                    cx="267"
-                    cy="91"
+                    class="proto-active proto-pulse"
+                    cx="182"
+                    cy="154"
                     r="6"
-                    fill="#75b4d5"
+                    fill="var(--coral)"
                   />
-                  <circle
-                    class="proto-node"
-                    cx="180"
-                    cy="248"
-                    r="6"
-                    fill="#7bd88f"
-                  />
-                  <circle
-                    class="proto-active"
-                    cx="93"
-                    cy="91"
-                    r="6"
-                    fill="#ff6b5f"
-                  />
-                  <circle class="lab-hub" cx="180" cy="148" r="46" />
                   <text
-                    class="lab-hub-label"
-                    x="180"
-                    y="145"
-                    text-anchor="middle"
+                    class="lab-label"
+                    x="198"
+                    y="158"
+                    fill="var(--coral)"
                   >
-                    EduSight
-                  </text>
-                  <text class="lab-label" x="180" y="164" text-anchor="middle">
-                    LEARNING SIGNAL LOOP
-                  </text>
-                  <text class="lab-label" x="252" y="82" text-anchor="middle">
-                    TELEMETRY
-                  </text>
-                  <text class="lab-label" x="180" y="270" text-anchor="middle">
-                    INSIGHT
-                  </text>
-                  <text class="lab-label" x="108" y="82" text-anchor="middle">
                     SUPPORT
+                  </text>
+
+                  <!-- mastery progress -->
+                  <text class="lab-label" x="44" y="232">MASTERY</text>
+                  <line
+                    x1="44"
+                    y1="248"
+                    x2="316"
+                    y2="248"
+                    stroke="var(--line)"
+                    stroke-width="8"
+                    stroke-linecap="round"
+                  />
+                  <line
+                    class="proto-route"
+                    style="--dash: 186"
+                    x1="44"
+                    y1="248"
+                    x2="229"
+                    y2="248"
+                    stroke="var(--signal)"
+                    stroke-width="8"
+                    stroke-linecap="round"
+                  />
+                  <text
+                    class="lab-label"
+                    x="316"
+                    y="232"
+                    text-anchor="end"
+                    fill="var(--signal)"
+                  >
+                    68%
                   </text>
                 </svg>
               </div>
@@ -3232,7 +3483,7 @@
             >pakawat.zon@gmail.com</a
           >
         </div>
-        <div class="copyright">© 2026 Pakawat Smutkun.</div>
+        <div class="copyright">© 2026.</div>
       </div>
     </footer>
 
