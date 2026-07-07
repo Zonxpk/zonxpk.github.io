@@ -1,3 +1,6 @@
 [submodule "edusight"]
 	path = edusight
 	url = https://github.com/Zonxpk/edusight
+[submodule "performance-management"]
+	path = performance-management
+	url = https://github.com/Zonxpk/performance-management.git
