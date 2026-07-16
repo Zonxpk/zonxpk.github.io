@@ -25,28 +25,29 @@
     <meta property="og:image:type" content="image/webp" />
     <style>
       :root {
-        /* ponytail: light theme — var names keep old semantics, values inverted (--ink = paper bg, --paper = ink text) */
-        --ink: #f7f6f3;
+        /* ponytail: editorial theme — accent family = vermillion primary (#e5431f); text/headings stay near-black, secondary meta uses grey tiers */
+        --ink: #ffffff;
         --ink-2: #ffffff;
-        --ink-3: #e9e7e1;
-        --draft: #1f4b8f;
-        --draft-light: #1f4b8f;
-        --signal: #1f4b8f;
-        --signal-dark: #163a6f;
-        --paper: #16181c;
-        --paper-dim: #3a3f47;
-        --steel: #565c64;
-        --steel-2: #696f77;
-        --coral: #1f4b8f;
-        --line: rgba(22, 24, 28, 0.14);
-        --line-strong: rgba(22, 24, 28, 0.26);
-        --surface: rgba(22, 24, 28, 0.045);
-        --surface-2: rgba(22, 24, 28, 0.075);
+        --ink-3: #f2f2f2;
+        --draft: #e5431f;
+        --draft-light: #e5431f;
+        --signal: #e5431f;
+        --signal-dark: #b8331a;
+        --signal-red: #e5431f;
+        --paper: #0a0a0a;
+        --paper-dim: #2a2a2a;
+        --steel: #333333;
+        --steel-2: #666666;
+        --coral: #e5431f;
+        --line: rgba(10, 10, 10, 0.16);
+        --line-strong: rgba(10, 10, 10, 0.32);
+        --surface: rgba(10, 10, 10, 0.04);
+        --surface-2: rgba(10, 10, 10, 0.07);
         --font-display: "Archivo", system-ui, sans-serif;
         --font-body: "Source Sans 3", system-ui, sans-serif;
         --font-mono: "Azeret Mono", ui-monospace, monospace;
         --wrap: min(1160px, calc(100vw - 40px));
-        --radius: 8px;
+        --radius: 0px;
         --section: clamp(72px, 10vw, 132px);
         --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
         --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
@@ -66,18 +67,7 @@
         min-width: 320px;
         font-family: var(--font-body);
         color: var(--paper);
-        background:
-          linear-gradient(
-            90deg,
-            rgba(22, 24, 28, 0.035) 1px,
-            transparent 1px
-          ),
-          linear-gradient(rgba(22, 24, 28, 0.03) 1px, transparent 1px),
-          var(--ink);
-        background-size:
-          42px 42px,
-          42px 42px,
-          auto;
+        background: var(--ink);
         -webkit-font-smoothing: antialiased;
         overflow-x: hidden;
       }
@@ -150,8 +140,8 @@
         left: 0;
         z-index: 90;
         width: 100%;
-        height: 2px;
-        background: var(--signal);
+        height: 3px;
+        background: var(--signal-red);
         transform: scaleX(0);
         transform-origin: left center;
         pointer-events: none;
@@ -193,8 +183,8 @@
         position: sticky;
         top: 0;
         z-index: 40;
-        border-bottom: 1px solid rgba(22, 24, 28, 0.09);
-        background: rgba(247, 246, 243, 0.88);
+        border-bottom: 1px solid rgba(10, 10, 10, 0.09);
+        background: rgba(255, 255, 255, 0.88);
         backdrop-filter: blur(16px);
       }
       .nav-inner {
@@ -225,7 +215,7 @@
         width: 34px;
         height: 34px;
         border: 1px solid var(--line-strong);
-        border-radius: 6px;
+        border-radius: 0;
         display: grid;
         place-items: center;
         color: var(--signal);
@@ -239,8 +229,8 @@
       }
       .brand:hover .brand-mark,
       .brand:focus-visible .brand-mark {
-        border-color: rgba(31, 75, 143, 0.72);
-        background: rgba(31, 75, 143, 0.1);
+        border-color: rgba(10, 10, 10, 0.72);
+        background: rgba(10, 10, 10, 0.1);
       }
       .nav-links {
         display: flex;
@@ -273,8 +263,8 @@
       }
       .nav-toggle:hover,
       .nav-toggle:focus-visible {
-        background: rgba(31, 75, 143, 0.08);
-        border-color: rgba(31, 75, 143, 0.58);
+        background: rgba(10, 10, 10, 0.08);
+        border-color: rgba(10, 10, 10, 0.58);
       }
       .nav-toggle:active {
         transform: scale(0.96);
@@ -302,8 +292,8 @@
       .btn:hover,
       .btn:focus-visible {
         transform: translateY(-1px);
-        border-color: rgba(31, 75, 143, 0.72);
-        background: rgba(31, 75, 143, 0.08);
+        border-color: rgba(10, 10, 10, 0.72);
+        background: rgba(10, 10, 10, 0.08);
       }
       .btn-primary {
         background: var(--paper);
@@ -328,47 +318,76 @@
       }
       .hero-grid {
         display: grid;
-        grid-template-columns: minmax(0, 0.95fr) minmax(360px, 1.05fr);
-        align-items: center;
-        gap: clamp(36px, 6vw, 76px);
+        grid-template-columns: 1fr;
+        gap: clamp(28px, 4vw, 44px);
       }
       .availability {
         display: inline-flex;
         align-items: center;
-        gap: 10px;
+        gap: 12px;
         margin-bottom: 24px;
-        color: var(--paper-dim);
+        color: var(--paper);
         font-family: var(--font-mono);
-        font-size: 0.76rem;
+        font-size: 0.78rem;
+        letter-spacing: 0.01em;
       }
       .availability::before {
         content: "";
-        width: 9px;
-        height: 9px;
-        border-radius: 50%;
-        background: var(--signal);
-        box-shadow: 0 0 0 5px rgba(31, 75, 143, 0.12);
-        animation: soft-pulse 2.6s var(--ease-out-quart) infinite;
+        flex: 0 0 auto;
+        width: 11px;
+        height: 11px;
+        background: var(--signal-red);
       }
       .hero h1 {
         margin: 0;
         font-family: var(--font-display);
-        font-size: clamp(3.2rem, 8.8vw, 6rem);
-        line-height: 0.92;
-        letter-spacing: -0.035em;
-        font-stretch: 112%;
-      }
-      .hero h1 span {
+        font-size: clamp(3.4rem, 14vw, 9rem);
+        line-height: 0.86;
+        letter-spacing: -0.045em;
+        font-stretch: 118%;
+        text-transform: uppercase;
         color: var(--signal);
       }
+      .hero h1 span {
+        color: var(--signal-red);
+      }
+      .hero-lead {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: clamp(28px, 5vw, 64px);
+        align-items: end;
+        margin-top: clamp(22px, 3vw, 32px);
+        padding-top: clamp(20px, 3vw, 28px);
+        border-top: 2px solid var(--paper);
+      }
       .hero-title {
-        margin: 22px 0 0;
-        max-width: 52ch;
+        margin: 0;
+        max-width: 46ch;
         color: var(--paper-dim);
-        font-size: clamp(1.18rem, 2vw, 1.45rem);
-        line-height: 1.55;
+        font-size: clamp(1.12rem, 1.7vw, 1.35rem);
+        line-height: 1.5;
       }
       .hero-title strong {
+        color: var(--paper);
+      }
+      .hero-figure {
+        display: grid;
+        justify-items: end;
+        text-align: right;
+      }
+      .hero-figure b {
+        font-family: var(--font-display);
+        font-size: clamp(3rem, 7vw, 5.5rem);
+        line-height: 0.8;
+        letter-spacing: -0.04em;
+        color: var(--signal-red);
+      }
+      .hero-figure span {
+        margin-top: 10px;
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
         color: var(--paper);
       }
       .hero-actions {
@@ -400,147 +419,6 @@
         color: var(--paper);
       }
 
-      .map-shell {
-        position: relative;
-        min-height: 540px;
-        border: 1px solid var(--line-strong);
-        border-radius: var(--radius);
-        background:
-          linear-gradient(
-            90deg,
-            rgba(22, 24, 28, 0.075) 1px,
-            transparent 1px
-          ),
-          linear-gradient(rgba(22, 24, 28, 0.075) 1px, transparent 1px),
-          rgba(22, 24, 28, 0.035);
-        background-size: 28px 28px;
-        overflow: hidden;
-        contain: paint;
-        transition:
-          border-color 0.24s var(--ease-out-quart),
-          background-color 0.24s var(--ease-out-quart),
-          transform 0.24s var(--ease-out-quart);
-      }
-      .map-shell:hover {
-        border-color: rgba(31, 75, 143, 0.46);
-        transform: translateY(-2px);
-      }
-      .map-stage {
-        position: absolute;
-        inset: clamp(20px, 3vw, 40px);
-        z-index: 1;
-      }
-      .map-stage svg {
-        width: 100%;
-        height: 100%;
-        display: block;
-      }
-      .map-note {
-        position: absolute;
-        z-index: 2;
-        display: grid;
-        gap: 5px;
-        width: clamp(176px, 17vw, 198px);
-        padding: 12px 14px;
-        border: 1px solid var(--line-strong);
-        border-radius: var(--radius);
-        background: rgba(247, 246, 243, 0.82);
-        backdrop-filter: blur(6px);
-        transition:
-          border-color 0.2s var(--ease-out-quart),
-          transform 0.2s var(--ease-out-quart),
-          background 0.2s var(--ease-out-quart);
-      }
-      .map-shell:hover .map-note {
-        border-color: rgba(31, 75, 143, 0.48);
-      }
-      .map-note b {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        color: var(--paper);
-        font-family: var(--font-mono);
-        font-size: 0.7rem;
-        font-weight: 500;
-        letter-spacing: 0.01em;
-      }
-      .map-note b::before {
-        content: "";
-        width: 7px;
-        height: 7px;
-        border-radius: 2px;
-        background: var(--draft-light);
-        box-shadow: 0 0 0 3px rgba(31, 75, 143, 0.16);
-      }
-      .map-note span {
-        color: var(--steel);
-        font-size: 0.82rem;
-        line-height: 1.35;
-      }
-      .map-note-1 {
-        left: 16px;
-        top: 16px;
-      }
-      .map-note-2 {
-        right: 16px;
-        top: 16px;
-      }
-      .map-note-3 {
-        left: 16px;
-        bottom: 56px;
-      }
-      .map-status {
-        position: absolute;
-        z-index: 2;
-        left: 14px;
-        right: 14px;
-        bottom: 14px;
-        display: flex;
-        justify-content: flex-end;
-        gap: 8px;
-        flex-wrap: wrap;
-      }
-      .status-pill {
-        border: 1px solid rgba(31, 75, 143, 0.38);
-        border-radius: 999px;
-        padding: 7px 11px;
-        color: var(--paper-dim);
-        background: rgba(31, 75, 143, 0.08);
-        font-family: var(--font-mono);
-        font-size: 0.68rem;
-        letter-spacing: 0.01em;
-        transition:
-          border-color 0.18s var(--ease-out-quart),
-          background 0.18s var(--ease-out-quart);
-      }
-
-      .map-stage .draft {
-        stroke: var(--draft-light);
-      }
-      .map-stage .draft-fill {
-        fill: rgba(31, 75, 143, 0.12);
-      }
-      .map-stage .signal {
-        stroke: var(--signal);
-      }
-      .map-stage .signal-soft {
-        fill: rgba(31, 75, 143, 0.1);
-        stroke: rgba(31, 75, 143, 0.68);
-      }
-      .map-stage .node {
-        fill: var(--signal);
-        stroke: var(--ink);
-      }
-      .map-stage .alert {
-        stroke: var(--coral);
-      }
-      .map-stage .map-label {
-        fill: var(--paper-dim);
-        font-family: var(--font-mono);
-        font-size: 12px;
-        letter-spacing: 0.04em;
-      }
-
       .evidence {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
@@ -553,7 +431,7 @@
         transition: background 0.2s var(--ease-out-quart);
       }
       .evidence-item:hover {
-        background: rgba(31, 75, 143, 0.045);
+        background: rgba(10, 10, 10, 0.045);
       }
       .evidence-item:last-child {
         border-right: 0;
@@ -594,6 +472,8 @@
         font-size: clamp(2.15rem, 5.2vw, 4.1rem);
         line-height: 0.98;
         letter-spacing: -0.035em;
+        text-transform: uppercase;
+        color: var(--signal);
       }
       .section-copy {
         max-width: 64ch;
@@ -620,21 +500,21 @@
         grid-template-columns: repeat(2, 1fr);
         gap: 8px;
         border: 1px solid var(--line-strong);
-        border-radius: 18px;
+        border-radius: 0;
         background:
           linear-gradient(
             180deg,
-            rgba(22, 24, 28, 0.075),
-            rgba(22, 24, 28, 0.04)
+            rgba(10, 10, 10, 0.075),
+            rgba(10, 10, 10, 0.04)
           ),
-          rgba(22, 24, 28, 0.02);
-        box-shadow: 0 8px 20px rgba(22, 24, 28, 0.08);
+          rgba(10, 10, 10, 0.02);
+        box-shadow: 0 8px 20px rgba(10, 10, 10, 0.08);
       }
       .stack-mark-cell {
         display: grid;
         place-items: center;
-        border-radius: 12px;
-        background: rgba(22, 24, 28, 0.05);
+        border-radius: 0;
+        background: rgba(10, 10, 10, 0.05);
         overflow: hidden;
       }
       .stack-mark-cell img {
@@ -663,10 +543,10 @@
       .role:hover {
         background: linear-gradient(
           90deg,
-          rgba(31, 75, 143, 0.035),
+          rgba(10, 10, 10, 0.035),
           transparent 42%
         );
-        border-color: rgba(31, 75, 143, 0.24);
+        border-color: rgba(10, 10, 10, 0.24);
       }
       .role-meta {
         color: var(--steel);
@@ -681,7 +561,7 @@
         letter-spacing: -0.025em;
       }
       .role-company {
-        color: var(--draft-light);
+        color: var(--steel);
       }
       .role ul {
         display: grid;
@@ -725,6 +605,8 @@
         font-size: clamp(1.8rem, 4vw, 3.2rem);
         line-height: 1;
         letter-spacing: -0.035em;
+        text-transform: uppercase;
+        color: var(--signal);
       }
       .case-summary p {
         margin: 0;
@@ -738,11 +620,11 @@
         gap: 8px;
       }
       .chip {
-        border: 1px solid rgba(31, 75, 143, 0.36);
-        border-radius: 999px;
+        border: 1px solid rgba(10, 10, 10, 0.36);
+        border-radius: 0;
         padding: 7px 10px;
         color: var(--paper-dim);
-        background: rgba(31, 75, 143, 0.12);
+        background: rgba(10, 10, 10, 0.12);
         font-family: var(--font-mono);
         font-size: 0.7rem;
         transition:
@@ -751,8 +633,8 @@
           transform 0.18s var(--ease-out-quart);
       }
       .chip:hover {
-        border-color: rgba(31, 75, 143, 0.56);
-        background: rgba(31, 75, 143, 0.08);
+        border-color: rgba(10, 10, 10, 0.56);
+        background: rgba(10, 10, 10, 0.08);
         transform: translateY(-1px);
       }
       .feature-board {
@@ -774,7 +656,7 @@
       }
       .feature-panel:hover {
         transform: translateY(-3px);
-        border-color: rgba(31, 75, 143, 0.42);
+        border-color: rgba(10, 10, 10, 0.42);
         background: var(--surface-2);
       }
       .feature-copy {
@@ -806,7 +688,7 @@
       .feature-copy li {
         color: var(--paper-dim);
         border: 1px solid var(--line);
-        border-radius: 999px;
+        border-radius: 0;
         padding: 6px 9px;
         font-family: var(--font-mono);
         font-size: 0.68rem;
@@ -816,22 +698,22 @@
           background 0.18s var(--ease-out-quart);
       }
       .feature-panel:hover .feature-copy li {
-        border-color: rgba(31, 75, 143, 0.34);
+        border-color: rgba(10, 10, 10, 0.34);
         color: var(--paper);
-        background: rgba(31, 75, 143, 0.045);
+        background: rgba(10, 10, 10, 0.045);
       }
       .prototype {
         min-height: 220px;
-        border: 1px solid rgba(22, 24, 28, 0.18);
+        border: 1px solid rgba(10, 10, 10, 0.18);
         border-radius: var(--radius);
         background:
           linear-gradient(
             90deg,
-            rgba(22, 24, 28, 0.05) 1px,
+            rgba(10, 10, 10, 0.05) 1px,
             transparent 1px
           ),
-          linear-gradient(rgba(22, 24, 28, 0.05) 1px, transparent 1px),
-          rgba(247, 246, 243, 0.52);
+          linear-gradient(rgba(10, 10, 10, 0.05) 1px, transparent 1px),
+          rgba(255, 255, 255, 0.52);
         background-size: 24px 24px;
         overflow: hidden;
         contain: paint;
@@ -840,7 +722,7 @@
           background-position 0.8s var(--ease-out-quart);
       }
       .feature-panel:hover .prototype {
-        border-color: rgba(31, 75, 143, 0.42);
+        border-color: rgba(10, 10, 10, 0.42);
         background-position:
           8px 0,
           0 8px,
@@ -894,7 +776,7 @@
       }
       .project:hover {
         transform: translateY(-3px);
-        border-color: rgba(31, 75, 143, 0.42);
+        border-color: rgba(10, 10, 10, 0.42);
         background: var(--surface-2);
       }
       .project .prototype {
@@ -905,15 +787,15 @@
         background:
           linear-gradient(
             90deg,
-            rgba(22, 24, 28, 0.045) 1px,
+            rgba(10, 10, 10, 0.045) 1px,
             transparent 1px
           ),
-          linear-gradient(rgba(22, 24, 28, 0.045) 1px, transparent 1px),
-          rgba(247, 246, 243, 0.42);
+          linear-gradient(rgba(10, 10, 10, 0.045) 1px, transparent 1px),
+          rgba(255, 255, 255, 0.42);
         background-size: 22px 22px;
       }
       .project:hover .prototype {
-        border-color: rgba(31, 75, 143, 0.36);
+        border-color: rgba(10, 10, 10, 0.36);
       }
       .project .prototype svg {
         min-height: 150px;
@@ -937,7 +819,7 @@
       }
       .project-tag {
         margin-top: 4px;
-        color: var(--draft-light);
+        color: var(--steel-2);
         font-family: var(--font-mono);
         font-size: 0.68rem;
         letter-spacing: 0.02em;
@@ -954,9 +836,9 @@
         background:
           linear-gradient(
             135deg,
-            rgba(31, 75, 143, 0.16),
-            rgba(31, 75, 143, 0.055) 48%,
-            rgba(31, 75, 143, 0.075)
+            rgba(10, 10, 10, 0.16),
+            rgba(10, 10, 10, 0.055) 48%,
+            rgba(10, 10, 10, 0.075)
           ),
           var(--surface);
         overflow: hidden;
@@ -994,11 +876,11 @@
         background:
           linear-gradient(
             90deg,
-            rgba(22, 24, 28, 0.045) 1px,
+            rgba(10, 10, 10, 0.045) 1px,
             transparent 1px
           ),
-          linear-gradient(rgba(22, 24, 28, 0.045) 1px, transparent 1px),
-          rgba(247, 246, 243, 0.34);
+          linear-gradient(rgba(10, 10, 10, 0.045) 1px, transparent 1px),
+          rgba(255, 255, 255, 0.34);
         background-size: 26px 26px;
       }
       .lab-diagram {
@@ -1013,7 +895,7 @@
       }
       .lab-track {
         fill: none;
-        stroke: rgba(22, 24, 28, 0.16);
+        stroke: rgba(10, 10, 10, 0.16);
         stroke-width: 14;
       }
       .lab-arc {
@@ -1022,16 +904,16 @@
         stroke-linecap: round;
       }
       .lab-arc-demand {
-        stroke: var(--coral);
+        stroke: var(--paper);
       }
       .lab-arc-fulfillment {
-        stroke: var(--signal);
+        stroke: var(--steel);
       }
       .lab-arc-supply {
-        stroke: var(--draft-light);
+        stroke: var(--steel-2);
       }
       .lab-hub {
-        fill: rgba(247, 246, 243, 0.92);
+        fill: rgba(255, 255, 255, 0.92);
         stroke: var(--line-strong);
       }
       .lab-label {
@@ -1073,7 +955,7 @@
       }
       .lab-bet:hover,
       .lab-bet:focus-visible {
-        background: rgba(31, 75, 143, 0.055);
+        background: rgba(10, 10, 10, 0.055);
       }
       .lab-bet b {
         display: block;
@@ -1090,7 +972,7 @@
         line-height: 1.42;
       }
       .lab-bet em {
-        color: var(--draft-light);
+        color: var(--steel-2);
         font-family: var(--font-mono);
         font-size: 0.68rem;
         font-style: normal;
@@ -1113,7 +995,7 @@
         transition: background 0.2s var(--ease-out-quart);
       }
       .skill-cluster:hover {
-        background: rgba(31, 75, 143, 0.05);
+        background: rgba(10, 10, 10, 0.05);
       }
       .skill-head {
         display: flex;
@@ -1126,9 +1008,9 @@
         height: 42px;
         display: grid;
         place-items: center;
-        border-radius: 12px;
-        border: 1px solid rgba(22, 24, 28, 0.12);
-        background: rgba(22, 24, 28, 0.035);
+        border-radius: 0;
+        border: 1px solid rgba(10, 10, 10, 0.12);
+        background: rgba(10, 10, 10, 0.035);
       }
       .skill-icon img {
         width: 24px;
@@ -1166,12 +1048,12 @@
         padding: clamp(24px, 4vw, 34px);
         border-right: 1px solid var(--line);
         background:
-          linear-gradient(135deg, rgba(31, 75, 143, 0.12), transparent 62%),
-          rgba(22, 24, 28, 0.025);
+          linear-gradient(135deg, rgba(10, 10, 10, 0.12), transparent 62%),
+          rgba(10, 10, 10, 0.025);
       }
       .ai-workflow-label {
         margin: 0 0 10px;
-        color: var(--draft-light);
+        color: var(--steel-2);
         font-family: var(--font-mono);
         font-size: 0.74rem;
       }
@@ -1204,8 +1086,8 @@
         background: linear-gradient(
           90deg,
           transparent,
-          rgba(31, 75, 143, 0.74),
-          rgba(31, 75, 143, 0.76),
+          rgba(10, 10, 10, 0.74),
+          rgba(10, 10, 10, 0.76),
           transparent
         );
         pointer-events: none;
@@ -1227,7 +1109,7 @@
         z-index: 1;
         width: 9px;
         height: 9px;
-        border: 1px solid rgba(31, 75, 143, 0.72);
+        border: 1px solid rgba(10, 10, 10, 0.72);
         border-radius: 50%;
         background: var(--ink);
       }
@@ -1241,9 +1123,9 @@
         height: 44px;
         display: grid;
         place-items: center;
-        border: 1px solid rgba(31, 75, 143, 0.36);
+        border: 1px solid rgba(10, 10, 10, 0.36);
         border-radius: var(--radius);
-        background: rgba(31, 75, 143, 0.08);
+        background: rgba(10, 10, 10, 0.08);
         color: var(--signal);
       }
       .ai-tool-icon svg {
@@ -1270,7 +1152,7 @@
         gap: 14px;
         flex-wrap: wrap;
         padding: 18px 24px;
-        background: rgba(22, 24, 28, 0.03);
+        background: rgba(10, 10, 10, 0.03);
       }
       .ai-addon strong {
         color: var(--paper-dim);
@@ -1287,11 +1169,11 @@
         min-height: 32px;
         display: inline-flex;
         align-items: center;
-        border: 1px solid rgba(31, 75, 143, 0.28);
-        border-radius: 999px;
+        border: 1px solid rgba(10, 10, 10, 0.28);
+        border-radius: 0;
         padding: 0.36rem 0.66rem;
         color: var(--paper-dim);
-        background: rgba(31, 75, 143, 0.08);
+        background: rgba(10, 10, 10, 0.08);
         font-family: var(--font-mono);
         font-size: 0.7rem;
       }
@@ -1337,8 +1219,8 @@
         gap: 8px;
         padding: 16px 18px;
         border: 1px solid var(--line);
-        border-radius: 14px;
-        background: rgba(22, 24, 28, 0.03);
+        border-radius: 0;
+        background: rgba(10, 10, 10, 0.03);
       }
       .language-head {
         display: flex;
@@ -1353,8 +1235,8 @@
       }
       .level-chip {
         padding: 0.38rem 0.66rem;
-        border-radius: 999px;
-        background: rgba(31, 75, 143, 0.14);
+        border-radius: 0;
+        background: rgba(10, 10, 10, 0.14);
         color: var(--signal);
         font-family: var(--font-mono);
         font-size: 0.72rem;
@@ -1384,6 +1266,8 @@
         font-size: clamp(1.8rem, 4vw, 3rem);
         line-height: 1;
         letter-spacing: -0.035em;
+        text-transform: uppercase;
+        color: var(--signal);
       }
       .footer p {
         margin: 12px 0 0;
@@ -1501,7 +1385,7 @@
       }
 
       :focus-visible {
-        outline: 3px solid var(--signal);
+        outline: 3px solid var(--signal-red);
         outline-offset: 3px;
       }
 
@@ -1565,7 +1449,7 @@
           padding: 14px;
           border: 1px solid var(--line-strong);
           border-radius: var(--radius);
-          background: rgba(247, 246, 243, 0.96);
+          background: rgba(255, 255, 255, 0.96);
           transform-origin: top center;
         }
         .nav-links.open {
@@ -1653,7 +1537,7 @@
           height: 76px;
           padding: 10px;
           gap: 6px;
-          border-radius: 16px;
+          border-radius: 0;
         }
         .stack-mark-cell img {
           width: 20px;
@@ -1760,11 +1644,16 @@
               developer who works close to the business side.
             </div>
             <h1 class="reveal">Pakawat<br /><span>Smutkun</span></h1>
-            <p class="hero-title reveal">
-              5+ Years engineering business systems where
-              <strong>Floorplans, Reports, Workflows, and Field Teams</strong>
-              need to operate as one reliable product.
-            </p>
+            <div class="hero-lead reveal">
+              <p class="hero-title">
+                5+ Years engineering business systems where
+                <strong>Floorplans, Reports, Workflows, and Field Teams</strong>
+                need to operate as one reliable product.
+              </p>
+              <div class="hero-figure" aria-hidden="true">
+                <b>5+</b><span>Years shipping systems</span>
+              </div>
+            </div>
             <div class="hero-actions reveal">
               <a
                 href="https://drive.google.com/uc?export=download&id=1B2tvM8jNeyZd6OBbq5haLpY4j3sO8lss"
@@ -1825,97 +1714,6 @@
             </div>
           </div>
 
-          <div class="map-shell reveal" aria-hidden="true">
-            <div class="map-note map-note-1">
-              <b>ERP + LINE OA</b
-              ><span>Mobile-first work intake for 200+ active users.</span>
-            </div>
-            <div class="map-note map-note-2">
-              <b>Floorplan intelligence</b
-              ><span>Revenue, occupancy, vacancy, and category overlays.</span>
-            </div>
-            <div class="map-note map-note-3">
-              <b>Reporting automation</b
-              ><span>Templates and consolidation across 2,000+ branches.</span>
-            </div>
-            <div class="map-stage">
-              <svg
-                viewBox="0 0 620 520"
-                role="img"
-                aria-label=""
-                preserveAspectRatio="xMidYMid meet"
-              >
-                <defs>
-                  <pattern
-                    id="smallGrid"
-                    width="28"
-                    height="28"
-                    patternUnits="userSpaceOnUse"
-                  >
-                    <path
-                      d="M28 0H0V28"
-                      fill="none"
-                      stroke="rgba(22, 24, 28,.10)"
-                      stroke-width="1"
-                    />
-                  </pattern>
-                </defs>
-                <rect
-                  x="0"
-                  y="0"
-                  width="620"
-                  height="520"
-                  fill="url(#smallGrid)"
-                />
-                <path
-                  class="map-plan draft draft-fill"
-                  style="--dash: 1320"
-                  d="M120 110h180v92h84v-60h116v326H384v44H236V388h-116Z"
-                  stroke-width="2"
-                />
-                <path
-                  class="map-wall draft"
-                  style="--dash: 1100"
-                  d="M236 388h148v92M300 110v278M384 142v292M500 478V332h-92M408 332h-24"
-                  fill="none"
-                  stroke-width="2"
-                />
-                <path
-                  class="map-route signal"
-                  style="--dash: 760"
-                  d="M160 392C226 344 300 332 360 350c78 24 104 92 180 76"
-                  fill="none"
-                  stroke-width="4"
-                  stroke-linecap="round"
-                />
-                <path
-                  class="map-zone signal-soft"
-                  d="M168 176h96v74h-96Zm240 0h84v74h-84Zm0 168h84v66h-84Zm-240 10h104v66H168Z"
-                  stroke-width="2"
-                />
-                <g class="node" stroke-width="5">
-                  <circle class="map-node" cx="216" cy="213" r="10" />
-                  <circle class="map-node" cx="360" cy="350" r="10" />
-                  <circle class="map-node" cx="450" cy="213" r="10" />
-                  <circle class="map-node" cx="450" cy="377" r="10" />
-                </g>
-                <g class="alert" fill="none" stroke-width="2">
-                  <path class="map-alert" d="M470 176h30v30h-30Z" />
-                  <path class="map-alert" d="M232 350h42v20h-42Z" />
-                </g>
-                <g class="map-label">
-                  <text x="176" y="270">LEASE ZONE</text>
-                  <text x="412" y="270">EVENT</text>
-                  <text x="300" y="478">REPORT NODE</text>
-                </g>
-              </svg>
-            </div>
-            <div class="map-status">
-              <span class="status-pill">10 modules</span>
-              <span class="status-pill">2,000+ branches</span>
-              <span class="status-pill">200+ users</span>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -2141,8 +1939,8 @@
                       class="proto-line"
                       style="--dash: 900"
                       d="M38 32h156v70h54V48h138v162H268v36H70v-84H38Z"
-                      fill="rgba(31, 75, 143,.14)"
-                      stroke="#1f4b8f"
+                      fill="rgba(10, 10, 10,.14)"
+                      stroke="#0a0a0a"
                       stroke-width="2"
                     />
                     <path
@@ -2150,7 +1948,7 @@
                       style="--dash: 760"
                       d="M70 162h94v84M194 32v130M248 48v162M268 210v-76h118M268 134h-20"
                       fill="none"
-                      stroke="#1f4b8f"
+                      stroke="#0a0a0a"
                       stroke-width="2"
                     />
                     <rect
@@ -2158,31 +1956,31 @@
                       y="58"
                       width="72"
                       height="36"
-                      fill="rgba(31, 75, 143,.16)"
-                      stroke="#1f4b8f"
+                      fill="rgba(10, 10, 10,.16)"
+                      stroke="#0a0a0a"
                     />
                     <rect
                       x="286"
                       y="72"
                       width="70"
                       height="46"
-                      fill="rgba(31, 75, 143,.16)"
-                      stroke="#1f4b8f"
+                      fill="rgba(10, 10, 10,.16)"
+                      stroke="#0a0a0a"
                     />
                     <rect
                       x="288"
                       y="154"
                       width="66"
                       height="36"
-                      fill="rgba(31, 75, 143,.12)"
-                      stroke="#1f4b8f"
+                      fill="rgba(10, 10, 10,.12)"
+                      stroke="#0a0a0a"
                     />
                     <path
                       class="proto-route"
                       style="--dash: 420"
                       d="M88 190c44-36 92-42 144-18 38 18 76 8 116-30"
                       fill="none"
-                      stroke="#1f4b8f"
+                      stroke="#0a0a0a"
                       stroke-width="4"
                       stroke-linecap="round"
                     />
@@ -2217,7 +2015,7 @@
                 </div>
                 <div class="prototype" aria-hidden="true">
                   <svg viewBox="0 0 420 260">
-                    <g fill="none" stroke="#1f4b8f" stroke-width="2">
+                    <g fill="none" stroke="#0a0a0a" stroke-width="2">
                       <path
                         class="proto-line"
                         style="--dash: 900"
@@ -2229,7 +2027,7 @@
                         d="M142 86c18 0 18 32 36 32M142 174c18 0 18-32 36-32M262 130c18 0 18-36 38-36M262 130c18 0 18 50 38 50"
                       />
                     </g>
-                    <g fill="#1f4b8f">
+                    <g fill="#0a0a0a">
                       <circle class="proto-node" cx="142" cy="86" r="5" />
                       <circle class="proto-node" cx="142" cy="174" r="5" />
                       <circle class="proto-active" cx="300" cy="94" r="5" />
@@ -2272,8 +2070,8 @@
                       class="proto-line"
                       style="--dash: 1000"
                       d="M68 58h284v40H68zM68 118h284v40H68zM68 178h284v40H68z"
-                      fill="rgba(22, 24, 28,.04)"
-                      stroke="#1f4b8f"
+                      fill="rgba(10, 10, 10,.04)"
+                      stroke="#0a0a0a"
                     />
                     <path
                       class="proto-line"
@@ -2286,7 +2084,7 @@
                       class="proto-route"
                       style="--dash: 300"
                       d="M278 78h42M278 138h42M278 198h42"
-                      stroke="#1f4b8f"
+                      stroke="#0a0a0a"
                       stroke-width="6"
                       stroke-linecap="round"
                     />
@@ -2295,21 +2093,21 @@
                       cx="338"
                       cy="78"
                       r="8"
-                      fill="#1f4b8f"
+                      fill="#0a0a0a"
                     />
                     <circle
                       class="proto-active"
                       cx="338"
                       cy="138"
                       r="8"
-                      fill="#1f4b8f"
+                      fill="#0a0a0a"
                     />
                     <circle
                       class="proto-node"
                       cx="338"
                       cy="198"
                       r="8"
-                      fill="#1f4b8f"
+                      fill="#0a0a0a"
                     />
                     <g
                       font-family="Azeret Mono, monospace"
@@ -2346,14 +2144,14 @@
                       class="proto-line"
                       style="--dash: 220"
                       d="M78 130h304"
-                      stroke="#1f4b8f"
+                      stroke="#0a0a0a"
                       stroke-width="2"
                     />
                     <g
                       class="proto-line"
                       style="--dash: 900"
-                      fill="rgba(31, 75, 143,.16)"
-                      stroke="#1f4b8f"
+                      fill="rgba(10, 10, 10,.16)"
+                      stroke="#0a0a0a"
                       d="M20"
                       stroke-width="2"
                     >
@@ -2365,7 +2163,7 @@
                       class="proto-route"
                       style="--dash: 260"
                       d="M124 130h26M226 130h26M328"
-                      stroke="#1f4b8f"
+                      stroke="#0a0a0a"
                       stroke-width="4"
                       stroke-linecap="round"
                     />
@@ -2374,21 +2172,21 @@
                       cx="86"
                       cy="130"
                       r="14"
-                      fill="#1f4b8f"
+                      fill="#0a0a0a"
                     />
                     <circle
                       class="proto-node"
                       cx="188"
                       cy="130"
                       r="14"
-                      fill="#1f4b8f"
+                      fill="#0a0a0a"
                     />
                     <circle
                       class="proto-active"
                       cx="290"
                       cy="130"
                       r="14"
-                      fill="#1f4b8f"
+                      fill="#0a0a0a"
                     />
                     <g
                       font-family="Azeret Mono, monospace"
@@ -2421,7 +2219,7 @@
                     style="--dash: 360"
                     d="M28 52h264M28 92h264M28 132h264"
                     fill="none"
-                    stroke="rgba(22, 24, 28,.16)"
+                    stroke="rgba(10, 10, 10,.16)"
                     stroke-width="1"
                   />
                   <g
@@ -2437,34 +2235,34 @@
                       cx="44"
                       cy="68"
                       r="10"
-                      fill="rgba(31, 75, 143,.5)"
-                      stroke="#1f4b8f"
+                      fill="rgba(10, 10, 10,.5)"
+                      stroke="#0a0a0a"
                     />
                     <circle
                       cx="44"
                       cy="108"
                       r="10"
-                      fill="rgba(31, 75, 143,.5)"
-                      stroke="#1f4b8f"
+                      fill="rgba(10, 10, 10,.5)"
+                      stroke="#0a0a0a"
                     />
                     <circle
                       cx="44"
                       cy="148"
                       r="10"
-                      fill="rgba(31, 75, 143,.5)"
-                      stroke="#1f4b8f"
+                      fill="rgba(10, 10, 10,.5)"
+                      stroke="#0a0a0a"
                     />
                     <path
                       d="M40 66a4 4 0 1 1 8 0 4 4 0 0 1-8 0M37 74c0-4 14-4 14 0"
-                      fill="#1f4b8f"
+                      fill="#0a0a0a"
                     />
                     <path
                       d="M40 106a4 4 0 1 1 8 0 4 4 0 0 1-8 0M37 114c0-4 14-4 14 0"
-                      fill="#1f4b8f"
+                      fill="#0a0a0a"
                     />
                     <path
                       d="M40 146a4 4 0 1 1 8 0 4 4 0 0 1-8 0M37 154c0-4 14-4 14 0"
-                      fill="#1f4b8f"
+                      fill="#0a0a0a"
                     />
                   </g>
                   <g
@@ -2474,9 +2272,9 @@
                     stroke-linecap="round"
                     stroke-width="6"
                   >
-                    <path d="M64 68h120" stroke="rgba(31, 75, 143,.32)" />
-                    <path d="M64 108h120" stroke="rgba(31, 75, 143,.32)" />
-                    <path d="M64 148h120" stroke="rgba(31, 75, 143,.28)" />
+                    <path d="M64 68h120" stroke="rgba(10, 10, 10,.32)" />
+                    <path d="M64 108h120" stroke="rgba(10, 10, 10,.32)" />
+                    <path d="M64 148h120" stroke="rgba(10, 10, 10,.28)" />
                   </g>
                   <g
                     font-family="Azeret Mono, monospace"
@@ -2485,7 +2283,7 @@
                   >
                     <text x="232" y="71">CONVERTED</text>
                     <text x="232" y="111">CONVERTED</text>
-                    <text x="232" y="151" fill="#1f4b8f">PENDING</text>
+                    <text x="232" y="151" fill="#0a0a0a">PENDING</text>
                   </g>
                   <g>
                     <circle
@@ -2493,21 +2291,21 @@
                       cx="220"
                       cy="68"
                       r="4"
-                      fill="#1f4b8f"
+                      fill="#0a0a0a"
                     />
                     <circle
                       class="proto-node"
                       cx="220"
                       cy="108"
                       r="4"
-                      fill="#1f4b8f"
+                      fill="#0a0a0a"
                     />
                     <circle
                       class="proto-active proto-pulse"
                       cx="220"
                       cy="148"
                       r="4"
-                      fill="#1f4b8f"
+                      fill="#0a0a0a"
                     />
                   </g>
                 </svg>
@@ -2529,7 +2327,7 @@
                     class="proto-line"
                     style="--dash: 1400"
                     fill="none"
-                    stroke="#1f4b8f"
+                    stroke="#0a0a0a"
                     stroke-width="1.5"
                   >
                     <rect x="40" y="36" width="44" height="40" />
@@ -2546,21 +2344,21 @@
                     y="36"
                     width="44"
                     height="40"
-                    fill="rgba(31, 75, 143,.18)"
+                    fill="rgba(10, 10, 10,.18)"
                   />
                   <rect
                     x="152"
                     y="36"
                     width="44"
                     height="40"
-                    fill="rgba(31, 75, 143,.18)"
+                    fill="rgba(10, 10, 10,.18)"
                   />
                   <rect
                     x="96"
                     y="100"
                     width="44"
                     height="40"
-                    fill="rgba(31, 75, 143,.14)"
+                    fill="rgba(10, 10, 10,.14)"
                     class="proto-pulse"
                   />
                   <rect
@@ -2568,13 +2366,13 @@
                     y="100"
                     width="44"
                     height="40"
-                    fill="rgba(31, 75, 143,.18)"
+                    fill="rgba(10, 10, 10,.18)"
                   />
                   <path
                     class="proto-route"
                     style="--dash: 240"
                     d="M268 56v84"
-                    stroke="#1f4b8f"
+                    stroke="#0a0a0a"
                     stroke-width="3"
                     stroke-linecap="round"
                   />
@@ -2606,14 +2404,14 @@
                     style="--dash: 600"
                     d="M40 44h150M40 78h150M40 112h150"
                     fill="none"
-                    stroke="#1f4b8f"
+                    stroke="#0a0a0a"
                     stroke-width="1.5"
                   />
                   <path
                     class="proto-route"
                     style="--dash: 200"
                     d="M40 44h66M40 78h94M40 112h54"
-                    stroke="#1f4b8f"
+                    stroke="#0a0a0a"
                     stroke-width="4"
                     stroke-linecap="round"
                   />
@@ -2624,8 +2422,8 @@
                     width="58"
                     height="58"
                     rx="6"
-                    fill="rgba(22, 24, 28,.06)"
-                    stroke="#1f4b8f"
+                    fill="rgba(10, 10, 10,.06)"
+                    stroke="#0a0a0a"
                     stroke-width="1.5"
                   />
                   <g class="proto-node" fill="#3a3f47">
@@ -2705,7 +2503,7 @@
                     width="312"
                     height="252"
                     rx="12"
-                    fill="rgba(22, 24, 28, 0.035)"
+                    fill="rgba(10, 10, 10, 0.035)"
                     stroke="var(--line-strong)"
                   />
                   <text class="lab-label" x="44" y="52">
@@ -2791,6 +2589,8 @@
                     cy="156"
                     r="6"
                     fill="var(--coral)"
+                    stroke="var(--ink)"
+                    stroke-width="2"
                   />
 
                   <g class="lab-label">
@@ -2973,7 +2773,7 @@
                     width="312"
                     height="252"
                     rx="12"
-                    fill="rgba(22, 24, 28, 0.035)"
+                    fill="rgba(10, 10, 10, 0.035)"
                     stroke="var(--line-strong)"
                   />
                   <circle cx="46" cy="48" r="4" fill="var(--coral)" />
@@ -3067,6 +2867,8 @@
                     cy="154"
                     r="6"
                     fill="var(--coral)"
+                    stroke="var(--ink)"
+                    stroke-width="2"
                   />
                   <text class="lab-label" x="198" y="158" fill="var(--coral)">
                     SUPPORT
