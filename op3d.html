@@ -720,6 +720,7 @@ function click() {
   o.start();
   o.stop(audio.currentTime + 0.03);
 }
+window.opClick = click; // exposed for the module script's hero/knob interactions
 sndBtn.addEventListener('click', () => {
   snd = !snd;
   localStorage.setItem('snd', snd ? '1' : '0');
@@ -735,7 +736,10 @@ paintSnd();
 const readout = document.getElementById('readout');
 const readoutIO = new IntersectionObserver((entries) => {
   entries.forEach((en) => {
-    if (en.isIntersecting) readout.textContent = en.target.dataset.code;
+    if (en.isIntersecting) {
+      readout.textContent = en.target.dataset.code;
+      window.opScreen?.print(en.target.dataset.code);
+    }
   });
 }, { rootMargin: '-40% 0px -55% 0px' });
 document.querySelectorAll('[data-code]').forEach((s) => readoutIO.observe(s));
@@ -885,6 +889,52 @@ function boot(THREE) {
     });
   }
 
+  /* ---- raycast pick + 15deg detent engine (shared: Task 4's encoder reuses these) ---- */
+  const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+  function pick(view, e, objects) {
+    const r = view.elem.getBoundingClientRect();
+    ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -(((e.clientY - r.top) / r.height) * 2 - 1));
+    ray.setFromCamera(ndc, view.camera);
+    return ray.intersectObjects(objects, true)[0]?.object ?? null;
+  }
+
+  const DETENT = Math.PI / 12; // 15 degrees
+  function makeDetent(object, onStep) {
+    let acc = 0, step = 0;
+    // ponytail: one persistent spring per detent object, not one per step-crossing.
+    // A fast drag/turn can cross several 15deg steps before a single rAF frame runs;
+    // spawning a fresh spring() per crossing would stack N competing controllers on
+    // the same object.rotation.y (each with its own stale velocity state), which
+    // measurably diverges instead of settling. Keeping one controller and just
+    // retargeting it keeps the exact k/c "overshoot then settle" feel but converges.
+    let target = object.rotation.y, v = 0, running = false;
+    function tick(dt) {
+      let x = object.rotation.y;
+      const a = -1400 * (x - target) - 10 * v;
+      v += a * dt; x += v * dt;
+      if (Math.abs(x - target) < 0.001 && Math.abs(v) < 0.01) {
+        object.rotation.y = target; invalidate();
+        running = false;
+        return false;
+      }
+      object.rotation.y = x; invalidate();
+      return true;
+    }
+    function add(delta) {           // delta: radians of raw input
+      acc += delta;
+      const s = Math.round(acc / DETENT);
+      if (s !== step) {
+        const dir = Math.sign(s - step); step = s;
+        window.opClick?.();
+        onStep?.(dir, s);
+        // snap with micro-shudder: overshoot then settle
+        target = s * DETENT;
+        if (!running) { running = true; animate(tick); }
+      }
+    }
+    return { add };
+  }
+
   /* ---- dot-matrix screen texture ---- */
   const screenTex = (() => {
     const c = Object.assign(document.createElement('canvas'), { width: 256, height: 128 });
@@ -987,6 +1037,79 @@ function boot(THREE) {
 
     return { keys, knob, screen: screenTex };
   });
+
+  /* ---- hero interactions: spring keys, knob detents, live screen ---- */
+  const hero = views.get('hero');
+  const { keys: heroKeys, knob: heroKnob } = hero.api;
+  const heroModules = ['work', 'lab', 'log', 'spec'].map((id) => document.getElementById(id));
+  hero.elem.dataset.live = '';
+  hero.elem.setAttribute('role', 'presentation');
+
+  // ponytail: per-key persistent spring controller, retargeted rather than
+  // re-spawned. The 90ms return-to-rest fires before the compress spring has
+  // decayed (default k/c settle in ~0.6s), so two independently-spawned
+  // spring() closures would fight over the same key.position.y and never
+  // both converge (same class of bug as the knob's detent spring above).
+  const keySprings = new Map();
+  function driveKey(key, target) {
+    let s = keySprings.get(key);
+    if (!s) { s = { v: 0, running: false }; keySprings.set(key, s); }
+    s.target = target;
+    if (s.running) return;
+    s.running = true;
+    animate((dt) => {
+      let y = key.position.y;
+      const a = -900 * (y - s.target) - 14 * s.v;
+      s.v += a * dt; y += s.v * dt;
+      if (Math.abs(y - s.target) < 0.001 && Math.abs(s.v) < 0.01) {
+        key.position.y = s.target; invalidate();
+        s.running = false;
+        return false;
+      }
+      key.position.y = y; invalidate();
+      return true;
+    });
+  }
+  function pressKey(key) {
+    window.opClick?.();
+    const rest = key.userData.rest;
+    driveKey(key, rest - 0.12);
+    setTimeout(() => driveKey(key, rest), 90);
+    heroModules[key.userData.i]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  const heroDetent = makeDetent(heroKnob);
+  let heroDragging = false, heroLastX = 0;
+
+  hero.elem.addEventListener('pointerdown', (e) => {
+    const hit = pick(hero, e, [...heroKeys, heroKnob]);
+    if (!hit) return;
+    let obj = hit;
+    while (obj && obj !== heroKnob && obj.userData?.rest === undefined) obj = obj.parent;
+    if (obj === heroKnob) {
+      hero.elem.setPointerCapture(e.pointerId);
+      heroDragging = true; heroLastX = e.clientX;
+    } else if (obj) {
+      pressKey(obj);
+    }
+  });
+  hero.elem.addEventListener('pointermove', (e) => {
+    if (!heroDragging) return;
+    heroDetent.add((e.clientX - heroLastX) * 0.02);
+    heroLastX = e.clientX;
+  });
+  function heroEndDrag(e) {
+    if (!heroDragging) return;
+    heroDragging = false;
+    hero.elem.releasePointerCapture(e.pointerId);
+  }
+  hero.elem.addEventListener('pointerup', heroEndDrag);
+  hero.elem.addEventListener('pointercancel', heroEndDrag);
+  hero.elem.addEventListener('wheel', (e) => {
+    if (!pick(hero, e, [heroKnob])) return;
+    e.preventDefault();
+    heroDetent.add(e.deltaY * 0.005);
+  }, { passive: false });
 
   invalidate();
 }
