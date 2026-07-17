@@ -2,7 +2,7 @@
 
 Date: 2026-07-17
 
-Status: Approved in brainstorming; awaiting written-spec review
+Status: Approved
 
 Target: `index.html`
 
