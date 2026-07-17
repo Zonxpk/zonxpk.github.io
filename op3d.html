@@ -812,10 +812,11 @@ function boot(THREE) {
     renderer.setScissorTest(false);
     renderer.clear();               // wipe stale rects from previous scroll positions
     renderer.setScissorTest(true);
-    for (const { elem, scene, camera } of views.values()) {
+    for (const v of views.values()) {
+      const { elem, scene, camera } = v;
       const r = elem.getBoundingClientRect();
       if (r.bottom < 0 || r.top > innerHeight || r.right < 0 || r.left > innerWidth) continue;
-      const zoom = 1.6; // world units of half-height
+      const zoom = v.zoom ?? 1.6; // world units of half-height (per-view override, e.g. rail widgets)
       camera.left = -zoom * (r.width / r.height); camera.right = zoom * (r.width / r.height);
       camera.top = zoom; camera.bottom = -zoom;
       camera.updateProjectionMatrix();
@@ -887,6 +888,29 @@ function boot(THREE) {
       if (Math.abs(x - target) < 0.001 && Math.abs(v) < 0.01) { set(target); return false; }
       set(x); return true;
     });
+  }
+
+  // ponytail: persistent per-property spring controller, retargeted rather than
+  // re-spawned — same reasoning as the hero key/knob-detent controllers above:
+  // an event that fires again before the previous spring settles (e.g. a fast
+  // double-click, or hover/leave in quick succession) would otherwise stack a
+  // second competing spring() on the same property and the two can diverge
+  // instead of converging. Task 4's cart tilt + toggle flick reuse this.
+  function springCtl(get, set, { k = 900, c = 14 } = {}) {
+    let v = 0, running = false, target = get();
+    function tick(dt) {
+      let x = get();
+      const a = -k * (x - target) - c * v;
+      v += a * dt; x += v * dt;
+      if (Math.abs(x - target) < 0.001 && Math.abs(v) < 0.01) { set(target); running = false; return false; }
+      set(x); return true;
+    }
+    return {
+      to(t) {
+        target = t;
+        if (!running) { running = true; animate(tick); }
+      },
+    };
   }
 
   /* ---- raycast pick + 15deg detent engine (shared: Task 4's encoder reuses these) ---- */
@@ -1110,6 +1134,182 @@ function boot(THREE) {
     e.preventDefault();
     heroDetent.add(e.deltaY * 0.005);
   }, { passive: false });
+
+  /* ---- 01 WORK: fader (9-stop, zero-lag snap) ---- */
+  register('fader', (scene, view) => {
+    stdScene(scene);
+    view.zoom = 1.9;
+    view.camera.lookAt(0, 1.3, 0);
+    const track = new THREE.Mesh(new THREE.BoxGeometry(0.18, 2.4, 0.18), ALU());
+    track.position.y = 1.3;
+    track.castShadow = true;
+    track.receiveShadow = true;
+    scene.add(track);
+    const cap = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.3, 0.5), PLASTIC(TOY.orange));
+    cap.position.y = 1.3;
+    cap.castShadow = true;
+    scene.add(cap);
+    return { cap };
+  });
+
+  const FADER_TRACK_Y = 1.3;
+  const FADER_STOPS = Array.from({ length: 9 }, (_, i) => 1 - i * 0.25); // +1 .. -1, 9 stops
+  const faderView = views.get('fader');
+  if (faderView) {
+    const { cap: faderCap } = faderView.api;
+    faderView.elem.dataset.live = '';
+    let faderStop = 4; // start centered
+    faderCap.position.y = FADER_TRACK_Y + FADER_STOPS[faderStop];
+    let faderDragging = false;
+    function faderMoveTo(clientY) {
+      const r = faderView.elem.getBoundingClientRect();
+      const t = Math.min(1, Math.max(0, (clientY - r.top) / r.height));
+      const y = 1 - t * 2;
+      let idx = 0, best = Infinity;
+      FADER_STOPS.forEach((s, i) => { const d = Math.abs(s - y); if (d < best) { best = d; idx = i; } });
+      if (idx !== faderStop) {
+        faderStop = idx;
+        window.opClick?.();
+        faderCap.position.y = FADER_TRACK_Y + FADER_STOPS[idx]; // direct set: zero easing
+        invalidate();
+      }
+    }
+    faderView.elem.addEventListener('pointerdown', (e) => {
+      faderView.elem.setPointerCapture(e.pointerId);
+      faderDragging = true;
+      faderMoveTo(e.clientY);
+    });
+    faderView.elem.addEventListener('pointermove', (e) => {
+      if (!faderDragging) return;
+      faderMoveTo(e.clientY);
+    });
+    function faderEndDrag(e) {
+      if (!faderDragging) return;
+      faderDragging = false;
+      faderView.elem.releasePointerCapture(e.pointerId);
+    }
+    faderView.elem.addEventListener('pointerup', faderEndDrag);
+    faderView.elem.addEventListener('pointercancel', faderEndDrag);
+    invalidate();
+  }
+
+  /* ---- 02 LAB: cartridges (hover lift/tilt) ---- */
+  function buildCartridge(scene) {
+    stdScene(scene);
+    const group = new THREE.Group();
+    const body = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.35, 1.1), PLASTIC(TOY.cyan));
+    body.position.y = 0.175;
+    body.castShadow = true;
+    body.receiveShadow = true;
+    group.add(body);
+    const plate = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.06, 0.6), ALU());
+    plate.position.y = 0.38;
+    plate.castShadow = true;
+    group.add(plate);
+    const notch = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.1, 0.06), ALU());
+    notch.position.set(0, 0.175, 0.58);
+    group.add(notch);
+    scene.add(group);
+    return group;
+  }
+
+  const CART_NAMES = ['cart-empeo', 'cart-thaimart', 'cart-edusight'];
+  CART_NAMES.forEach((name) => register(name, (scene) => ({ cart: buildCartridge(scene) })));
+  CART_NAMES.forEach((name) => {
+    const v = views.get(name);
+    if (!v) return;
+    const cart = v.api.cart;
+    const parent = v.elem.closest('.cart');
+    if (!parent) return;
+    const tilt = springCtl(() => cart.rotation.x, (r) => { cart.rotation.x = r; invalidate(); });
+    parent.addEventListener('mouseenter', () => tilt.to(-0.18));
+    parent.addEventListener('mouseleave', () => tilt.to(0));
+  });
+
+  /* ---- 03 LOG: encoder (reuses buildKnob + makeDetent, steps a log row) ---- */
+  register('encoder', (scene, view) => {
+    stdScene(scene);
+    view.zoom = 1.9;
+    const knob = buildKnob(1.3);
+    knob.position.y = 0.3;
+    scene.add(knob);
+    return { knob };
+  });
+
+  const logRows = [...document.querySelectorAll('.log tbody tr')];
+  let hotRow = -1;
+  function stepRow(dir) {
+    if (hotRow >= 0) logRows[hotRow].classList.remove('hot');
+    hotRow = Math.min(logRows.length - 1, Math.max(0, hotRow + dir));
+    logRows[hotRow].classList.add('hot');
+  }
+
+  const encoderView = views.get('encoder');
+  if (encoderView) {
+    const { knob: encKnob } = encoderView.api;
+    encoderView.elem.dataset.live = '';
+    const encDetent = makeDetent(encKnob, (dir) => stepRow(dir));
+    let encDragging = false, encLastX = 0;
+    encoderView.elem.addEventListener('pointerdown', (e) => {
+      if (!pick(encoderView, e, [encKnob])) return;
+      encoderView.elem.setPointerCapture(e.pointerId);
+      encDragging = true; encLastX = e.clientX;
+    });
+    encoderView.elem.addEventListener('pointermove', (e) => {
+      if (!encDragging) return;
+      encDetent.add((e.clientX - encLastX) * 0.02);
+      encLastX = e.clientX;
+    });
+    function encEndDrag(e) {
+      if (!encDragging) return;
+      encDragging = false;
+      encoderView.elem.releasePointerCapture(e.pointerId);
+    }
+    encoderView.elem.addEventListener('pointerup', encEndDrag);
+    encoderView.elem.addEventListener('pointercancel', encEndDrag);
+    encoderView.elem.addEventListener('wheel', (e) => {
+      if (!pick(encoderView, e, [encKnob])) return;
+      e.preventDefault();
+      encDetent.add(e.deltaY * 0.005);
+    }, { passive: false });
+  }
+
+  /* ---- 04 SPEC: toggle (stiff flick between ±0.5 rad) ---- */
+  register('toggle', (scene, view) => {
+    stdScene(scene);
+    view.zoom = 1.9;
+    const base = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.25, 0.9), ALU());
+    base.position.y = 0.125;
+    base.castShadow = true;
+    base.receiveShadow = true;
+    scene.add(base);
+    const lever = new THREE.Group();
+    lever.position.set(0, 0.25, 0.15);
+    scene.add(lever);
+    const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.09, 0.7, 16), RUBBER());
+    arm.position.y = 0.35;
+    arm.castShadow = true;
+    lever.add(arm);
+    const tip = new THREE.Mesh(new THREE.SphereGeometry(0.16, 16, 16), PLASTIC(TOY.green));
+    tip.position.y = 0.7;
+    tip.castShadow = true;
+    lever.add(tip);
+    lever.rotation.x = -0.5; // resting flick position
+    return { lever };
+  });
+
+  const toggleView = views.get('toggle');
+  if (toggleView) {
+    const { lever } = toggleView.api;
+    toggleView.elem.dataset.live = '';
+    let toggleOn = false;
+    const flick = springCtl(() => lever.rotation.x, (v) => { lever.rotation.x = v; invalidate(); }, { k: 1400, c: 11 });
+    toggleView.elem.addEventListener('pointerdown', () => {
+      window.opClick?.();
+      toggleOn = !toggleOn;
+      flick.to(toggleOn ? 0.5 : -0.5);
+    });
+  }
 
   invalidate();
 }
