@@ -97,6 +97,7 @@ a { color: inherit; }
 }
 .key:active { transform: translate(2px, 2px); box-shadow: none; }
 .key:hover { background: #fff; }
+.key svg { display: inline-block; width: 13px; height: 13px; vertical-align: -2px; margin-right: 7px; fill: currentColor; }
 .key--accent { background: var(--c-orange); color: #fff; }
 .key--accent:hover { background: #e64500; }
 
@@ -328,6 +329,69 @@ a { color: inherit; }
 }
 .spec th::before { content: "▪ "; color: var(--c-green); }
 .spec td { font-size: 14px; color: var(--ink-soft); }
+/* stack clusters — icon cards */
+.stack-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  margin-bottom: 24px;
+}
+.stack-cell { background: var(--chassis); padding: 22px; }
+.stack-icon {
+  width: 34px; height: 34px;
+  display: grid; place-items: center;
+  border: 1px solid var(--ink);
+  background: #fff;
+  box-shadow: 1.5px 1.5px 0 var(--ink);
+  margin-bottom: 14px;
+}
+.stack-icon img { width: 20px; height: 20px; object-fit: contain; }
+.stack-cell h3 {
+  font-family: var(--mono);
+  font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.stack-cell p { font-size: 13px; color: var(--ink-soft); line-height: 1.6; }
+
+/* ai toolchain flow */
+.ai-flow {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.7fr) minmax(0, 1.3fr);
+  border: 1px solid var(--ink);
+  margin-bottom: 24px;
+}
+.ai-intro { padding: 26px; border-right: 1px solid var(--ink); background: var(--panel); }
+.ai-intro .k {
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--c-orange); margin-bottom: 10px;
+}
+.ai-intro h3 { font-size: 22px; letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 12px; }
+.ai-intro p { font-size: 13px; color: var(--ink-soft); line-height: 1.6; }
+.ai-tools {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 1px; background: var(--ink); border-bottom: 1px solid var(--ink);
+}
+.ai-tool { background: var(--chassis); padding: 22px; }
+.ai-tool-icon {
+  width: 38px; height: 38px; display: grid; place-items: center;
+  border: 1px solid var(--ink); background: #fff;
+  box-shadow: 1.5px 1.5px 0 var(--ink);
+  color: var(--ink); margin-bottom: 12px;
+}
+.ai-tool-icon svg { width: 22px; height: 22px; }
+.ai-tool h4 { font-size: 15px; margin-bottom: 4px; }
+.ai-tool p { font-size: 12px; color: var(--ink-soft); line-height: 1.5; }
+.ai-addon { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 16px 22px; }
+.ai-addon strong {
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em;
+  text-transform: uppercase; font-weight: 600;
+}
+.ai-addon span {
+  font-family: var(--mono); font-size: 11px;
+  border: 1px solid var(--ink); padding: 4px 10px; background: #fff;
+}
 
 /* ============ footer ============ */
 .foot { padding: 56px 40px 32px; }
@@ -376,6 +440,9 @@ kbd {
   .secondary article:last-child { border-bottom: 0; }
   .cap { grid-template-columns: 1fr; gap: 4px; }
   .cap .tags { white-space: normal; }
+  .stack-grid { grid-template-columns: repeat(2, 1fr); }
+  .ai-flow { grid-template-columns: 1fr; }
+  .ai-intro { border-right: 0; border-bottom: 1px solid var(--ink); }
 }
 @media (max-width: 720px) {
   :root { --rail: 44px; }
@@ -421,8 +488,8 @@ kbd {
         <p class="thesis">Pakawat Smutkun: 5+ years engineering business systems where <strong>floorplans, reports, workflows, and field teams</strong> operate as one reliable product.</p>
         <div class="hero-keys">
           <a class="key key--accent" href="https://drive.google.com/uc?export=download&amp;id=1B2tvM8jNeyZd6OBbq5haLpY4j3sO8lss">Download resume</a>
-          <a class="key" href="https://github.com/Zonxpk">GitHub</a>
-          <a class="key" href="https://www.linkedin.com/in/zonpk/">LinkedIn</a>
+          <a class="key" href="https://github.com/Zonxpk"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>GitHub</a>
+          <a class="key" href="https://www.linkedin.com/in/zonpk/"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 110-4.13 2.06 2.06 0 010 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/></svg>LinkedIn</a>
         </div>
       </div>
       <div class="hero-art" aria-hidden="true">
@@ -628,13 +695,71 @@ kbd {
         <p class="module-lede reveal">The stack follows the workflow.</p>
         <p class="module-note reveal">Choosing the shape that makes business systems easier to operate.</p>
 
+        <div class="stack-grid reveal">
+          <article class="stack-cell">
+            <span class="stack-icon" aria-hidden="true"><img src="https://svgl.app/library/react_dark.svg" alt="" loading="lazy" width="20" height="20"></span>
+            <h3>Frontend systems</h3>
+            <p>React, Next.js, TypeScript, Vue, Angular, HTML, CSS</p>
+          </article>
+          <article class="stack-cell">
+            <span class="stack-icon" aria-hidden="true"><img src="https://svgl.app/library/nodejs.svg" alt="" loading="lazy" width="20" height="20"></span>
+            <h3>Backend delivery</h3>
+            <p>Node.js, NestJS, Express, Go, Python, PHP, SQL</p>
+          </article>
+          <article class="stack-cell">
+            <span class="stack-icon" aria-hidden="true"><img src="https://svgl.app/library/reactquery.svg" alt="" loading="lazy" width="20" height="20"></span>
+            <h3>State + testing</h3>
+            <p>React Query, Zustand, XState, Jest, Vitest, Agile/Scrum</p>
+          </article>
+          <article class="stack-cell">
+            <span class="stack-icon" aria-hidden="true"><img src="https://svgl.app/library/google-cloud.svg" alt="" loading="lazy" width="20" height="20"></span>
+            <h3>Cloud + automation</h3>
+            <p>GCP, AWS, Docker, Firebase, Git, n8n, AI integration, LINE OA</p>
+          </article>
+        </div>
+
+        <div class="ai-flow reveal">
+          <div class="ai-intro">
+            <p class="k">AI toolchain</p>
+            <h3>Tools route by kind of work.</h3>
+            <p>Everyday coding, interface judgment, and complex debugging stay in the same workflow, with skills layered on when the task needs stronger process.</p>
+          </div>
+          <div class="ai-right">
+            <div class="ai-tools">
+              <article class="ai-tool">
+                <span class="ai-tool-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none"><path d="M4 3.8 20.2 12 12.8 14.2 9.4 21 4 3.8Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="m12.8 14.2 4.9 4.9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                </span>
+                <h4>Grok Composer 4.5</h4>
+                <p>All-around everyday code.</p>
+              </article>
+              <article class="ai-tool">
+                <span class="ai-tool-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none"><path d="M12 3.5c1.1 3.2 2.3 5.1 5.7 5.8-3.4.7-4.6 2.6-5.7 5.8-1.1-3.2-2.3-5.1-5.7-5.8 3.4-.7 4.6-2.6 5.7-5.8Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M18.2 14.8c.5 1.4 1 2.2 2.5 2.6-1.5.4-2 1.2-2.5 2.6-.5-1.4-1-2.2-2.5-2.6 1.5-.4 2-1.2 2.5-2.6Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+                </span>
+                <h4>Claude Opus Fable 5</h4>
+                <p>Designer and frontend partner.</p>
+              </article>
+              <article class="ai-tool">
+                <span class="ai-tool-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none"><path d="m8.2 7.2-4.4 4.7 4.4 4.9M15.8 7.2l4.4 4.7-4.4 4.9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M13.8 5.5 10.2 18.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                </span>
+                <h4>Codex GPT 5.6 Sol</h4>
+                <p>Bug hunts and complex solving.</p>
+              </article>
+            </div>
+            <div class="ai-addon" aria-label="AI workflow skills">
+              <strong>Add-on skills</strong>
+              <span>Superpowers</span>
+              <span>Obsidian Vault</span>
+              <span>Ponytail</span>
+              <span>Loop Engineering</span>
+            </div>
+          </div>
+        </div>
+
         <table class="spec reveal">
           <tbody>
-            <tr><th scope="row">Frontend</th><td>React, Next.js, TypeScript, Vue, Angular, HTML, CSS</td></tr>
-            <tr><th scope="row">Backend</th><td>Node.js, NestJS, Express, Go, Python, PHP, SQL</td></tr>
-            <tr><th scope="row">State + testing</th><td>React Query, Zustand, XState, Jest, Vitest, Agile/Scrum</td></tr>
-            <tr><th scope="row">Cloud + automation</th><td>GCP, AWS, Docker, Firebase, Git, n8n, AI integration, LINE OA</td></tr>
-            <tr><th scope="row">AI toolchain</th><td>Cursor Composer for everyday code · Claude Opus as design and frontend partner · Codex for bug hunts, with Superpowers, Obsidian Vault, Ponytail, and Loop Engineering skills layered on.</td></tr>
             <tr><th scope="row">Also</th><td>JavaScript, Kotlin, C#, QR workflows, bot follow-ups, reporting pipelines, enterprise data collection</td></tr>
             <tr><th scope="row">Education</th><td>B.Sc. Software Engineering, Burapha University, 2020. GPA 3.53</td></tr>
             <tr><th scope="row">Languages</th><td>Thai (native) · English (conversational)</td></tr>
@@ -648,10 +773,10 @@ kbd {
       <h2>Ready to make operations legible.</h2>
       <p>Open to full-stack and product-engineering roles. Bangkok, Thailand.</p>
       <div class="foot-keys">
-        <a class="key key--accent" href="mailto:pakawat.zon@gmail.com">pakawat.zon@gmail.com</a>
-        <a class="key" href="tel:+66971427997">(+66) 97-142-7997</a>
-        <a class="key" href="https://github.com/Zonxpk">GitHub</a>
-        <a class="key" href="https://www.linkedin.com/in/zonpk/">LinkedIn</a>
+        <a class="key key--accent" href="mailto:pakawat.zon@gmail.com"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 5.5C2 4.67 2.67 4 3.5 4h17c.83 0 1.5.67 1.5 1.5v13c0 .83-.67 1.5-1.5 1.5h-17C2.67 20 2 19.33 2 18.5v-13zm2.2.5 7.8 5.2L19.8 6H4.2zM20 7.55l-7.45 4.97a1 1 0 01-1.1 0L4 7.55V18h16V7.55z"/></svg>pakawat.zon@gmail.com</a>
+        <a class="key" href="tel:+66971427997"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.62 10.79a15.15 15.15 0 006.59 6.59l2.2-2.2a1 1 0 011.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 011 1V20a1 1 0 01-1 1C10.4 21 3 13.6 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.24.2 2.45.57 3.57a1 1 0 01-.24 1.02l-2.21 2.2z"/></svg>(+66) 97-142-7997</a>
+        <a class="key" href="https://github.com/Zonxpk"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>GitHub</a>
+        <a class="key" href="https://www.linkedin.com/in/zonpk/"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 110-4.13 2.06 2.06 0 010 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/></svg>LinkedIn</a>
       </div>
       <div class="foot-meta mono">
         <span>© 2026 Pakawat Smutkun</span>
