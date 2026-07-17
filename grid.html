@@ -17,9 +17,7 @@
       rel="stylesheet"
     />
     <script>
-      if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        document.documentElement.classList.add("motion-ok");
-      }
+      document.documentElement.classList.add("motion-ok");
     </script>
     <meta property="og:image" content="/preview.webp" />
     <meta property="og:image:type" content="image/webp" />
@@ -1752,31 +1750,6 @@
         }
       }
 
-      @media (prefers-reduced-motion: reduce) {
-        *,
-        *::before,
-        *::after {
-          animation-duration: 0.01ms !important;
-          animation-iteration-count: 1 !important;
-          scroll-behavior: auto !important;
-          transition-duration: 0.01ms !important;
-        }
-        body {
-          animation: none;
-        }
-        .scroll-progress {
-          display: none;
-        }
-        .reveal {
-          opacity: 1;
-          transform: none;
-          filter: none;
-        }
-        .btn:hover,
-        .btn:focus-visible {
-          transform: none;
-        }
-      }
     </style>
     <noscript
       ><style>
@@ -3553,9 +3526,7 @@
       const starfieldCanvas = document.getElementById("starfieldCanvas");
 
       if (starfieldCanvas) {
-        const motionQuery = window.matchMedia(
-          "(prefers-reduced-motion: reduce)",
-        );
+        const motionQuery = { matches: false };
         const sectionPresets = {
           top: {
             parallaxX: 0.18,
@@ -3923,12 +3894,6 @@
           { passive: true },
         );
 
-        motionQuery.addEventListener("change", () => {
-          pointer.targetX = 0;
-          pointer.targetY = 0;
-          updateActiveSection();
-          startStarfield();
-        });
       }
     </script>-->
   </body>

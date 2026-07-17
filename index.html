@@ -361,15 +361,8 @@ kbd {
 }
 
 /* ============ reveal ============ */
-@media (prefers-reduced-motion: no-preference) {
-  .js .reveal { opacity: 0; translate: 0 8px; }
-  .js .reveal.on { opacity: 1; translate: 0 0; transition: opacity 0.35s steps(4), translate 0.35s steps(4); }
-}
-@media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  .rec { animation: none; }
-  .signal .wire { animation: none; stroke-dashoffset: 0; }
-}
+.js .reveal { opacity: 0; translate: 0 8px; }
+.js .reveal.on { opacity: 1; translate: 0 0; transition: opacity 0.35s steps(4), translate 0.35s steps(4); }
 
 /* ============ responsive ============ */
 @media (max-width: 900px) {
