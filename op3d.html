@@ -408,7 +408,7 @@ kbd {
 }
 
 /* ============ op3d: gl views ============ */
-#gl { position: fixed; inset: 0; z-index: 5; pointer-events: none; display: none; }
+#gl { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; display: none; }
 .gl #gl { display: block; }
 .gl-view { touch-action: pan-y; }
 .gl .gl-view > * { visibility: hidden; }   /* SVG/chip fallback hidden once WebGL boots */
@@ -763,6 +763,233 @@ const revealIO = new IntersectionObserver((entries) => {
   });
 }, { threshold: 0.15 });
 document.querySelectorAll('.reveal').forEach((el) => revealIO.observe(el));
+</script>
+
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js" } }
+</script>
+<script type="module">
+try {
+  const THREE = await import('three');
+  boot(THREE);
+  document.documentElement.classList.add('gl');
+} catch (e) { /* CDN or WebGL unavailable: SVG fallbacks stay */ }
+
+function boot(THREE) {
+  const canvas = document.getElementById('gl');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.setScissorTest(true);
+
+  /* ---- scissor render pipeline (render-on-demand) ---- */
+  const views = new Map();
+  let dirty = false, raf = 0;
+  const anims = new Set();
+
+  function register(name, builder) {
+    const elem = document.querySelector(`[data-view="${name}"]`);
+    if (!elem) return;
+    const scene = new THREE.Scene();
+    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 100);
+    camera.position.set(5, 5, 5); // isometric-ish
+    camera.lookAt(0, 0.4, 0);
+    const view = { elem, scene, camera, api: null };
+    view.api = builder(scene, view) || {};
+    views.set(name, view);
+  }
+
+  function frame() {
+    raf = 0;
+    const dt = 1 / 60;
+    for (const fn of [...anims]) if (fn(dt) === false) anims.delete(fn);
+    renderer.setSize(innerWidth, innerHeight, false);
+    renderer.setScissorTest(false);
+    renderer.clear();               // wipe stale rects from previous scroll positions
+    renderer.setScissorTest(true);
+    for (const { elem, scene, camera } of views.values()) {
+      const r = elem.getBoundingClientRect();
+      if (r.bottom < 0 || r.top > innerHeight || r.right < 0 || r.left > innerWidth) continue;
+      const zoom = 1.6; // world units of half-height
+      camera.left = -zoom * (r.width / r.height); camera.right = zoom * (r.width / r.height);
+      camera.top = zoom; camera.bottom = -zoom;
+      camera.updateProjectionMatrix();
+      const y = innerHeight - r.bottom;
+      renderer.setViewport(r.left, y, r.width, r.height);
+      renderer.setScissor(r.left, y, r.width, r.height);
+      renderer.render(scene, camera);
+    }
+    dirty = false;
+    if (anims.size) invalidate();
+  }
+  function invalidate() { dirty = true; if (!raf) raf = requestAnimationFrame(frame); }
+  function animate(fn) { anims.add(fn); invalidate(); }
+  addEventListener('scroll', invalidate, { passive: true });
+  addEventListener('resize', invalidate);
+
+  /* ---- shared materials, lighting, spring ---- */
+  const ALU = () => new THREE.MeshStandardMaterial({ color: 0xdcdcda, metalness: 0.5, roughness: 0.5 });
+  const PLASTIC = (c) => new THREE.MeshStandardMaterial({ color: c, metalness: 0, roughness: 0.9 });
+  const RUBBER = () => new THREE.MeshStandardMaterial({ color: 0x222222, metalness: 0, roughness: 0.85 });
+  const TOY = { orange: 0xff4d00, cyan: 0x00a4c8, yellow: 0xf5c400, green: 0x3fa435 };
+
+  // procedural clinical-white studio environment so metals read as light aluminum
+  let _env = null;
+  function studioEnv() {
+    if (_env) return _env;
+    const c = Object.assign(document.createElement('canvas'), { width: 8, height: 256 });
+    const g = c.getContext('2d');
+    const grd = g.createLinearGradient(0, 0, 0, 256);
+    grd.addColorStop(0.0, '#ffffff');   // overhead softbox
+    grd.addColorStop(0.5, '#eaeae8');
+    grd.addColorStop(1.0, '#c4c4c1');   // floor bounce
+    g.fillStyle = grd; g.fillRect(0, 0, 8, 256);
+    const raw = new THREE.CanvasTexture(c);
+    raw.mapping = THREE.EquirectangularReflectionMapping;
+    raw.colorSpace = THREE.SRGBColorSpace;
+    const pmrem = new THREE.PMREMGenerator(renderer);   // prefilter for MeshStandard IBL
+    _env = pmrem.fromEquirectangular(raw).texture;
+    raw.dispose();
+    pmrem.dispose();
+    return _env;
+  }
+
+  function stdScene(scene) {
+    scene.environment = studioEnv();
+    scene.add(new THREE.AmbientLight(0xffffff, 1.1));
+    const sun = new THREE.DirectionalLight(0xffffff, 2.2);
+    sun.position.set(2, 8, 3);
+    sun.castShadow = true;
+    sun.shadow.mapSize.set(1024, 1024);
+    sun.shadow.camera.near = 1;
+    sun.shadow.camera.far = 20;
+    sun.shadow.camera.left = -4; sun.shadow.camera.right = 4;
+    sun.shadow.camera.top = 4; sun.shadow.camera.bottom = -4;
+    sun.shadow.bias = -0.0005;
+    scene.add(sun);
+    const ground = new THREE.Mesh(new THREE.PlaneGeometry(20, 20), new THREE.ShadowMaterial({ opacity: 0.18 }));
+    ground.rotation.x = -Math.PI / 2;
+    ground.receiveShadow = true;
+    scene.add(ground);
+  }
+
+  function spring(get, set, target, { k = 900, c = 14 } = {}) {
+    let v = 0;
+    animate((dt) => {
+      let x = get();
+      const a = -k * (x - target) - c * v;
+      v += a * dt; x += v * dt;
+      if (Math.abs(x - target) < 0.001 && Math.abs(v) < 0.01) { set(target); return false; }
+      set(x); return true;
+    });
+  }
+
+  /* ---- dot-matrix screen texture ---- */
+  const screenTex = (() => {
+    const c = Object.assign(document.createElement('canvas'), { width: 256, height: 128 });
+    const g = c.getContext('2d');
+    const tex = new THREE.CanvasTexture(c);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    function print(text) {
+      g.globalCompositeOperation = 'source-over';
+      g.fillStyle = '#0a0a0a'; g.fillRect(0, 0, 256, 128);
+      g.fillStyle = '#9adcc8'; g.font = '700 40px ui-monospace, monospace';
+      g.textBaseline = 'middle'; g.fillText(text.toUpperCase(), 16, 64);
+      g.globalCompositeOperation = 'destination-in';   // punch into a dot grid (single path = one mask)
+      g.beginPath();
+      for (let y = 2; y < 128; y += 6) for (let x = 2; x < 256; x += 6) g.rect(x, y, 4, 4);
+      g.fill();
+      g.globalCompositeOperation = 'source-over';
+      tex.needsUpdate = true; invalidate();
+    }
+    print('00 READY');
+    return { tex, print };
+  })();
+  window.opScreen = screenTex;
+
+  /* ---- reusable ribbed rubber knob (Task 4 reuses for encoder) ---- */
+  function buildKnob(scale = 1) {
+    const g = new THREE.Group();
+    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.42, 0.34, 48), RUBBER());
+    body.position.y = 0.17;
+    body.castShadow = true;
+    g.add(body);
+    const ridgeGeo = new THREE.BoxGeometry(0.03, 0.3, 0.06);
+    const ridgeMat = RUBBER();
+    for (let i = 0; i < 24; i++) {
+      const a = (i / 24) * Math.PI * 2;
+      const ridge = new THREE.Mesh(ridgeGeo, ridgeMat);
+      ridge.position.set(Math.cos(a) * 0.42, 0.17, Math.sin(a) * 0.42);
+      ridge.rotation.y = -a;
+      ridge.castShadow = true;
+      g.add(ridge);
+    }
+    const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 0.02, 48), ALU());
+    cap.position.y = 0.35;
+    cap.castShadow = true;
+    g.add(cap);
+    const notch = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.03, 0.16), RUBBER());
+    notch.position.set(0, 0.37, 0.2);
+    g.add(notch);
+    g.scale.setScalar(scale);
+    return g;
+  }
+
+  /* ---- hero gadget scene ---- */
+  register('hero', (scene) => {
+    stdScene(scene);
+
+    // chassis: cold sandblasted aluminum slab
+    const chassis = new THREE.Mesh(new THREE.BoxGeometry(3.6, 0.5, 2.4), ALU());
+    chassis.position.y = 0.25;
+    chassis.castShadow = true;
+    chassis.receiveShadow = true;
+    scene.add(chassis);
+
+    // feet: dark rubber cylinders under the corners
+    const footGeo = new THREE.CylinderGeometry(0.13, 0.13, 0.1, 20);
+    for (const sx of [-1, 1]) for (const sz of [-1, 1]) {
+      const foot = new THREE.Mesh(footGeo, RUBBER());
+      foot.position.set(sx * 1.5, 0.0, sz * 0.95);
+      scene.add(foot);
+    }
+
+    // recessed screen: dark inset frame + glowing dot-matrix panel (back-left)
+    const inset = new THREE.Mesh(new THREE.BoxGeometry(1.7, 0.06, 0.9), PLASTIC(0x14140f));
+    inset.position.set(-0.72, 0.51, -0.6);
+    inset.castShadow = true;
+    inset.receiveShadow = true;
+    scene.add(inset);
+    const screen = new THREE.Mesh(
+      new THREE.PlaneGeometry(1.55, 0.75),
+      new THREE.MeshStandardMaterial({ roughness: 0.9, emissive: 0xffffff, emissiveMap: screenTex.tex, color: 0x111111, emissiveIntensity: 1.6 })
+    );
+    screen.rotation.x = -Math.PI / 2;
+    screen.position.set(-0.72, 0.541, -0.6);
+    scene.add(screen);
+
+    // 4 chalky plastic keys, front row
+    const keyColors = [TOY.orange, TOY.cyan, TOY.yellow, TOY.green];
+    const keys = keyColors.map((col, i) => {
+      const key = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.24, 0.5), PLASTIC(col));
+      key.position.set(-1.15 + i * 0.62, 0.62, 0.62);
+      key.castShadow = true;
+      key.userData = { i, rest: 0.62 };
+      scene.add(key);
+      return key;
+    });
+
+    // ribbed rubber knob with machined steel cap, front-right
+    const knob = buildKnob(1);
+    knob.position.set(1.25, 0.5, 0.35);
+    scene.add(knob);
+
+    return { keys, knob, screen: screenTex };
+  });
+
+  invalidate();
+}
 </script>
 </body>
 </html>
