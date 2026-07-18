@@ -1,44 +1,614 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>eKYC review console</title>
-<link rel="stylesheet" href="screen.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b2447">
+  <title>Verification Review | eKYC</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --navy-950: #071b37;
+      --navy-900: #0b2447;
+      --navy-800: #12345d;
+      --mint-50: #eefbf8;
+      --mint-100: #d9f5ee;
+      --mint-300: #7fddca;
+      --teal-500: #19a98d;
+      --teal-600: #108d77;
+      --teal-700: #0b725f;
+      --slate-900: #15243a;
+      --slate-700: #41536a;
+      --slate-500: #718096;
+      --slate-300: #cbd6df;
+      --slate-200: #dde5eb;
+      --slate-100: #e9eff3;
+      --canvas: #f1f6f6;
+      --surface: #fbfdfd;
+      --white: #ffffff;
+      --amber-50: #fff8e8;
+      --amber-700: #9a6410;
+      --red-50: #fff0f0;
+      --red-700: #ad3434;
+      --radius-control: 10px;
+      --radius-card: 16px;
+      --shadow-card:
+        0 8px 22px rgba(7, 34, 64, 0.07),
+        0 1px 3px rgba(7, 34, 64, 0.05);
+      --shadow-button:
+        0 7px 14px rgba(16, 141, 119, 0.20),
+        0 2px 4px rgba(7, 34, 64, 0.10);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      margin: 0;
+      background: var(--canvas);
+      color: var(--slate-900);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 13px;
+      line-height: 1.4;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .console {
+      width: 100%;
+      max-width: 1100px;
+      height: 438px;
+      margin: 0 auto;
+      overflow: hidden;
+      background: var(--canvas);
+    }
+
+    .app-header {
+      height: 68px;
+      padding: 0 clamp(18px, 3vw, 30px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      color: var(--white);
+      background:
+        linear-gradient(132deg, rgba(127, 221, 202, 0.08), transparent 42%),
+        var(--navy-900);
+      box-shadow: 0 3px 12px rgba(7, 27, 55, 0.16);
+    }
+
+    .brand {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-mark {
+      width: 34px;
+      height: 38px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 34px;
+      color: var(--mint-300);
+    }
+
+    .brand-mark svg {
+      width: 34px;
+      height: 38px;
+    }
+
+    .brand-copy {
+      min-width: 0;
+    }
+
+    .brand-label {
+      display: block;
+      color: var(--mint-100);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+
+    h1 {
+      margin: 1px 0 0;
+      color: var(--white);
+      font-size: 20px;
+      font-weight: 600;
+      line-height: 1.15;
+      letter-spacing: -0.018em;
+      white-space: nowrap;
+    }
+
+    .header-meta {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      white-space: nowrap;
+    }
+
+    .analyst-state {
+      color: rgba(255, 255, 255, 0.72);
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .analyst-dot {
+      width: 8px;
+      height: 8px;
+      display: inline-block;
+      margin-right: 6px;
+      border: 2px solid rgba(217, 245, 238, 0.45);
+      border-radius: 50%;
+      background: var(--mint-300);
+      vertical-align: -1px;
+    }
+
+    main {
+      height: 370px;
+      padding: 18px clamp(18px, 3vw, 30px) 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .page-bar {
+      min-height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .page-copy {
+      min-width: 0;
+    }
+
+    .page-copy h2 {
+      margin: 0;
+      color: var(--slate-900);
+      font-size: 18px;
+      font-weight: 600;
+      line-height: 1.2;
+      letter-spacing: -0.014em;
+    }
+
+    .page-copy p {
+      margin: 3px 0 0;
+      color: var(--slate-500);
+      font-size: 12px;
+    }
+
+    .queue-summary {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .queue-count {
+      min-width: 122px;
+      height: 38px;
+      padding: 0 13px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      border: 1px solid rgba(11, 36, 71, 0.07);
+      border-radius: var(--radius-control);
+      background: var(--white);
+      box-shadow:
+        0 4px 12px rgba(7, 34, 64, 0.04),
+        0 1px 2px rgba(7, 34, 64, 0.04);
+      color: var(--slate-700);
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .queue-count strong {
+      color: var(--navy-900);
+      font-size: 18px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
+    }
+
+    .next-button {
+      height: 42px;
+      min-width: 124px;
+      padding: 0 17px 0 19px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      border: 1px solid rgba(7, 34, 64, 0.06);
+      border-radius: var(--radius-control);
+      background: var(--teal-600);
+      color: var(--white);
+      box-shadow: var(--shadow-button);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: -0.005em;
+    }
+
+    .next-button svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .next-button:focus-visible {
+      outline: 3px solid var(--mint-300);
+      outline-offset: 2px;
+    }
+
+    .next-button:active {
+      background: var(--teal-700);
+      transform: scale(0.98);
+    }
+
+    .table-card {
+      min-height: 278px;
+      flex: 1;
+      overflow: hidden;
+      border: 1px solid rgba(11, 36, 71, 0.06);
+      border-radius: var(--radius-card);
+      background: var(--surface);
+      box-shadow: var(--shadow-card);
+    }
+
+    .table-grid {
+      display: grid;
+      grid-template-columns: minmax(240px, 1fr) minmax(170px, 0.66fr) 106px 96px;
+      align-items: center;
+      column-gap: clamp(12px, 2vw, 24px);
+    }
+
+    .table-head {
+      height: 40px;
+      padding: 0 clamp(16px, 2.4vw, 24px);
+      border-bottom: 1px solid rgba(11, 36, 71, 0.075);
+      background: #f7fafb;
+      color: var(--slate-500);
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .table-head div:nth-child(3),
+    .table-head div:nth-child(4) {
+      text-align: right;
+    }
+
+    .applicant-row {
+      position: relative;
+      min-height: 58px;
+      padding: 0 clamp(16px, 2.4vw, 24px);
+      border-bottom: 1px solid rgba(11, 36, 71, 0.06);
+      background: var(--surface);
+      transition: background-color 150ms ease-out, box-shadow 150ms ease-out, transform 150ms ease-out;
+    }
+
+    .applicant-row:last-child {
+      border-bottom: 0;
+    }
+
+    .applicant-row.is-active {
+      background: linear-gradient(90deg, var(--mint-50), rgba(238, 251, 248, 0.22) 74%, transparent);
+      box-shadow: inset 3px 0 0 var(--teal-500);
+    }
+
+    .identity {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+    }
+
+    .avatar {
+      width: 30px;
+      height: 30px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 30px;
+      border: 1px solid rgba(16, 141, 119, 0.13);
+      border-radius: 50%;
+      background: var(--mint-100);
+      color: var(--teal-700);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .identity-text {
+      min-width: 0;
+    }
+
+    .name {
+      overflow: hidden;
+      color: var(--slate-900);
+      font-size: 13px;
+      font-weight: 600;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .national-id {
+      margin-top: 2px;
+      overflow: hidden;
+      color: var(--slate-500);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 10px;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.012em;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .score-cell {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .score-track {
+      position: relative;
+      height: 7px;
+      min-width: 70px;
+      flex: 1;
+      overflow: hidden;
+      border-radius: 999px;
+      background: var(--slate-100);
+      box-shadow: inset 0 1px 2px rgba(7, 34, 64, 0.06);
+    }
+
+    .score-fill {
+      display: block;
+      width: var(--score);
+      height: 100%;
+      border-radius: inherit;
+      background: var(--teal-500);
+      box-shadow: 0 0 0 1px rgba(11, 114, 95, 0.05);
+    }
+
+    .score-fill.warn {
+      background: #d99a2b;
+    }
+
+    .score-fill.fail {
+      background: #d35454;
+    }
+
+    .score-number,
+    .liveness {
+      color: var(--slate-700);
+      font-size: 12px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .score-number {
+      width: 34px;
+      text-align: right;
+    }
+
+    .liveness {
+      text-align: right;
+    }
+
+    .verdict {
+      justify-self: end;
+      min-width: 64px;
+      height: 26px;
+      padding: 0 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 650;
+    }
+
+    .verdict::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .verdict.pass {
+      border-color: rgba(16, 141, 119, 0.14);
+      background: var(--mint-100);
+      color: var(--teal-700);
+    }
+
+    .verdict.review {
+      border-color: rgba(154, 100, 16, 0.14);
+      background: var(--amber-50);
+      color: var(--amber-700);
+    }
+
+    .verdict.fail {
+      border-color: rgba(173, 52, 52, 0.12);
+      background: var(--red-50);
+      color: var(--red-700);
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .next-button:hover {
+        background: var(--teal-700);
+      }
+
+      .applicant-row:hover {
+        z-index: 1;
+        background: var(--white);
+        box-shadow:
+          0 5px 13px rgba(7, 34, 64, 0.07),
+          0 1px 3px rgba(7, 34, 64, 0.05);
+        transform: translateY(-1px);
+      }
+
+      .applicant-row.is-active:hover {
+        background: linear-gradient(90deg, var(--mint-50), rgba(238, 251, 248, 0.30) 74%, var(--white));
+      }
+    }
+
+    @media (max-width: 790px) {
+      .analyst-state {
+        display: none;
+      }
+
+      .table-grid {
+        grid-template-columns: minmax(225px, 1fr) minmax(150px, 0.65fr) 86px 82px;
+        column-gap: 10px;
+      }
+
+      .table-head,
+      .applicant-row {
+        padding-right: 14px;
+        padding-left: 14px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .next-button,
+      .applicant-row {
+        transition: none;
+      }
+
+      .next-button:active,
+      .applicant-row:hover {
+        transform: none;
+      }
+    }
+  </style>
 </head>
 <body>
-<div class="scr-head">
-  <span class="scr-fill">Applicant</span>
-  <span style="width:160px">Doc match</span>
-  <span style="width:80px">Liveness</span>
-  <span style="width:70px">Verdict</span>
-</div>
-<div class="scr-row">
-  <span class="scr-fill">Narin Suksai · <span class="scr-num">1-1035-xxxxx-42-8</span></span>
-  <span style="width:160px"><span class="scr-bar" style="width:112px"><i style="width:97%"></i></span> <span class="scr-num">97%</span></span>
-  <span class="scr-num" style="width:80px">98%</span>
-  <span style="width:70px"><span class="scr-chip ok">pass</span></span>
-</div>
-<div class="scr-row">
-  <span class="scr-fill">Pimchanok Rattanakul · <span class="scr-num">3-2011-xxxxx-09-4</span></span>
-  <span style="width:160px"><span class="scr-bar" style="width:96px"><i style="width:81%"></i></span> <span class="scr-num">81%</span></span>
-  <span class="scr-num" style="width:80px">84%</span>
-  <span style="width:70px"><span class="scr-chip warn">review</span></span>
-</div>
-<div class="scr-row">
-  <span class="scr-fill">Thanawat Chaiyo · <span class="scr-num">1-4490-xxxxx-31-6</span></span>
-  <span style="width:160px"><span class="scr-bar" style="width:72px"><i style="width:52%"></i></span> <span class="scr-num">52%</span></span>
-  <span class="scr-num" style="width:80px">54%</span>
-  <span style="width:70px"><span class="scr-chip err">fail</span></span>
-</div>
-<div class="scr-row">
-  <span class="scr-fill">Kanyarat Boonmee · <span class="scr-num">2-7506-xxxxx-18-2</span></span>
-  <span style="width:160px"><span class="scr-bar" style="width:104px"><i style="width:94%"></i></span> <span class="scr-num">94%</span></span>
-  <span class="scr-num" style="width:80px">92%</span>
-  <span style="width:70px"><span class="scr-chip ok">pass</span></span>
-</div>
-<div class="scr-section">
-  <div class="scr-row"><span class="scr-sub scr-fill">queue · 12 pending</span><span class="scr-key">NEXT CASE</span></div>
-</div>
+  <div class="console">
+    <header class="app-header">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 36 40" fill="none">
+            <path d="M18 2.8 31 7.7v9.8c0 8.4-5.2 15.7-13 19.7-7.8-4-13-11.3-13-19.7V7.7L18 2.8Z" fill="currentColor" fill-opacity=".13" stroke="currentColor" stroke-width="1.8"/>
+            <path d="m12.4 19.6 3.6 3.6 7.8-8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <div class="brand-copy">
+          <span class="brand-label">eKYC operations</span>
+          <h1>Verification Review</h1>
+        </div>
+      </div>
+      <div class="header-meta">
+        <span class="analyst-state"><span class="analyst-dot"></span>Review desk online</span>
+      </div>
+    </header>
+
+    <main>
+      <div class="page-bar">
+        <div class="page-copy">
+          <h2>Applicant queue</h2>
+          <p>Review identity signals and route the next case.</p>
+        </div>
+        <div class="queue-summary">
+          <div class="queue-count" aria-label="12 cases pending">
+            <strong>12</strong>
+            <span>pending</span>
+          </div>
+          <button class="next-button" type="button">
+            <span>Next case</span>
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M4 10h11m-4-4 4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <section class="table-card" aria-label="Verification applicants">
+        <div class="table-head table-grid" role="row">
+          <div role="columnheader">Applicant</div>
+          <div role="columnheader">Document match</div>
+          <div role="columnheader">Liveness</div>
+          <div role="columnheader">Verdict</div>
+        </div>
+
+        <div class="applicant-row table-grid is-active" role="row">
+          <div class="identity" role="cell">
+            <span class="avatar" aria-hidden="true">NS</span>
+            <div class="identity-text">
+              <div class="name">Narin Suksai</div>
+              <div class="national-id">1-1035-xxxxx-42-8</div>
+            </div>
+          </div>
+          <div class="score-cell" role="cell">
+            <span class="score-track" aria-hidden="true"><span class="score-fill" style="--score:97%"></span></span>
+            <span class="score-number">97%</span>
+          </div>
+          <div class="liveness" role="cell">98%</div>
+          <span class="verdict pass" role="cell">Pass</span>
+        </div>
+
+        <div class="applicant-row table-grid" role="row">
+          <div class="identity" role="cell">
+            <span class="avatar" aria-hidden="true">PR</span>
+            <div class="identity-text">
+              <div class="name">Pimchanok Rattanakul</div>
+              <div class="national-id">3-2011-xxxxx-09-4</div>
+            </div>
+          </div>
+          <div class="score-cell" role="cell">
+            <span class="score-track" aria-hidden="true"><span class="score-fill warn" style="--score:81%"></span></span>
+            <span class="score-number">81%</span>
+          </div>
+          <div class="liveness" role="cell">84%</div>
+          <span class="verdict review" role="cell">Review</span>
+        </div>
+
+        <div class="applicant-row table-grid" role="row">
+          <div class="identity" role="cell">
+            <span class="avatar" aria-hidden="true">TC</span>
+            <div class="identity-text">
+              <div class="name">Thanawat Chaiyo</div>
+              <div class="national-id">1-4490-xxxxx-31-6</div>
+            </div>
+          </div>
+          <div class="score-cell" role="cell">
+            <span class="score-track" aria-hidden="true"><span class="score-fill fail" style="--score:52%"></span></span>
+            <span class="score-number">52%</span>
+          </div>
+          <div class="liveness" role="cell">54%</div>
+          <span class="verdict fail" role="cell">Fail</span>
+        </div>
+
+        <div class="applicant-row table-grid" role="row">
+          <div class="identity" role="cell">
+            <span class="avatar" aria-hidden="true">KB</span>
+            <div class="identity-text">
+              <div class="name">Kanyarat Boonmee</div>
+              <div class="national-id">2-7506-xxxxx-18-2</div>
+            </div>
+          </div>
+          <div class="score-cell" role="cell">
+            <span class="score-track" aria-hidden="true"><span class="score-fill" style="--score:94%"></span></span>
+            <span class="score-number">94%</span>
+          </div>
+          <div class="liveness" role="cell">92%</div>
+          <span class="verdict pass" role="cell">Pass</span>
+        </div>
+      </section>
+    </main>
+  </div>
 </body>
 </html>

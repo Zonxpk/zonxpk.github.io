@@ -1,21 +1,593 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Personal-data inventory</title>
-<link rel="stylesheet" href="screen.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f7fb">
+  <title>Personal-data inventory — PDPA Center</title>
+  <style>
+    :root {
+      --indigo-50: #eef2ff;
+      --indigo-100: #e0e7ff;
+      --indigo-500: #6366f1;
+      --indigo-600: #4f46e5;
+      --indigo-700: #4338ca;
+      --slate-25: #fbfcfe;
+      --slate-50: #f5f7fb;
+      --slate-100: #edf1f6;
+      --slate-200: #dfe5ec;
+      --slate-300: #cbd3df;
+      --slate-400: #8e9bad;
+      --slate-500: #64748b;
+      --slate-600: #475569;
+      --slate-700: #334155;
+      --slate-800: #1e293b;
+      --slate-900: #111c2e;
+      --amber-50: #fff9e8;
+      --amber-100: #fef0bd;
+      --amber-500: #d97706;
+      --green-50: #ecfdf5;
+      --green-600: #15803d;
+      --sky-50: #eff8ff;
+      --sky-600: #0369a1;
+      --violet-50: #f5f3ff;
+      --violet-600: #6d28d9;
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 20px;
+      --radius-button: 6px;
+      --radius-card: 8px;
+      --radius-pill: 999px;
+      --shadow-card: 0 1px 2px rgba(30, 41, 59, .04), 0 5px 14px rgba(30, 41, 59, .035);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      margin: 0;
+      background: var(--slate-50);
+      color: var(--slate-800);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 13px;
+      line-height: 1.4;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .app-shell {
+      width: min(100%, 1040px);
+      margin: 0 auto;
+      background: var(--slate-50);
+    }
+
+    .skip-link {
+      position: fixed;
+      top: 6px;
+      left: 6px;
+      z-index: 10;
+      padding: 8px 10px;
+      border-radius: var(--radius-button);
+      background: var(--slate-900);
+      color: #fff;
+      transform: translateY(-150%);
+    }
+
+    .skip-link:focus {
+      transform: translateY(0);
+    }
+
+    .topbar {
+      height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-4);
+      padding: 0 var(--space-5);
+      background: rgba(255, 255, 255, .96);
+      border-bottom: 1px solid var(--slate-200);
+    }
+
+    .brand-lockup,
+    .topbar-meta,
+    .org,
+    .page-heading,
+    .coverage-copy,
+    .coverage-meter {
+      display: flex;
+      align-items: center;
+    }
+
+    .brand-lockup {
+      min-width: 0;
+      gap: 10px;
+    }
+
+    .brand-mark {
+      width: 30px;
+      height: 30px;
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      background: var(--indigo-600);
+      box-shadow: 0 1px 2px rgba(49, 46, 129, .2), 0 4px 10px rgba(79, 70, 229, .16);
+    }
+
+    .brand-mark svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .wordmark {
+      color: var(--slate-900);
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -.015em;
+      white-space: nowrap;
+    }
+
+    .product-tag {
+      margin-left: 2px;
+      padding: 2px 6px;
+      border: 1px solid var(--indigo-100);
+      border-radius: 4px;
+      background: var(--indigo-50);
+      color: var(--indigo-700);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .topbar-meta {
+      min-width: 0;
+      gap: var(--space-4);
+    }
+
+    .org {
+      gap: var(--space-2);
+      color: var(--slate-600);
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .org svg {
+      width: 15px;
+      height: 15px;
+      color: var(--slate-400);
+    }
+
+    main {
+      padding: 15px var(--space-5) 17px;
+    }
+
+    .page-header {
+      min-height: 44px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: var(--space-4);
+      margin-bottom: 12px;
+    }
+
+    .page-heading {
+      align-items: flex-start;
+      gap: var(--space-3);
+      min-width: 0;
+    }
+
+    .module-icon {
+      width: 34px;
+      height: 34px;
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--indigo-100);
+      border-radius: 8px;
+      background: var(--indigo-50);
+      color: var(--indigo-600);
+    }
+
+    .module-icon svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .section-label {
+      margin: 0 0 2px;
+      color: var(--slate-500);
+      font-size: 9px;
+      font-weight: 750;
+      letter-spacing: .11em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--slate-900);
+      font-size: 18px;
+      line-height: 1.25;
+      font-weight: 700;
+      letter-spacing: -.025em;
+    }
+
+    .table-card {
+      overflow: hidden;
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-card);
+      background: #fff;
+      box-shadow: var(--shadow-card);
+    }
+
+    .table-toolbar {
+      height: 45px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-4);
+      padding: 0 14px;
+      border-bottom: 1px solid var(--slate-200);
+    }
+
+    .table-title {
+      min-width: 0;
+    }
+
+    .table-title h2 {
+      margin: 0;
+      color: var(--slate-800);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .table-title p {
+      margin: 1px 0 0;
+      color: var(--slate-400);
+      font-size: 9px;
+    }
+
+    .inventory-count {
+      min-height: 21px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 8px;
+      border-radius: var(--radius-pill);
+      background: var(--indigo-50);
+      color: var(--indigo-700);
+      font-size: 9px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    col.system-col { width: 25%; }
+    col.category-col { width: 32%; }
+    col.basis-col { width: 27%; }
+    col.retention-col { width: 16%; }
+
+    thead {
+      background: var(--slate-25);
+    }
+
+    th {
+      height: 31px;
+      padding: 0 10px;
+      border-bottom: 1px solid var(--slate-200);
+      color: var(--slate-500);
+      font-size: 9px;
+      font-weight: 650;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    th:first-child,
+    td:first-child {
+      padding-left: 14px;
+    }
+
+    th:last-child,
+    td:last-child {
+      padding-right: 14px;
+      text-align: right;
+    }
+
+    tbody tr {
+      height: 41px;
+      border-bottom: 1px solid var(--slate-100);
+    }
+
+    tbody tr:last-child {
+      border-bottom: 0;
+    }
+
+    td {
+      height: 41px;
+      padding: 0 10px;
+      color: var(--slate-600);
+      font-size: 10px;
+      vertical-align: middle;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .system-name {
+      color: var(--slate-700);
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .type-badge,
+    .flag-pill {
+      min-height: 21px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 8px;
+      border-radius: var(--radius-pill);
+      font-size: 9px;
+      font-weight: 700;
+    }
+
+    .type-contact {
+      background: var(--sky-50);
+      color: var(--sky-600);
+    }
+
+    .type-financial {
+      background: var(--green-50);
+      color: var(--green-600);
+    }
+
+    .type-biometric {
+      background: var(--violet-50);
+      color: var(--violet-600);
+    }
+
+    .type-employee {
+      background: var(--slate-100);
+      color: var(--slate-600);
+    }
+
+    .flag-pill {
+      border: 1px solid var(--amber-100);
+      background: var(--amber-50);
+      color: var(--amber-500);
+    }
+
+    .retention {
+      color: var(--slate-700);
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .coverage {
+      min-height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-5);
+      padding: 0 14px;
+      background: var(--slate-25);
+      border-top: 1px solid var(--slate-200);
+    }
+
+    .coverage-copy {
+      gap: var(--space-2);
+      color: var(--slate-600);
+      font-size: 10px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .coverage-copy strong {
+      color: var(--slate-800);
+      font-size: 11px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .coverage-meter {
+      width: min(42%, 240px);
+      gap: var(--space-2);
+    }
+
+    .coverage-track {
+      width: 100%;
+      height: 6px;
+      overflow: hidden;
+      border-radius: var(--radius-pill);
+      background: var(--indigo-100);
+      box-shadow: inset 0 1px 1px rgba(49, 46, 129, .06);
+    }
+
+    .coverage-fill {
+      display: block;
+      width: 88%;
+      height: 100%;
+      border-radius: inherit;
+      background: var(--indigo-600);
+    }
+
+    .coverage-percent {
+      min-width: 28px;
+      color: var(--indigo-700);
+      font-size: 10px;
+      font-weight: 700;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    @media (max-width: 720px) {
+      .topbar,
+      main {
+        padding-inline: 16px;
+      }
+
+      .product-tag,
+      .table-title p {
+        display: none;
+      }
+
+      col.system-col { width: 24%; }
+      col.category-col { width: 31%; }
+      col.basis-col { width: 29%; }
+      col.retention-col { width: 16%; }
+    }
+
+    @media (max-width: 560px) {
+      .org svg {
+        display: none;
+      }
+
+      .coverage {
+        gap: var(--space-3);
+      }
+
+      .coverage-meter {
+        width: 38%;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition: none !important;
+      }
+    }
+  </style>
 </head>
 <body>
-<div class="scr-title">Personal-data inventory</div>
-<div class="scr-section">
-  <div class="scr-head"><span style="width:90px">System</span><span class="scr-fill">Category</span><span style="width:110px">Lawful basis</span><span style="width:70px">Retention</span></div>
-  <div class="scr-row"><span style="width:90px">CRM</span><span class="scr-fill">contact + id</span><span style="width:110px">consent</span><span class="scr-num" style="width:70px">2Y</span></div>
-  <div class="scr-row"><span style="width:90px">Payroll</span><span class="scr-fill">financial</span><span style="width:110px">contract</span><span class="scr-num" style="width:70px">7Y</span></div>
-  <div class="scr-row"><span style="width:90px">CCTV</span><span class="scr-fill">biometric</span><span style="width:110px">legit. interest</span><span class="scr-num" style="width:70px">30D</span></div>
-  <div class="scr-row"><span style="width:90px">Visitor Log</span><span class="scr-fill">contact</span><span style="width:110px">legit. interest</span><span class="scr-num" style="width:70px">90D</span></div>
-  <div class="scr-row"><span style="width:90px">Legacy HR</span><span class="scr-fill">employee id</span><span style="width:110px"><span class="scr-chip warn">no basis</span></span><span class="scr-num" style="width:70px">10Y</span></div>
-</div>
-<div class="scr-row scr-section"><span class="scr-sub">systems mapped</span><span class="scr-num">23/26</span><span class="scr-fill"></span><span class="scr-bar" style="width:120px"><i style="width:88%"></i></span></div>
+  <a class="skip-link" href="#main-content">Skip to inventory</a>
+
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand-lockup">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 3.3 19 6v5.3c0 4.4-2.7 7.8-7 9.4-4.3-1.6-7-5-7-9.4V6l7-2.7Z" stroke="white" stroke-width="1.8" stroke-linejoin="round"/>
+            <path d="m8.8 12 2.1 2.1 4.4-4.6" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <span class="wordmark">PDPA Center</span>
+        <span class="product-tag">Governance</span>
+      </div>
+
+      <div class="topbar-meta">
+        <div class="org">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M4 20V6.5L12 3v17M12 8h8v12M2.5 20h19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M7 9h2M7 12.5h2M7 16h2M15 12h2M15 15.5h2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+          <span>Head Office · TH</span>
+        </div>
+      </div>
+    </header>
+
+    <main id="main-content">
+      <div class="page-header">
+        <div class="page-heading">
+          <div class="module-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <ellipse cx="8" cy="6" rx="4" ry="2.2" stroke="currentColor" stroke-width="1.6"/>
+              <path d="M4 6v5c0 1.2 1.8 2.2 4 2.2s4-1 4-2.2V6M4 11v5c0 1.2 1.8 2.2 4 2.2s4-1 4-2.2v-5M15.5 8h4M15.5 12h4M15.5 16h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div>
+            <p class="section-label">Data map</p>
+            <h1>Personal-data inventory</h1>
+          </div>
+        </div>
+      </div>
+
+      <section class="table-card" aria-labelledby="inventory-heading">
+        <div class="table-toolbar">
+          <div class="table-title">
+            <h2 id="inventory-heading">System inventory</h2>
+            <p>Personal-data categories, legal grounds, and retention rules</p>
+          </div>
+          <span class="inventory-count">5 systems shown</span>
+        </div>
+
+        <table>
+          <colgroup>
+            <col class="system-col">
+            <col class="category-col">
+            <col class="basis-col">
+            <col class="retention-col">
+          </colgroup>
+          <thead>
+            <tr>
+              <th scope="col">System</th>
+              <th scope="col">Data category</th>
+              <th scope="col">Lawful basis</th>
+              <th scope="col">Retention</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="system-name">CRM</span></td>
+              <td><span class="type-badge type-contact">contact + id</span></td>
+              <td>consent</td>
+              <td><span class="retention">2y</span></td>
+            </tr>
+            <tr>
+              <td><span class="system-name">Payroll</span></td>
+              <td><span class="type-badge type-financial">financial</span></td>
+              <td>contract</td>
+              <td><span class="retention">7y</span></td>
+            </tr>
+            <tr>
+              <td><span class="system-name">CCTV</span></td>
+              <td><span class="type-badge type-biometric">biometric</span></td>
+              <td>legit. interest</td>
+              <td><span class="retention">30d</span></td>
+            </tr>
+            <tr>
+              <td><span class="system-name">Visitor Log</span></td>
+              <td><span class="type-badge type-contact">contact</span></td>
+              <td>legit. interest</td>
+              <td><span class="retention">90d</span></td>
+            </tr>
+            <tr>
+              <td><span class="system-name">Legacy HR</span></td>
+              <td><span class="type-badge type-employee">employee id</span></td>
+              <td><span class="flag-pill">No basis</span></td>
+              <td><span class="retention">10y</span></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <footer class="coverage" aria-label="Systems mapped 23/26">
+          <div class="coverage-copy">
+            <span>Systems mapped</span>
+            <strong>23/26</strong>
+          </div>
+          <div class="coverage-meter">
+            <div class="coverage-track" role="progressbar" aria-label="Systems mapped" aria-valuemin="0" aria-valuemax="100" aria-valuenow="88">
+              <span class="coverage-fill"></span>
+            </div>
+            <span class="coverage-percent">88%</span>
+          </div>
+        </footer>
+      </section>
+    </main>
+  </div>
 </body>
 </html>

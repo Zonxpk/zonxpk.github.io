@@ -1,27 +1,424 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Chat lead bot</title>
-<link rel="stylesheet" href="screen.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Leads Assistant conversation</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      overflow: hidden;
+    }
+
+    body {
+      margin: 0;
+      width: 320px;
+      color: #18212b;
+      background: #eef1f5;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .phone {
+      width: 320px;
+      background: #eef1f5;
+    }
+
+    .app-bar {
+      height: 58px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 13px;
+      color: #fff;
+      background: #26323d;
+      box-shadow: 0 1px 0 rgba(0, 0, 0, 0.18);
+    }
+
+    .back {
+      width: 22px;
+      height: 22px;
+      flex: 0 0 auto;
+    }
+
+    .app-title {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .app-title strong {
+      display: block;
+      font-size: 15px;
+      font-weight: 650;
+      letter-spacing: -0.01em;
+    }
+
+    .app-title span {
+      display: block;
+      margin-top: 1px;
+      color: #b9c4cd;
+      font-size: 9px;
+    }
+
+    .menu {
+      width: 19px;
+      height: 19px;
+      flex: 0 0 auto;
+    }
+
+    .thread {
+      height: 466px;
+      padding: 18px 12px 16px 10px;
+      background:
+        radial-gradient(circle at 26px 30px, rgba(255, 255, 255, 0.44) 0 1px, transparent 1.5px) 0 0 / 28px 28px,
+        #eef1f5;
+    }
+
+    .date {
+      width: max-content;
+      margin: 0 auto 15px;
+      padding: 3px 9px 4px;
+      border-radius: 10px;
+      color: #7b8792;
+      background: rgba(205, 212, 220, 0.74);
+      font-size: 9px;
+      font-weight: 600;
+    }
+
+    .received {
+      display: grid;
+      grid-template-columns: 28px minmax(0, 232px) 1fr;
+      align-items: end;
+      column-gap: 7px;
+      margin-bottom: 12px;
+    }
+
+    .avatar {
+      width: 28px;
+      height: 28px;
+      align-self: start;
+      overflow: hidden;
+      border-radius: 50%;
+      box-shadow: 0 0 0 1px rgba(16, 36, 28, 0.08);
+    }
+
+    .bubble-wrap {
+      min-width: 0;
+    }
+
+    .bot-bubble {
+      position: relative;
+      display: inline-block;
+      max-width: 228px;
+      padding: 10px 12px;
+      border-radius: 4px 14px 14px;
+      color: #25303a;
+      background: #fff;
+      box-shadow: 0 1px 2px rgba(32, 47, 61, 0.09);
+      font-size: 12px;
+      line-height: 1.48;
+    }
+
+    .bot-bubble::before {
+      position: absolute;
+      top: 0;
+      left: -6px;
+      width: 9px;
+      height: 10px;
+      background: #fff;
+      clip-path: polygon(100% 0, 100% 100%, 0 0);
+      content: "";
+    }
+
+    .time {
+      align-self: end;
+      padding: 0 0 2px;
+      color: #8a949e;
+      font-size: 9px;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .lead-card {
+      width: 232px;
+      overflow: hidden;
+      border-radius: 4px 14px 14px;
+      background: #fff;
+      box-shadow: 0 1px 3px rgba(32, 47, 61, 0.12);
+    }
+
+    .lead-card::before {
+      position: absolute;
+      content: "";
+    }
+
+    .card-main {
+      padding: 12px 13px 11px;
+    }
+
+    .card-kicker {
+      margin-bottom: 5px;
+      color: #84909b;
+      font-size: 9px;
+      font-weight: 650;
+      letter-spacing: 0.055em;
+      text-transform: uppercase;
+    }
+
+    .card-title {
+      margin: 0 0 4px;
+      color: #17212a;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.012em;
+    }
+
+    .card-details {
+      margin: 0 0 10px;
+      color: #64717d;
+      font-size: 12px;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.4;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 8px;
+      border-radius: 10px;
+      color: #087a3f;
+      background: #e5f7ec;
+      font-size: 9px;
+      font-weight: 700;
+    }
+
+    .tag::before {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #06c755;
+      content: "";
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-top: 1px solid #e8ecf0;
+    }
+
+    .action {
+      height: 35px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      color: #087a3f;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .action + .action {
+      border-left: 1px solid #e8ecf0;
+      color: #687581;
+    }
+
+    .action svg {
+      width: 12px;
+      height: 12px;
+    }
+
+    .sent-row {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 3px;
+      margin: 16px 0 15px;
+      padding-left: 38px;
+    }
+
+    .sent-meta {
+      display: flex;
+      gap: 4px;
+      padding-right: 2px;
+      color: #8a949e;
+      font-size: 9px;
+      line-height: 1;
+      text-align: right;
+    }
+
+    .sent-meta span + span::before {
+      margin-right: 4px;
+      content: "·";
+    }
+
+    .sent-bubble {
+      position: relative;
+      max-width: 218px;
+      padding: 10px 12px;
+      border-radius: 14px 4px 14px 14px;
+      color: #fff;
+      background: #06c755;
+      box-shadow: 0 1px 2px rgba(4, 126, 54, 0.13);
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1.42;
+    }
+
+    .sent-bubble::after {
+      position: absolute;
+      top: 0;
+      right: -6px;
+      width: 9px;
+      height: 10px;
+      background: #06c755;
+      clip-path: polygon(0 0, 100% 0, 0 100%);
+      content: "";
+    }
+
+    .pipeline {
+      height: 36px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 12px;
+      border-top: 1px solid #d7dde3;
+      color: #697681;
+      background: #f8fafb;
+      font-size: 9px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .pipeline-icon {
+      width: 14px;
+      height: 14px;
+      color: #06a948;
+    }
+
+    .pipeline strong {
+      color: #35424d;
+      font-weight: 700;
+    }
+
+    .pipeline .divider {
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: #a9b2bb;
+    }
+
+    .pipeline .line {
+      height: 1px;
+      flex: 1;
+      background: #d9dfe4;
+    }
+  </style>
 </head>
 <body>
-<div class="scr-chat">
-  <div class="scr-msg">Reminder: lead L-2094 'Chai Yen kiosk' has no contact in 3 days. Next action?</div>
-  <div class="scr-msg">
-    <div class="scr-title">L-2094 · Chai Yen</div>
-    <div class="scr-sub">zone B1 · 12 m² · ฿38,000/mo</div>
-    <span class="scr-chip acc">negotiation</span>
-  </div>
-  <div class="scr-msg me">Booked call Thu 10:00 ✓</div>
-  <div class="scr-msg">Logged. Status → follow-up scheduled.</div>
-</div>
-<div class="scr-row" style="margin-top:14px">
-  <span class="scr-sub">pipeline</span>
-  <span class="scr-fill"></span>
-  <span class="scr-chip ok">12 active</span>
-  <span class="scr-chip warn">3 stale</span>
-</div>
+  <main class="phone" aria-label="Leads Assistant messenger mockup">
+    <header class="app-bar">
+      <svg class="back" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M15 5 8 12l7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div class="app-title">
+        <strong>Leads Assistant</strong>
+        <span>Official account</span>
+      </div>
+      <svg class="menu" viewBox="0 0 20 20" aria-hidden="true">
+        <circle cx="4" cy="10" r="1.4" fill="currentColor"/>
+        <circle cx="10" cy="10" r="1.4" fill="currentColor"/>
+        <circle cx="16" cy="10" r="1.4" fill="currentColor"/>
+      </svg>
+    </header>
+
+    <section class="thread" aria-label="Conversation">
+      <div class="date">Today</div>
+
+      <div class="received">
+        <div class="avatar" aria-hidden="true">
+          <svg viewBox="0 0 32 32" width="28" height="28">
+            <circle cx="16" cy="16" r="16" fill="#06c755"/>
+            <path d="M9.5 13h13v10h-13zM8 10.5h16l-1.3 4H9.3z" fill="#fff"/>
+            <path d="M13 17h6v6h-6z" fill="#06c755"/>
+            <path d="M12 10.5v3.8m4-3.8v3.8m4-3.8v3.8" fill="none" stroke="#06c755" stroke-width="1.1"/>
+          </svg>
+        </div>
+        <div class="bubble-wrap">
+          <div class="bot-bubble">Reminder: lead L-2094 'Chai Yen kiosk' has no contact in 3 days. Next action?</div>
+        </div>
+        <span class="time">09:12</span>
+      </div>
+
+      <div class="received">
+        <div class="avatar" aria-hidden="true">
+          <svg viewBox="0 0 32 32" width="28" height="28">
+            <circle cx="16" cy="16" r="16" fill="#06c755"/>
+            <path d="M9.5 13h13v10h-13zM8 10.5h16l-1.3 4H9.3z" fill="#fff"/>
+            <path d="M13 17h6v6h-6z" fill="#06c755"/>
+            <path d="M12 10.5v3.8m4-3.8v3.8m4-3.8v3.8" fill="none" stroke="#06c755" stroke-width="1.1"/>
+          </svg>
+        </div>
+        <article class="lead-card" aria-label="Lead L-2094 details">
+          <div class="card-main">
+            <div class="card-kicker">Lead reminder</div>
+            <h2 class="card-title">L-2094 · Chai Yen</h2>
+            <p class="card-details">Zone B1 · 12 m² · ฿38,000/mo</p>
+            <span class="tag">Negotiation</span>
+          </div>
+          <div class="actions" aria-label="Lead actions">
+            <span class="action">
+              <svg viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M4 2.5h8v11H4zM6 5h4M6 7.5h4M6 10h2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Log call
+            </span>
+            <span class="action">
+              <svg viewBox="0 0 16 16" aria-hidden="true">
+                <circle cx="8" cy="8" r="5.5" fill="none" stroke="currentColor" stroke-width="1.4"/>
+                <path d="M8 5v3.3l2.2 1.3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+              </svg>
+              Snooze
+            </span>
+          </div>
+        </article>
+        <span class="time">09:12</span>
+      </div>
+
+      <div class="sent-row">
+        <div class="sent-bubble">Booked call Thu 10:00 ✓</div>
+        <div class="sent-meta"><span>Read</span><span>09:14</span></div>
+      </div>
+
+      <div class="received">
+        <div class="avatar" aria-hidden="true">
+          <svg viewBox="0 0 32 32" width="28" height="28">
+            <circle cx="16" cy="16" r="16" fill="#06c755"/>
+            <path d="M9.5 13h13v10h-13zM8 10.5h16l-1.3 4H9.3z" fill="#fff"/>
+            <path d="M13 17h6v6h-6z" fill="#06c755"/>
+            <path d="M12 10.5v3.8m4-3.8v3.8m4-3.8v3.8" fill="none" stroke="#06c755" stroke-width="1.1"/>
+          </svg>
+        </div>
+        <div class="bubble-wrap">
+          <div class="bot-bubble">Logged. Status → follow-up scheduled.</div>
+        </div>
+        <span class="time">09:14</span>
+      </div>
+    </section>
+
+    <footer class="pipeline" aria-label="Pipeline status">
+      <svg class="pipeline-icon" viewBox="0 0 16 16" aria-hidden="true">
+        <path d="M2 12.5V9.7h3v2.8M6.5 12.5V6.6h3v5.9M11 12.5V3.5h3v9" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <strong>Pipeline</strong>
+      <span class="line"></span>
+      <span>12 active</span>
+      <span class="divider"></span>
+      <span>3 stale</span>
+    </footer>
+  </main>
 </body>
 </html>

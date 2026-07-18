@@ -1,24 +1,749 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SMS delivery history</title>
-<link rel="stylesheet" href="screen.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f7fb">
+  <title>Message History</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --orange-50: #fff4ed;
+      --orange-100: #ffe4d2;
+      --orange-500: #ff6b1a;
+      --orange-600: #e95608;
+      --blue-900: #0d2947;
+      --blue-700: #1d4268;
+      --gray-25: #fbfcfe;
+      --gray-50: #f4f7fb;
+      --gray-100: #edf1f6;
+      --gray-200: #e1e7ef;
+      --gray-400: #8b98a9;
+      --gray-500: #68778b;
+      --gray-700: #35465a;
+      --green-50: #eaf8f1;
+      --green-600: #16865a;
+      --amber-50: #fff7df;
+      --amber-700: #a76200;
+      --blue-50: #edf5ff;
+      --blue-600: #2469b4;
+      --red-600: #e03616;
+      --shadow-card: 0 8px 22px rgba(31, 53, 79, 0.055), 0 1px 3px rgba(31, 53, 79, 0.06);
+      --shadow-float: 0 7px 18px rgba(255, 107, 26, 0.18), 0 2px 5px rgba(31, 53, 79, 0.08);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html,
+    body {
+      width: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      margin: 0;
+      min-width: 700px;
+      background: var(--gray-50);
+      color: var(--blue-900);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 13px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button,
+    input,
+    select { font: inherit; }
+
+    button,
+    select { cursor: pointer; }
+
+    svg { display: block; }
+
+    .app {
+      display: grid;
+      grid-template-rows: 56px minmax(0, 1fr);
+      height: clamp(420px, 45.5vw, 500px);
+      background: var(--gray-50);
+    }
+
+    .topbar {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 0 18px 0 16px;
+      border-bottom: 1px solid var(--gray-200);
+      background: rgba(255, 255, 255, 0.98);
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.85);
+    }
+
+    .brand {
+      display: flex;
+      min-width: 172px;
+      align-items: center;
+      gap: 9px;
+      color: var(--blue-900);
+      text-decoration: none;
+    }
+
+    .brand-mark {
+      width: 29px;
+      height: 29px;
+      filter: drop-shadow(0 4px 7px rgba(255, 107, 26, 0.2));
+    }
+
+    .wordmark {
+      font-size: 17px;
+      font-weight: 760;
+      letter-spacing: -0.035em;
+      white-space: nowrap;
+    }
+
+    .wordmark strong { color: var(--orange-500); }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .balance {
+      display: inline-flex;
+      min-height: 32px;
+      align-items: center;
+      gap: 6px;
+      padding: 0 11px;
+      border: 1px solid var(--orange-100);
+      border-radius: 6px;
+      background: var(--orange-50);
+      color: var(--orange-600);
+      font-size: 11.5px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .balance svg { width: 14px; height: 14px; }
+
+    .account-chip {
+      display: flex;
+      height: 34px;
+      align-items: center;
+      gap: 8px;
+      padding: 3px 9px 3px 4px;
+      border: 1px solid var(--gray-200);
+      border-radius: 18px;
+      background: #fff;
+      color: var(--gray-700);
+      box-shadow: 0 1px 2px rgba(31, 53, 79, 0.04);
+      font-size: 10.5px;
+      font-weight: 700;
+    }
+
+    .avatar {
+      display: grid;
+      width: 26px;
+      height: 26px;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--blue-900);
+      color: #fff;
+      font-size: 9px;
+      font-weight: 750;
+      letter-spacing: 0.02em;
+    }
+
+    .shell {
+      display: grid;
+      grid-template-columns: 76px minmax(0, 1fr);
+      min-height: 0;
+    }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 14px 9px 11px;
+      border-right: 1px solid var(--gray-200);
+      background: #f8fafc;
+    }
+
+    .nav-list {
+      display: grid;
+      gap: 6px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .nav-item {
+      position: relative;
+      display: flex;
+      height: 56px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      border-radius: 9px;
+      color: var(--gray-500);
+      font-size: 9.5px;
+      font-weight: 620;
+      text-decoration: none;
+    }
+
+    .nav-item svg {
+      width: 19px;
+      height: 19px;
+      stroke-width: 1.8;
+    }
+
+    .nav-item.active {
+      background: var(--orange-50);
+      color: var(--orange-600);
+    }
+
+    .nav-item.active::before {
+      position: absolute;
+      top: 12px;
+      left: -9px;
+      width: 3px;
+      height: 32px;
+      border-radius: 0 4px 4px 0;
+      background: var(--orange-500);
+      box-shadow: 0 0 0 3px rgba(255, 107, 26, 0.08);
+      content: "";
+    }
+
+    .sidebar-help {
+      display: grid;
+      justify-items: center;
+      gap: 5px;
+      color: var(--gray-400);
+      font-size: 9px;
+    }
+
+    .help-ring {
+      display: grid;
+      width: 27px;
+      height: 27px;
+      place-items: center;
+      border: 1px solid var(--gray-200);
+      border-radius: 50%;
+      background: #fff;
+      color: var(--blue-700);
+      box-shadow: 0 2px 5px rgba(31, 53, 79, 0.05);
+      font-weight: 750;
+    }
+
+    main {
+      min-width: 0;
+      min-height: 0;
+      padding: 13px 18px 15px;
+      overflow: hidden;
+    }
+
+    .page-grid {
+      display: grid;
+      height: 100%;
+      grid-template-rows: 40px 58px minmax(0, 1fr);
+      gap: 10px;
+    }
+
+    .page-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .page-title h1 {
+      margin: 0;
+      color: var(--blue-900);
+      font-size: 20px;
+      line-height: 1.08;
+      letter-spacing: -0.025em;
+    }
+
+    .page-title p {
+      margin: 3px 0 0;
+      color: var(--gray-500);
+      font-size: 10.5px;
+    }
+
+    .result-count {
+      display: inline-flex;
+      height: 28px;
+      align-items: center;
+      gap: 6px;
+      padding: 0 9px;
+      border: 1px solid var(--gray-200);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--gray-500);
+      box-shadow: 0 1px 2px rgba(31, 53, 79, 0.035);
+      font-size: 10px;
+      font-weight: 650;
+    }
+
+    .result-count strong {
+      color: var(--blue-900);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .filter-bar {
+      display: grid;
+      min-width: 0;
+      grid-template-columns: minmax(118px, .72fr) minmax(180px, 1.2fr) minmax(116px, .72fr) auto;
+      align-items: center;
+      gap: 8px;
+      padding: 10px;
+      border: 1px solid rgba(214, 223, 233, 0.94);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: var(--shadow-card);
+    }
+
+    .control {
+      position: relative;
+      display: flex;
+      min-width: 0;
+      height: 36px;
+      align-items: center;
+      gap: 7px;
+      padding: 0 9px;
+      border: 1px solid var(--gray-200);
+      border-radius: 6px;
+      background: var(--gray-25);
+      color: var(--gray-500);
+    }
+
+    .control:focus-within {
+      border-color: var(--orange-500);
+      box-shadow: 0 0 0 3px rgba(255, 107, 26, 0.10);
+    }
+
+    .control svg {
+      width: 14px;
+      height: 14px;
+      flex: 0 0 auto;
+      color: var(--gray-400);
+    }
+
+    .control-copy {
+      display: grid;
+      min-width: 0;
+      gap: 1px;
+    }
+
+    .control-label {
+      color: var(--gray-400);
+      font-size: 8px;
+      font-weight: 650;
+      line-height: 1;
+    }
+
+    .control-value,
+    .control select {
+      overflow: hidden;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: var(--blue-900);
+      font-size: 10.5px;
+      font-weight: 680;
+      line-height: 1.2;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .control select {
+      width: 100%;
+      padding: 0 17px 0 0;
+      appearance: none;
+    }
+
+    .select-chevron {
+      position: absolute;
+      right: 9px;
+      width: 11px;
+      height: 11px;
+      pointer-events: none;
+    }
+
+    .search-button {
+      display: inline-flex;
+      height: 36px;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 0 13px;
+      border: 1px solid var(--orange-500);
+      border-radius: 6px;
+      background: var(--orange-500);
+      color: #fff;
+      box-shadow: var(--shadow-float);
+      font-size: 10.5px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .search-button svg { width: 14px; height: 14px; }
+
+    .content-grid {
+      display: grid;
+      min-width: 0;
+      min-height: 0;
+      grid-template-columns: minmax(0, 1.72fr) minmax(208px, .78fr);
+      gap: 12px;
+    }
+
+    .panel {
+      min-width: 0;
+      min-height: 0;
+      overflow: hidden;
+      border: 1px solid rgba(214, 223, 233, 0.94);
+      border-radius: 9px;
+      background: #fff;
+      box-shadow: var(--shadow-card);
+    }
+
+    .panel-head {
+      display: flex;
+      height: 42px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 0 13px;
+      border-bottom: 1px solid var(--gray-100);
+    }
+
+    .panel-title h2 {
+      margin: 0;
+      color: var(--blue-900);
+      font-size: 12.5px;
+      line-height: 1.15;
+      letter-spacing: -0.01em;
+    }
+
+    .panel-title p {
+      margin: 3px 0 0;
+      color: var(--gray-400);
+      font-size: 9px;
+    }
+
+    .table-panel {
+      display: grid;
+      grid-template-rows: 42px minmax(0, 1fr);
+    }
+
+    .table-meta {
+      color: var(--gray-400);
+      font-size: 9px;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .table-wrap {
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    table {
+      width: 100%;
+      height: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    thead { height: 28px; }
+
+    th {
+      padding: 0 9px;
+      background: var(--gray-25);
+      color: var(--gray-500);
+      font-size: 8.8px;
+      font-weight: 650;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 5px 9px;
+      border-top: 1px solid var(--gray-100);
+      color: var(--gray-700);
+      font-size: 10.2px;
+      vertical-align: middle;
+    }
+
+    th:nth-child(1) { width: 22%; }
+    th:nth-child(2) { width: 36%; }
+    th:nth-child(3) { width: 16%; text-align: center; }
+    th:nth-child(4) { width: 26%; text-align: center; }
+    td:nth-child(3),
+    td:nth-child(4) { text-align: center; }
+
+    .time {
+      color: var(--blue-700);
+      font-size: 9.8px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .recipient {
+      overflow: hidden;
+      color: var(--blue-900);
+      font-size: 10.2px;
+      font-weight: 680;
+      font-variant-numeric: tabular-nums;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .segments {
+      color: var(--blue-900);
+      font-weight: 680;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .status {
+      display: inline-flex;
+      min-width: 66px;
+      height: 21px;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      padding: 0 7px;
+      border-radius: 999px;
+      font-size: 8.8px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .status::before {
+      width: 5px;
+      height: 5px;
+      flex: 0 0 auto;
+      border-radius: 50%;
+      background: currentColor;
+      content: "";
+    }
+
+    .delivered { background: var(--green-50); color: var(--green-600); }
+    .queued { background: var(--amber-50); color: var(--amber-700); }
+    .failed { background: rgba(224, 54, 22, 0.08); color: var(--red-600); }
+
+    .chart-panel {
+      display: grid;
+      grid-template-rows: 42px minmax(0, 1fr);
+    }
+
+    .chart-total {
+      color: var(--blue-900);
+      font-size: 10.5px;
+      font-weight: 750;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .chart-total span {
+      display: block;
+      margin-top: 2px;
+      color: var(--gray-400);
+      font-size: 7.8px;
+      font-weight: 550;
+      text-align: right;
+    }
+
+    .chart-body {
+      display: grid;
+      min-height: 0;
+      grid-template-rows: minmax(0, 1fr) 20px;
+      padding: 11px 11px 7px;
+    }
+
+    .plot {
+      display: flex;
+      min-height: 0;
+      align-items: end;
+      justify-content: space-between;
+      gap: 6px;
+      padding: 7px 3px 0;
+      border-bottom: 1px solid var(--gray-200);
+      background-image: linear-gradient(to bottom, transparent calc(50% - .5px), var(--gray-100) 50%, transparent calc(50% + .5px));
+    }
+
+    .bar-wrap {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      align-items: end;
+      justify-content: center;
+    }
+
+    .bar {
+      width: min(17px, 68%);
+      min-height: 8px;
+      border-radius: 4px 4px 2px 2px;
+      background: #ffb488;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.34);
+    }
+
+    .bar-wrap:nth-child(1) .bar { height: 42%; }
+    .bar-wrap:nth-child(2) .bar { height: 68%; }
+    .bar-wrap:nth-child(3) .bar { height: 55%; }
+    .bar-wrap:nth-child(4) .bar { height: 84%; }
+    .bar-wrap:nth-child(5) .bar { height: 73%; }
+    .bar-wrap:nth-child(6) .bar { height: 100%; }
+    .bar-wrap:nth-child(7) .bar { height: 61%; }
+
+    .bar.highlight {
+      background: var(--orange-500);
+      box-shadow: 0 4px 9px rgba(255, 107, 26, 0.19), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+    }
+
+    .chart-days {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 6px;
+      padding: 0 3px;
+      color: var(--gray-400);
+      font-size: 7.8px;
+      font-weight: 600;
+    }
+
+    .chart-days span { width: 100%; text-align: center; }
+    .chart-days .peak { color: var(--orange-600); font-weight: 750; }
+
+    a:focus-visible,
+    button:focus-visible,
+    select:focus-visible {
+      outline: 2px solid var(--orange-500);
+      outline-offset: 2px;
+    }
+
+    @media (max-width: 760px) {
+      .shell { grid-template-columns: 66px minmax(0, 1fr); }
+      .sidebar { padding-inline: 6px; }
+      .nav-item { height: 54px; font-size: 8.8px; }
+      .nav-item.active::before { left: -6px; }
+      main { padding-inline: 13px; }
+      .content-grid { grid-template-columns: minmax(0, 1.6fr) minmax(188px, .84fr); gap: 10px; }
+      .filter-bar { grid-template-columns: minmax(112px, .7fr) minmax(166px, 1.15fr) minmax(108px, .68fr) auto; gap: 6px; padding-inline: 8px; }
+      .control { padding-inline: 7px; gap: 5px; }
+      .search-button { padding-inline: 10px; }
+      th, td { padding-inline: 7px; }
+      .status { min-width: 59px; padding-inline: 6px; font-size: 8.2px; }
+      .balance { display: none; }
+    }
+  </style>
 </head>
 <body>
-<div class="scr-input">sender: SND-01 · 01–15 JUL 2026 · status: all</div>
-<div class="scr-section">
-  <div class="scr-head"><span style="width:72px">Time</span><span class="scr-fill">Recipient</span><span style="width:64px">Seg</span><span style="width:78px">Status</span></div>
-  <div class="scr-row"><span class="scr-num" style="width:72px">09:42:18</span><span class="scr-fill">+66 81-xxx-1234</span><span class="scr-num" style="width:64px">01</span><span class="scr-chip ok">delivered</span></div>
-  <div class="scr-row"><span class="scr-num" style="width:72px">09:37:04</span><span class="scr-fill">+66 89-xxx-1234</span><span class="scr-num" style="width:64px">02</span><span class="scr-chip ok">delivered</span></div>
-  <div class="scr-row"><span class="scr-num" style="width:72px">09:31:55</span><span class="scr-fill">+66 86-xxx-1234</span><span class="scr-num" style="width:64px">01</span><span class="scr-chip warn">queued</span></div>
-  <div class="scr-row"><span class="scr-num" style="width:72px">09:24:41</span><span class="scr-fill">+66 82-xxx-1234</span><span class="scr-num" style="width:64px">03</span><span class="scr-chip ok">delivered</span></div>
-  <div class="scr-row"><span class="scr-num" style="width:72px">09:18:09</span><span class="scr-fill">+66 84-xxx-1234</span><span class="scr-num" style="width:64px">01</span><span class="scr-chip err">failed</span></div>
-</div>
-<div class="scr-section">
-  <div class="scr-sub">volume · 7 days</div>
-  <div class="scr-spark"><i style="height:42%"></i><i style="height:68%"></i><i style="height:55%"></i><i style="height:84%"></i><i style="height:73%"></i><i style="height:100%"></i><i style="height:61%"></i></div>
-</div>
+  <div class="app">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="BulkSMS home">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <path fill="#ff6b1a" d="M5.5 3.5h21A3.5 3.5 0 0 1 30 7v14a3.5 3.5 0 0 1-3.5 3.5H15.2L9.1 29v-4.5H5.5A3.5 3.5 0 0 1 2 21V7a3.5 3.5 0 0 1 3.5-3.5Z"/>
+          <path fill="#fff" d="M8.2 10.1h15.6a1.2 1.2 0 1 1 0 2.4H8.2a1.2 1.2 0 1 1 0-2.4Zm0 5h10.9a1.2 1.2 0 1 1 0 2.4H8.2a1.2 1.2 0 1 1 0-2.4Z"/>
+        </svg>
+        <span class="wordmark">Bulk<strong>SMS</strong></span>
+      </a>
+
+      <div class="top-actions">
+        <button class="balance" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M16 11h5v4h-5a2 2 0 0 1 0-4Z"/><path d="M7 6V4h10v2"/></svg>
+          128,540 credits
+        </button>
+        <button class="account-chip" type="button" aria-label="Open account menu">
+          <span class="avatar">AC</span>
+          <span>Account</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8b98a9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="shell">
+      <aside class="sidebar">
+        <nav aria-label="Main navigation">
+          <ul class="nav-list">
+            <li><a class="nav-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="4" rx="1.3"/><rect x="14" y="11" width="7" height="10" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg><span>Dashboard</span></a></li>
+            <li><a class="nav-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 3 9.5 14.5"/><path d="m21 3-7.3 18-4.2-6.5L3 10.3 21 3Z"/></svg><span>Campaigns</span></a></li>
+            <li><a class="nav-item active" href="#" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/></svg><span>History</span></a></li>
+            <li><a class="nav-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="14" rx="2"/><path d="M16 11h5v4h-5a2 2 0 0 1 0-4Z"/><path d="M7 6V4h10v2"/></svg><span>Credits</span></a></li>
+          </ul>
+        </nav>
+        <div class="sidebar-help" aria-label="Help center"><span class="help-ring">?</span><span>Help</span></div>
+      </aside>
+
+      <main id="main-content">
+        <div class="page-grid">
+          <div class="page-head">
+            <div class="page-title">
+              <h1>Message History</h1>
+              <p>Review message activity and delivery status.</p>
+            </div>
+            <div class="result-count"><strong>5</strong> results</div>
+          </div>
+
+          <form class="filter-bar" aria-label="Message history filters">
+            <label class="control">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 3 9.5 14.5"/><path d="m21 3-7.3 18-4.2-6.5L3 10.3 21 3Z"/></svg>
+              <span class="control-copy"><span class="control-label">Sender</span><span class="control-value">SND-01</span></span>
+            </label>
+            <label class="control">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>
+              <span class="control-copy"><span class="control-label">Date range</span><span class="control-value">01–15 Jul 2026</span></span>
+            </label>
+            <label class="control">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+              <span class="control-copy"><span class="control-label">Status</span><select aria-label="Status"><option selected>All statuses</option><option>Delivered</option><option>Queued</option><option>Failed</option></select></span>
+              <svg class="select-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg>
+            </label>
+            <button class="search-button" type="submit">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+              Search
+            </button>
+          </form>
+
+          <div class="content-grid">
+            <section class="panel table-panel" aria-labelledby="results-title">
+              <div class="panel-head">
+                <div class="panel-title"><h2 id="results-title">Delivery results</h2><p>Sender SND-01</p></div>
+                <div class="table-meta">Showing 1–5 of 5</div>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th scope="col">Time</th><th scope="col">Recipient</th><th scope="col">Segments</th><th scope="col">Status</th></tr></thead>
+                  <tbody>
+                    <tr><td><span class="time">09:42:18</span></td><td><span class="recipient">+66 81-xxx-1234</span></td><td><span class="segments">01</span></td><td><span class="status delivered">Delivered</span></td></tr>
+                    <tr><td><span class="time">09:37:04</span></td><td><span class="recipient">+66 89-xxx-1234</span></td><td><span class="segments">02</span></td><td><span class="status delivered">Delivered</span></td></tr>
+                    <tr><td><span class="time">09:31:55</span></td><td><span class="recipient">+66 86-xxx-1234</span></td><td><span class="segments">01</span></td><td><span class="status queued">Queued</span></td></tr>
+                    <tr><td><span class="time">09:24:41</span></td><td><span class="recipient">+66 82-xxx-1234</span></td><td><span class="segments">03</span></td><td><span class="status delivered">Delivered</span></td></tr>
+                    <tr><td><span class="time">09:18:09</span></td><td><span class="recipient">+66 84-xxx-1234</span></td><td><span class="segments">01</span></td><td><span class="status failed">Failed</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <section class="panel chart-panel" aria-labelledby="volume-title">
+              <div class="panel-head">
+                <div class="panel-title"><h2 id="volume-title">7-day volume</h2><p>Messages processed</p></div>
+                <div class="chart-total">248.6k<span>total SMS</span></div>
+              </div>
+              <div class="chart-body">
+                <div class="plot" role="img" aria-label="Seven-day message volume: July 9 at 42 percent, July 10 at 68 percent, July 11 at 55 percent, July 12 at 84 percent, July 13 at 73 percent, July 14 at 100 percent, and July 15 at 61 percent of peak volume">
+                  <div class="bar-wrap"><span class="bar"></span></div><div class="bar-wrap"><span class="bar"></span></div><div class="bar-wrap"><span class="bar"></span></div><div class="bar-wrap"><span class="bar"></span></div><div class="bar-wrap"><span class="bar"></span></div><div class="bar-wrap"><span class="bar highlight"></span></div><div class="bar-wrap"><span class="bar"></span></div>
+                </div>
+                <div class="chart-days" aria-hidden="true"><span>9 Jul</span><span>10</span><span>11</span><span>12</span><span>13</span><span class="peak">14</span><span>15</span></div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
 </body>
 </html>

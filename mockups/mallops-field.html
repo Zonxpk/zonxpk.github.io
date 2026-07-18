@@ -1,37 +1,534 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Field operations</title>
-<link rel="stylesheet" href="screen.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1e293b">
+  <title>Mall Ops — Field Tasks</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --slate-950: #0f172a;
+      --slate-900: #1e293b;
+      --slate-800: #273449;
+      --slate-700: #334155;
+      --slate-600: #475569;
+      --slate-500: #64748b;
+      --slate-400: #94a3b8;
+      --slate-300: #cbd5e1;
+      --slate-200: #e2e8f0;
+      --slate-100: #f1f5f9;
+      --slate-50: #f8fafc;
+      --emerald-700: #047857;
+      --emerald-600: #059669;
+      --emerald-500: #10b981;
+      --emerald-200: #a7f3d0;
+      --emerald-100: #d1fae5;
+      --emerald-50: #ecfdf5;
+      --amber-700: #b45309;
+      --amber-400: #fbbf24;
+      --amber-100: #fef3c7;
+      --canvas: #f3f6f8;
+      --white: #ffffff;
+      --border: #dce4ea;
+      --text: #172033;
+      --muted: #68778b;
+      --radius-input: 6px;
+      --radius-card: 8px;
+      --radius-panel: 10px;
+      --shadow-card: 0 1px 2px rgba(30, 41, 59, 0.04),
+        0 4px 12px rgba(30, 41, 59, 0.045);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      overflow: hidden;
+    }
+
+    body {
+      margin: 0;
+      background: var(--canvas);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.35;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .app {
+      display: flex;
+      width: 320px;
+      max-width: 100%;
+      height: 600px;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--canvas);
+    }
+
+    .app-bar {
+      display: flex;
+      height: 76px;
+      flex: 0 0 76px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 0 14px;
+      background: var(--slate-900);
+      box-shadow: inset 0 -1px rgba(255, 255, 255, 0.05);
+      color: var(--white);
+    }
+
+    .app-title {
+      display: flex;
+      min-width: 0;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-mark {
+      width: 30px;
+      height: 30px;
+      flex: 0 0 auto;
+    }
+
+    .brand-name {
+      display: block;
+      margin-bottom: 3px;
+      color: var(--slate-400);
+      font-size: 10px;
+      font-weight: 650;
+      line-height: 1;
+      letter-spacing: 0.04em;
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--slate-50);
+      font-size: 18px;
+      font-weight: 720;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+
+    .branch-chip {
+      display: inline-flex;
+      min-height: 28px;
+      flex: 0 0 auto;
+      align-items: center;
+      padding: 0 9px;
+      border: 1px solid rgba(167, 243, 208, 0.18);
+      border-radius: var(--radius-input);
+      background: rgba(16, 185, 129, 0.14);
+      color: #d8fff0;
+      font-size: 11px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.025em;
+    }
+
+    main {
+      display: flex;
+      min-height: 0;
+      flex: 1 1 auto;
+      flex-direction: column;
+      padding: 14px;
+    }
+
+    .task-card {
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-panel);
+      background: var(--white);
+      box-shadow: var(--shadow-card);
+    }
+
+    .task-copy {
+      padding: 15px 16px 14px;
+    }
+
+    .task-kicker {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 7px;
+      color: var(--emerald-700);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .task-kicker::before {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--emerald-500);
+      box-shadow: 0 0 0 3px var(--emerald-100);
+      content: "";
+    }
+
+    h2 {
+      margin: 0;
+      color: var(--slate-900);
+      font-size: 17px;
+      font-weight: 700;
+      line-height: 1.32;
+      letter-spacing: -0.015em;
+      text-wrap: balance;
+    }
+
+    .sla-row {
+      display: flex;
+      min-height: 54px;
+      align-items: center;
+      gap: 10px;
+      padding: 0 14px 0 16px;
+      border-top: 1px solid #e7edf1;
+      background: var(--slate-50);
+    }
+
+    .sla-label {
+      color: var(--slate-500);
+      font-size: 11px;
+      font-weight: 650;
+    }
+
+    .countdown {
+      margin-right: auto;
+      color: var(--slate-900);
+      font-size: 19px;
+      font-weight: 750;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.025em;
+    }
+
+    .due-chip,
+    .site-chip {
+      display: inline-flex;
+      min-height: 26px;
+      align-items: center;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .due-chip {
+      padding: 0 9px;
+      border: 1px solid #f2d28b;
+      background: var(--amber-100);
+      color: var(--amber-700);
+    }
+
+    .photos {
+      margin-top: 16px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 9px;
+    }
+
+    .section-head h3 {
+      margin: 0;
+      color: var(--slate-800);
+      font-size: 13px;
+      font-weight: 680;
+    }
+
+    .progress {
+      color: var(--emerald-700);
+      font-size: 12px;
+      font-weight: 750;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .photo-slot {
+      position: relative;
+      display: grid;
+      min-width: 0;
+      height: 70px;
+      place-items: center;
+      overflow: hidden;
+      border-radius: var(--radius-card);
+    }
+
+    .photo-slot.filled {
+      border: 1px solid var(--emerald-200);
+      background-color: var(--emerald-50);
+      background-image:
+        linear-gradient(135deg, rgba(16, 185, 129, 0.075) 25%, transparent 25%),
+        linear-gradient(315deg, rgba(16, 185, 129, 0.075) 25%, transparent 25%);
+      background-position: 0 0, 6px 6px;
+      background-size: 12px 12px;
+      color: var(--emerald-700);
+    }
+
+    .photo-slot.empty {
+      border: 1px dashed #aebbc8;
+      background: rgba(255, 255, 255, 0.52);
+      color: var(--slate-400);
+    }
+
+    .photo-slot svg {
+      width: 22px;
+      height: 22px;
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 1.65;
+    }
+
+    .photo-index {
+      position: absolute;
+      right: 5px;
+      bottom: 4px;
+      color: var(--emerald-700);
+      font-size: 9px;
+      font-weight: 750;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .assignee {
+      display: flex;
+      min-height: 64px;
+      align-items: center;
+      gap: 11px;
+      margin-top: 16px;
+      padding: 0 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      background: rgba(255, 255, 255, 0.72);
+    }
+
+    .avatar {
+      display: grid;
+      width: 36px;
+      height: 36px;
+      flex: 0 0 auto;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--slate-700);
+      color: var(--slate-50);
+      font-size: 11px;
+      font-weight: 750;
+      letter-spacing: 0.03em;
+    }
+
+    .assignee-copy {
+      min-width: 0;
+      flex: 1 1 auto;
+    }
+
+    .assignee-label {
+      display: block;
+      margin-bottom: 2px;
+      color: var(--slate-500);
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    .assignee-name {
+      display: block;
+      color: var(--slate-800);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .site-chip {
+      gap: 6px;
+      padding: 0 9px;
+      background: var(--emerald-100);
+      color: var(--emerald-700);
+    }
+
+    .site-chip::before {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--emerald-500);
+      content: "";
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: minmax(0, 1.58fr) minmax(0, 1fr);
+      gap: 10px;
+      margin-top: auto;
+      padding-top: 18px;
+    }
+
+    .action {
+      display: inline-flex;
+      min-width: 0;
+      height: 50px;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 0 16px;
+      border-radius: var(--radius-card);
+      font-size: 15px;
+      font-weight: 720;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .action svg {
+      width: 18px;
+      height: 18px;
+      flex: 0 0 auto;
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 1.8;
+    }
+
+    .action.primary {
+      border: 1px solid var(--emerald-600);
+      background: var(--emerald-600);
+      box-shadow: 0 1px 2px rgba(4, 120, 87, 0.18),
+        0 5px 12px rgba(4, 120, 87, 0.14);
+      color: var(--white);
+    }
+
+    .action.secondary {
+      border: 1px solid var(--slate-300);
+      background: var(--white);
+      box-shadow: 0 1px 2px rgba(30, 41, 59, 0.04);
+      color: var(--slate-700);
+    }
+
+    .action:active {
+      transform: scale(0.98);
+    }
+
+    .action:focus-visible {
+      outline: 3px solid rgba(16, 185, 129, 0.36);
+      outline-offset: 2px;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .action.primary:hover {
+        background: var(--emerald-700);
+      }
+
+      .action.secondary:hover {
+        border-color: var(--slate-400);
+        background: var(--slate-50);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .action {
+        transition: none;
+      }
+    }
+  </style>
 </head>
 <body>
-<div class="scr-title">Task #1847 · BR-0412</div>
-<div class="scr-sub">signage check · zone B2</div>
-<div class="scr-row" style="margin-top:10px">
-  <span class="scr-sub">SLA</span>
-  <span class="scr-fill"></span>
-  <span class="scr-num">04:12:33</span>
-  <span class="scr-chip warn">due today</span>
-</div>
-<div class="scr-section">
-  <div class="scr-sub">photo records · 2/4</div>
-  <div class="scr-cellgrid" style="grid-template-columns:repeat(4,1fr);margin-top:6px">
-    <span class="scr-cell occ" style="height:56px"></span>
-    <span class="scr-cell occ" style="height:56px"></span>
-    <span class="scr-cell" style="height:56px"></span>
-    <span class="scr-cell" style="height:56px"></span>
+  <div class="app">
+    <header class="app-bar">
+      <div class="app-title">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <rect x="1.5" y="1.5" width="29" height="29" rx="7" fill="#10b981"/>
+          <path d="M8 9.5h7v5.8H8zM17 9.5h7v5.8h-7zM8 17.3h7V23H8zM17 17.3h7V23h-7z" fill="#ecfdf5"/>
+          <path d="M15 12.4h2M11.5 15.3v2M20.5 15.3v2M15 20.2h2" fill="none" stroke="#047857" stroke-width="1.2"/>
+        </svg>
+        <div>
+          <span class="brand-name">Mall Ops</span>
+          <h1>Field Tasks</h1>
+        </div>
+      </div>
+      <span class="branch-chip">BR-0412</span>
+    </header>
+
+    <main>
+      <section class="task-card" aria-labelledby="task-title">
+        <div class="task-copy">
+          <div class="task-kicker">Active assignment</div>
+          <h2 id="task-title">Task #1847 · Signage check · Zone B2</h2>
+        </div>
+        <div class="sla-row" aria-label="Service level agreement due in 4 hours 12 minutes 33 seconds">
+          <span class="sla-label">SLA</span>
+          <strong class="countdown">04:12:33</strong>
+          <span class="due-chip">Due today</span>
+        </div>
+      </section>
+
+      <section class="photos" aria-labelledby="photos-title">
+        <div class="section-head">
+          <h3 id="photos-title">Photo records</h3>
+          <span class="progress">2/4</span>
+        </div>
+        <div class="photo-grid">
+          <div class="photo-slot filled" role="img" aria-label="Photo record 1 complete">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 7.5h3l1.5-2h7l1.5 2h3v11H4z"/>
+              <circle cx="12" cy="13" r="3.2"/>
+            </svg>
+            <span class="photo-index">01</span>
+          </div>
+          <div class="photo-slot filled" role="img" aria-label="Photo record 2 complete">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 7.5h3l1.5-2h7l1.5 2h3v11H4z"/>
+              <circle cx="12" cy="13" r="3.2"/>
+            </svg>
+            <span class="photo-index">02</span>
+          </div>
+          <div class="photo-slot empty" role="img" aria-label="Empty photo slot 3">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 7v10M7 12h10"/>
+            </svg>
+          </div>
+          <div class="photo-slot empty" role="img" aria-label="Empty photo slot 4">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 7v10M7 12h10"/>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <section class="assignee" aria-label="Assignee">
+        <span class="avatar" aria-hidden="true">SP</span>
+        <div class="assignee-copy">
+          <span class="assignee-label">Assignee</span>
+          <strong class="assignee-name">Somchai P.</strong>
+        </div>
+        <span class="site-chip">On site</span>
+      </section>
+
+      <div class="actions">
+        <button class="action primary" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 21s6-5.1 6-11a6 6 0 1 0-12 0c0 5.9 6 11 6 11z"/>
+            <path d="m9.5 10.3 1.7 1.7 3.4-3.6"/>
+          </svg>
+          Check in
+        </button>
+        <button class="action secondary" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5M5 14v5h14v-5"/>
+          </svg>
+          Upload
+        </button>
+      </div>
+    </main>
   </div>
-</div>
-<div class="scr-row">
-  <span class="scr-sub">assignee</span>
-  <span class="scr-fill">Somchai P.</span>
-  <span class="scr-chip info">on site</span>
-</div>
-<div class="scr-section">
-  <span class="scr-key">CHECK IN</span>
-  <span class="scr-key">UPLOAD</span>
-</div>
 </body>
 </html>

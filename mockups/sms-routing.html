@@ -1,21 +1,808 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Lead routing</title>
-<link rel="stylesheet" href="screen.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f7fb">
+  <title>Lead routing</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --orange-50: #fff4ed;
+      --orange-100: #ffe4d2;
+      --orange-500: #ff6b1a;
+      --orange-600: #e95608;
+      --blue-900: #0d2947;
+      --blue-700: #1d4268;
+      --gray-25: #fbfcfe;
+      --gray-50: #f4f7fb;
+      --gray-100: #edf1f6;
+      --gray-200: #e1e7ef;
+      --gray-400: #8b98a9;
+      --gray-500: #68778b;
+      --gray-700: #35465a;
+      --green-50: #eaf8f1;
+      --green-600: #16865a;
+      --amber-50: #fff7df;
+      --amber-700: #a76200;
+      --blue-50: #edf5ff;
+      --blue-600: #2469b4;
+      --slate-50: #f0f3f7;
+      --slate-600: #66758a;
+      --shadow-card: 0 8px 22px rgba(31, 53, 79, 0.055), 0 1px 3px rgba(31, 53, 79, 0.06);
+      --shadow-float: 0 7px 18px rgba(255, 107, 26, 0.18), 0 2px 5px rgba(31, 53, 79, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    html,
+    body {
+      width: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      margin: 0;
+      min-width: 700px;
+      background: var(--gray-50);
+      color: var(--blue-900);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 13px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button { font-family: inherit; }
+    svg { display: block; }
+
+    .app {
+      display: grid;
+      grid-template-rows: 56px 374px;
+      width: clamp(700px, 100vw, 1100px);
+      height: 430px;
+      overflow: hidden;
+      background: var(--gray-50);
+    }
+
+    .topbar {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 0 18px 0 16px;
+      background: rgba(255, 255, 255, 0.98);
+      border-bottom: 1px solid var(--gray-200);
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.85);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      min-width: 172px;
+      gap: 9px;
+      color: var(--blue-900);
+      text-decoration: none;
+    }
+
+    .brand-mark {
+      width: 29px;
+      height: 29px;
+      filter: drop-shadow(0 4px 7px rgba(255, 107, 26, 0.2));
+    }
+
+    .wordmark {
+      font-size: 17px;
+      font-weight: 760;
+      letter-spacing: -0.035em;
+      white-space: nowrap;
+    }
+
+    .wordmark strong { color: var(--orange-500); }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .connection-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 32px;
+      padding: 0 10px;
+      border: 1px solid var(--gray-200);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--gray-700);
+      font-size: 10.5px;
+      font-weight: 650;
+      white-space: nowrap;
+      box-shadow: 0 1px 2px rgba(31, 53, 79, 0.035);
+    }
+
+    .connection-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green-600);
+      box-shadow: 0 0 0 3px var(--green-50);
+    }
+
+    .user-chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      height: 34px;
+      padding: 3px 7px 3px 4px;
+      border: 1px solid var(--gray-200);
+      border-radius: 18px;
+      background: #fff;
+      color: var(--gray-700);
+      box-shadow: 0 1px 2px rgba(31, 53, 79, 0.04);
+    }
+
+    .avatar {
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--blue-900);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 750;
+      letter-spacing: 0.02em;
+    }
+
+    .user-copy { line-height: 1.05; }
+    .user-name { display: block; font-size: 11px; font-weight: 700; }
+    .user-company { display: block; margin-top: 3px; color: var(--gray-400); font-size: 9px; }
+
+    .shell {
+      display: grid;
+      grid-template-columns: 76px minmax(0, 1fr);
+      min-height: 0;
+    }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 13px 9px 11px;
+      background: #f8fafc;
+      border-right: 1px solid var(--gray-200);
+      overscroll-behavior: contain;
+    }
+
+    .nav-list {
+      display: grid;
+      gap: 4px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .nav-item {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      height: 51px;
+      border-radius: 9px;
+      color: var(--gray-500);
+      text-decoration: none;
+      font-size: 9px;
+      font-weight: 620;
+    }
+
+    .nav-item svg {
+      width: 18px;
+      height: 18px;
+      stroke-width: 1.8;
+    }
+
+    .nav-item.active {
+      background: var(--orange-50);
+      color: var(--orange-600);
+    }
+
+    .nav-item.active::before {
+      content: "";
+      position: absolute;
+      left: -9px;
+      top: 10px;
+      width: 3px;
+      height: 31px;
+      border-radius: 0 4px 4px 0;
+      background: var(--orange-500);
+      box-shadow: 0 0 0 3px rgba(255, 107, 26, 0.08);
+    }
+
+    .sidebar-help {
+      display: grid;
+      justify-items: center;
+      gap: 4px;
+      color: var(--gray-400);
+      font-size: 9px;
+    }
+
+    .help-ring {
+      display: grid;
+      place-items: center;
+      width: 27px;
+      height: 27px;
+      border: 1px solid var(--gray-200);
+      border-radius: 50%;
+      background: #fff;
+      color: var(--blue-700);
+      font-weight: 750;
+      box-shadow: 0 2px 5px rgba(31, 53, 79, 0.05);
+    }
+
+    main {
+      min-width: 0;
+      min-height: 0;
+      padding: 13px 18px 15px;
+      overflow: hidden;
+    }
+
+    .page-grid {
+      display: grid;
+      grid-template-rows: 44px 58px minmax(0, 1fr);
+      gap: 10px;
+      height: 100%;
+    }
+
+    .page-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .page-title h1 {
+      margin: 0;
+      color: var(--blue-900);
+      font-size: 20px;
+      line-height: 1.08;
+      letter-spacing: -0.025em;
+    }
+
+    .page-title p {
+      margin: 4px 0 0;
+      color: var(--gray-500);
+      font-size: 10.5px;
+    }
+
+    .head-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .button {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      height: 32px;
+      padding: 0 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+
+    .button svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .button::before {
+      content: "";
+      position: absolute;
+      inset: -6px -2px;
+    }
+
+    .button-secondary {
+      border: 1px solid var(--gray-200);
+      background: #fff;
+      color: var(--gray-700);
+      box-shadow: 0 1px 2px rgba(31, 53, 79, 0.035);
+    }
+
+    .button-primary {
+      border: 1px solid var(--orange-500);
+      background: var(--orange-500);
+      color: #fff;
+      box-shadow: var(--shadow-float);
+    }
+
+    .button:focus-visible,
+    .brand:focus-visible,
+    .nav-item:focus-visible {
+      outline: 2px solid var(--blue-600);
+      outline-offset: 2px;
+    }
+
+    .sync-strip {
+      display: grid;
+      grid-template-columns: minmax(220px, 1.28fr) repeat(3, minmax(88px, 0.64fr)) minmax(125px, 0.8fr);
+      align-items: center;
+      min-width: 0;
+      overflow: hidden;
+      border: 1px solid rgba(214, 223, 233, 0.92);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: var(--shadow-card);
+    }
+
+    .sync-destination {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      height: 100%;
+      padding: 0 14px;
+      background: linear-gradient(110deg, #fff7f1 0%, #fff 88%);
+      border-right: 1px solid var(--gray-100);
+    }
+
+    .sync-icon {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      flex: 0 0 auto;
+      border-radius: 10px;
+      background: var(--orange-100);
+      color: var(--orange-600);
+    }
+
+    .sync-icon svg { width: 17px; height: 17px; }
+
+    .sync-name {
+      overflow: hidden;
+      color: var(--blue-900);
+      font-size: 11.5px;
+      font-weight: 700;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .sync-detail {
+      margin-top: 3px;
+      color: var(--gray-400);
+      font-size: 9px;
+      white-space: nowrap;
+    }
+
+    .sync-stat {
+      min-width: 0;
+      padding: 0 10px;
+      border-right: 1px solid var(--gray-100);
+    }
+
+    .sync-stat-value {
+      color: var(--blue-900);
+      font-size: 15px;
+      font-weight: 750;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .sync-stat-value.success { color: var(--green-600); }
+    .sync-stat-value.warning { color: var(--amber-700); }
+
+    .sync-stat-label {
+      margin-top: 5px;
+      color: var(--gray-400);
+      font-size: 8.5px;
+      white-space: nowrap;
+    }
+
+    .last-sync {
+      min-width: 0;
+      padding: 0 13px;
+    }
+
+    .last-sync-label {
+      color: var(--gray-400);
+      font-size: 8.5px;
+    }
+
+    .last-sync-time {
+      margin-top: 5px;
+      color: var(--blue-700);
+      font-size: 10px;
+      font-weight: 680;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .panel {
+      min-width: 0;
+      min-height: 0;
+      overflow: hidden;
+      border: 1px solid rgba(214, 223, 233, 0.94);
+      border-radius: 9px;
+      background: #fff;
+      box-shadow: var(--shadow-card);
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      height: 44px;
+      padding: 0 14px;
+      border-bottom: 1px solid var(--gray-100);
+    }
+
+    .panel-title h2 {
+      margin: 0;
+      color: var(--blue-900);
+      font-size: 13px;
+      line-height: 1.15;
+      letter-spacing: -0.01em;
+    }
+
+    .panel-title p {
+      margin: 3px 0 0;
+      color: var(--gray-400);
+      font-size: 9px;
+    }
+
+    .queue-count {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--gray-500);
+      font-size: 9.5px;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+
+    .queue-count::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--orange-500);
+      box-shadow: 0 0 0 3px var(--orange-50);
+    }
+
+    .table-wrap { height: calc(100% - 44px); }
+
+    table {
+      width: 100%;
+      height: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    caption {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    thead { height: 27px; }
+
+    th {
+      padding: 0 12px;
+      background: var(--gray-25);
+      color: var(--gray-500);
+      font-size: 9px;
+      font-weight: 650;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 4px 12px;
+      border-top: 1px solid var(--gray-100);
+      color: var(--gray-700);
+      font-size: 10px;
+      vertical-align: middle;
+    }
+
+    th:nth-child(1) { width: 32%; }
+    th:nth-child(2) { width: 17%; }
+    th:nth-child(3) { width: 32%; }
+    th:nth-child(4) { width: 19%; text-align: center; }
+    td:nth-child(4) { text-align: center; }
+
+    .lead-name {
+      overflow: hidden;
+      color: var(--blue-900);
+      font-size: 10.4px;
+      font-weight: 680;
+      line-height: 1.15;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .lead-time {
+      margin-top: 2px;
+      overflow: hidden;
+      color: var(--gray-400);
+      font-size: 8px;
+      line-height: 1;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .source-badge,
+    .status {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      height: 20px;
+      padding: 0 7px;
+      border-radius: 999px;
+      font-size: 8.6px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .source-badge::before,
+    .status::before {
+      content: "";
+      width: 5px;
+      height: 5px;
+      flex: 0 0 auto;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .source-web { background: var(--blue-50); color: var(--blue-600); }
+    .source-line { background: var(--green-50); color: var(--green-600); }
+    .source-import { background: var(--slate-50); color: var(--slate-600); }
+
+    .rule {
+      display: flex;
+      align-items: center;
+      min-width: 0;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .rule-name {
+      overflow: hidden;
+      color: var(--blue-700);
+      font-size: 9.4px;
+      font-weight: 700;
+      text-overflow: ellipsis;
+    }
+
+    .rule-arrow {
+      flex: 0 0 auto;
+      color: var(--gray-400);
+      font-size: 10px;
+    }
+
+    .rule-owner {
+      overflow: hidden;
+      color: var(--gray-700);
+      font-size: 9.5px;
+      font-weight: 620;
+      text-overflow: ellipsis;
+    }
+
+    .status {
+      min-width: 61px;
+    }
+
+    .synced { background: var(--green-50); color: var(--green-600); }
+    .retry { background: var(--amber-50); color: var(--amber-700); }
+
+    @media (hover: hover) and (pointer: fine) {
+      .button-secondary:hover { border-color: #cfd8e4; background: var(--gray-25); }
+      .button-primary:hover { background: var(--orange-600); border-color: var(--orange-600); }
+      .nav-item:hover { color: var(--blue-700); }
+      tbody tr:hover { background: var(--gray-25); }
+    }
+
+    @media (max-width: 760px) {
+      .shell { grid-template-columns: 66px minmax(0, 1fr); }
+      .sidebar { padding-inline: 6px; }
+      .nav-item { font-size: 8.5px; }
+      .nav-item.active::before { left: -6px; }
+      main { padding-inline: 13px; }
+      .connection-chip { display: none; }
+      .sync-strip { grid-template-columns: minmax(190px, 1.1fr) repeat(3, minmax(72px, 0.55fr)) minmax(105px, 0.7fr); }
+      .sync-destination { padding-inline: 11px; }
+      .sync-stat { padding-inline: 8px; }
+      .last-sync { padding-inline: 9px; }
+      th,
+      td { padding-inline: 8px; }
+      .source-badge,
+      .status { padding-inline: 6px; font-size: 8.2px; }
+    }
+  </style>
 </head>
 <body>
-<div class="scr-title">Inbound leads → Pipedrive</div>
-<div class="scr-section">
-  <div class="scr-head"><span class="scr-fill">Lead</span><span style="width:76px">Source</span><span style="width:148px">Rule → owner</span><span style="width:66px">Sync</span></div>
-  <div class="scr-row"><span class="scr-fill">Siam Retail Co.</span><span style="width:76px">web form</span><span style="width:148px">SME → Nattapong</span><span class="scr-chip ok">synced</span></div>
-  <div class="scr-row"><span class="scr-fill">Chao Phraya Foods</span><span style="width:76px">LINE</span><span style="width:148px">F&amp;B → Pimchanok</span><span class="scr-chip ok">synced</span></div>
-  <div class="scr-row"><span class="scr-fill">Krung Siam Clinic</span><span style="width:76px">import</span><span style="width:148px">health → Kittisak</span><span class="scr-chip warn">retry</span></div>
-  <div class="scr-row"><span class="scr-fill">Lanna Homeware</span><span style="width:76px">web form</span><span style="width:148px">north → Siriporn</span><span class="scr-chip ok">synced</span></div>
-  <div class="scr-row"><span class="scr-fill">Andaman Logistics</span><span style="width:76px">LINE</span><span style="width:148px">enterprise → Thanawat</span><span class="scr-chip ok">synced</span></div>
-</div>
-<div class="scr-section"><span class="scr-key">ADD RULE</span> <span class="scr-key">RE-SYNC</span></div>
+  <div class="app">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="BulkSMS home">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <path fill="#ff6b1a" d="M5.5 3.5h21A3.5 3.5 0 0 1 30 7v14a3.5 3.5 0 0 1-3.5 3.5H15.2L9.1 29v-4.5H5.5A3.5 3.5 0 0 1 2 21V7a3.5 3.5 0 0 1 3.5-3.5Z"/>
+          <path fill="#fff" d="M8.2 10.1h15.6a1.2 1.2 0 1 1 0 2.4H8.2a1.2 1.2 0 1 1 0-2.4Zm0 5h10.9a1.2 1.2 0 1 1 0 2.4H8.2a1.2 1.2 0 1 1 0-2.4Z"/>
+        </svg>
+        <span class="wordmark">Bulk<strong>SMS</strong></span>
+      </a>
+
+      <div class="top-actions">
+        <div class="connection-chip" aria-label="Pipedrive connection active">
+          <span class="connection-dot" aria-hidden="true"></span>
+          Pipedrive connected
+        </div>
+        <div class="user-chip" aria-label="Signed in as Narin, Siam Retail">
+          <span class="avatar">NR</span>
+          <span class="user-copy">
+            <span class="user-name">Narin</span>
+            <span class="user-company">Siam Retail</span>
+          </span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8b98a9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg>
+        </div>
+      </div>
+    </header>
+
+    <div class="shell">
+      <aside class="sidebar">
+        <nav aria-label="Main navigation">
+          <ul class="nav-list">
+            <li>
+              <a class="nav-item" href="#">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="4" rx="1.3"/><rect x="14" y="11" width="7" height="10" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg>
+                <span>Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a class="nav-item" href="#">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 3 9.5 14.5"/><path d="m21 3-7.3 18-4.2-6.5L3 10.3 21 3Z"/></svg>
+                <span>Campaigns</span>
+              </a>
+            </li>
+            <li>
+              <a class="nav-item active" href="#" aria-current="page">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="5" r="2"/><circle cx="18" cy="5" r="2"/><circle cx="12" cy="19" r="2"/><path d="M6 7v3c0 2 1.7 3.5 3.7 3.5H12M18 7v3c0 2-1.7 3.5-3.7 3.5H12v3.5"/></svg>
+                <span>Routing</span>
+              </a>
+            </li>
+            <li>
+              <a class="nav-item" href="#">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1a1.7 1.7 0 0 0 1.9.3A1.7 1.7 0 0 0 10 3V2.8h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1Z"/></svg>
+                <span>Settings</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <div class="sidebar-help" aria-label="Help center">
+          <span class="help-ring">?</span>
+          <span>Help</span>
+        </div>
+      </aside>
+
+      <main id="main-content">
+        <div class="page-grid">
+          <div class="page-head">
+            <div class="page-title">
+              <h1>Lead routing</h1>
+              <p>Inbound leads → Pipedrive</p>
+            </div>
+            <div class="head-actions">
+              <button class="button button-secondary" type="button">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.8-4.2L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8 8 0 0 0 14.8 4.2L21 14"/><path d="M21 20v-6h-6"/></svg>
+                Re-sync
+              </button>
+              <button class="button button-primary" type="button">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+                Add rule
+              </button>
+            </div>
+          </div>
+
+          <section class="sync-strip" aria-label="Routing sync summary">
+            <div class="sync-destination">
+              <div class="sync-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h7a4 4 0 0 1 4 4v6"/><path d="m13 14 3 3 3-3"/><circle cx="5" cy="7" r="2"/></svg>
+              </div>
+              <div>
+                <div class="sync-name">Pipedrive sync</div>
+                <div class="sync-detail">Rules run before each lead is created</div>
+              </div>
+            </div>
+            <div class="sync-stat">
+              <div class="sync-stat-value">5</div>
+              <div class="sync-stat-label">In queue</div>
+            </div>
+            <div class="sync-stat">
+              <div class="sync-stat-value success">4</div>
+              <div class="sync-stat-label">Synced</div>
+            </div>
+            <div class="sync-stat">
+              <div class="sync-stat-value warning">1</div>
+              <div class="sync-stat-label">Needs retry</div>
+            </div>
+            <div class="last-sync">
+              <div class="last-sync-label">Last sync</div>
+              <div class="last-sync-time">Today, 10:42</div>
+            </div>
+          </section>
+
+          <section class="panel" aria-labelledby="leads-title">
+            <div class="panel-head">
+              <div class="panel-title">
+                <h2 id="leads-title">Inbound leads</h2>
+                <p>Queue applies the matching rule before sync</p>
+              </div>
+              <div class="queue-count">5 leads</div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <caption>Inbound leads, sources, routing rules and Pipedrive sync statuses</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Lead</th>
+                    <th scope="col">Source</th>
+                    <th scope="col">Rule → owner</th>
+                    <th scope="col">Sync</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><div class="lead-name">Siam Retail Co.</div><div class="lead-time">Received 2 min ago</div></td>
+                    <td><span class="source-badge source-web">web form</span></td>
+                    <td><div class="rule"><span class="rule-name">SME</span><span class="rule-arrow">→</span><span class="rule-owner">Nattapong</span></div></td>
+                    <td><span class="status synced">Synced</span></td>
+                  </tr>
+                  <tr>
+                    <td><div class="lead-name">Chao Phraya Foods</div><div class="lead-time">Received 8 min ago</div></td>
+                    <td><span class="source-badge source-line">LINE</span></td>
+                    <td><div class="rule"><span class="rule-name">F&amp;B</span><span class="rule-arrow">→</span><span class="rule-owner">Pimchanok</span></div></td>
+                    <td><span class="status synced">Synced</span></td>
+                  </tr>
+                  <tr>
+                    <td><div class="lead-name">Krung Siam Clinic</div><div class="lead-time">Received 14 min ago</div></td>
+                    <td><span class="source-badge source-import">import</span></td>
+                    <td><div class="rule"><span class="rule-name">health</span><span class="rule-arrow">→</span><span class="rule-owner">Kittisak</span></div></td>
+                    <td><span class="status retry">Retry</span></td>
+                  </tr>
+                  <tr>
+                    <td><div class="lead-name">Lanna Homeware</div><div class="lead-time">Received 21 min ago</div></td>
+                    <td><span class="source-badge source-web">web form</span></td>
+                    <td><div class="rule"><span class="rule-name">north</span><span class="rule-arrow">→</span><span class="rule-owner">Siriporn</span></div></td>
+                    <td><span class="status synced">Synced</span></td>
+                  </tr>
+                  <tr>
+                    <td><div class="lead-name">Andaman Logistics</div><div class="lead-time">Received 34 min ago</div></td>
+                    <td><span class="source-badge source-line">LINE</span></td>
+                    <td><div class="rule"><span class="rule-name">enterprise</span><span class="rule-arrow">→</span><span class="rule-owner">Thanawat</span></div></td>
+                    <td><span class="status synced">Synced</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
 </body>
 </html>
