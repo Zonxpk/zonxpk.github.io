@@ -1,0 +1,702 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TNS Doc-Flow | Purchase Request Approval</title>
+  <style>
+    :root {
+      --chrome: #f1f3f5;
+      --chrome-dark: #e2e6ea;
+      --panel: #ffffff;
+      --line: #cbd1d7;
+      --line-dark: #aeb7c0;
+      --ink: #26323d;
+      --muted: #68747f;
+      --steel: #3b5b7d;
+      --steel-dark: #2e4965;
+      --steel-soft: #e8eef4;
+      --stamp: #b42b32;
+      --waiting: #9aa3ac;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      margin: 0;
+      background: #dfe3e7;
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .app-shell {
+      width: 100%;
+      height: 100vh;
+      min-width: 700px;
+      background: var(--chrome);
+    }
+
+    .topbar {
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      color: #fff;
+      background: var(--steel);
+      border-bottom: 1px solid #29435d;
+      box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 17px;
+      font-weight: 650;
+      letter-spacing: 0.01em;
+    }
+
+    .brand-mark {
+      width: 27px;
+      height: 27px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(255, 255, 255, 0.72);
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.08);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+
+    .plant-select {
+      min-width: 176px;
+      height: 29px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 0 10px;
+      border: 1px solid rgba(255, 255, 255, 0.42);
+      border-radius: 3px;
+      background: rgba(20, 41, 60, 0.22);
+      font-size: 12px;
+    }
+
+    .chevron {
+      width: 7px;
+      height: 7px;
+      border-right: 1px solid currentColor;
+      border-bottom: 1px solid currentColor;
+      transform: rotate(45deg) translateY(-2px);
+      opacity: 0.8;
+    }
+
+    .utilitybar {
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      background: #e7eaed;
+      border-bottom: 1px solid #c3c9cf;
+      color: #5d6872;
+      font-size: 11.5px;
+    }
+
+    .breadcrumb strong {
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .record-state {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .state-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--steel);
+      box-shadow: 0 0 0 2px rgba(59, 91, 125, 0.15);
+    }
+
+    main {
+      height: calc(100vh - 80px);
+      display: grid;
+      grid-template-rows: 112px minmax(0, 1fr) 64px;
+      gap: 10px;
+      padding: 12px 14px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      box-shadow: 0 1px 2px rgba(31, 45, 58, 0.08);
+    }
+
+    .document-head {
+      overflow: hidden;
+    }
+
+    .document-titlebar {
+      height: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      border-bottom: 1px solid #d8dde2;
+      background: #fbfcfd;
+    }
+
+    .document-title {
+      display: flex;
+      align-items: baseline;
+      gap: 11px;
+      min-width: 0;
+    }
+
+    .document-title h1 {
+      margin: 0;
+      color: #202b35;
+      font-size: 17px;
+      font-weight: 650;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+    }
+
+    .document-id {
+      color: var(--steel);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+    }
+
+    .document-kind {
+      padding: 3px 7px;
+      border: 1px solid #bdc6ce;
+      border-radius: 3px;
+      color: #596672;
+      background: #f2f4f6;
+      font-size: 10.5px;
+      white-space: nowrap;
+    }
+
+    .meta-grid {
+      height: calc(100% - 46px);
+      display: grid;
+      grid-template-columns: 1.05fr 1.05fr 1.28fr 1fr 0.8fr;
+      align-items: center;
+      padding: 0 14px;
+    }
+
+    .meta-item {
+      min-width: 0;
+      padding: 0 14px;
+      border-left: 1px solid #e0e4e8;
+    }
+
+    .meta-item:first-child {
+      padding-left: 0;
+      border-left: 0;
+    }
+
+    .meta-label {
+      display: block;
+      margin-bottom: 3px;
+      color: #77828c;
+      font-size: 10.5px;
+      letter-spacing: 0.025em;
+    }
+
+    .meta-value {
+      display: block;
+      overflow: hidden;
+      color: #25313c;
+      font-size: 13px;
+      font-weight: 600;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .amount {
+      font-variant-numeric: tabular-nums;
+    }
+
+    .priority-normal {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .priority-normal::before {
+      width: 7px;
+      height: 7px;
+      content: "";
+      border: 1px solid #87929c;
+      border-radius: 50%;
+      background: #eef0f2;
+    }
+
+    .route-panel {
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .section-heading {
+      height: 37px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      border-bottom: 1px solid #d7dce1;
+      background: #f7f8f9;
+    }
+
+    .section-heading h2 {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .section-note {
+      color: #7a858f;
+      font-size: 10.5px;
+    }
+
+    .stepper {
+      position: relative;
+      height: calc(100% - 37px);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      padding: 15px 24px 8px;
+    }
+
+    .route-line {
+      position: absolute;
+      z-index: 0;
+      top: 51px;
+      left: 13%;
+      right: 13%;
+      height: 3px;
+      background: linear-gradient(
+        to right,
+        var(--stamp) 0%,
+        var(--stamp) 34%,
+        var(--line-dark) 34%,
+        var(--line-dark) 100%
+      );
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+
+    .step {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      min-width: 0;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .step-number {
+      position: absolute;
+      top: -4px;
+      left: 50%;
+      margin-left: 27px;
+      color: #8a949d;
+      font-size: 10px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .route-marker {
+      width: 66px;
+      height: 66px;
+      display: grid;
+      flex: 0 0 auto;
+      place-items: center;
+      border-radius: 50%;
+      background: #fff;
+    }
+
+    .hanko {
+      position: relative;
+      border: 2px solid var(--stamp);
+      color: var(--stamp);
+      transform: rotate(-7deg);
+      box-shadow: inset 0 0 0 2px #fff, inset 0 0 0 3px rgba(180, 43, 50, 0.72);
+    }
+
+    .hanko::before,
+    .hanko::after {
+      position: absolute;
+      left: 10px;
+      right: 10px;
+      height: 1px;
+      content: "";
+      background: rgba(180, 43, 50, 0.6);
+    }
+
+    .hanko::before {
+      top: 20px;
+    }
+
+    .hanko::after {
+      bottom: 18px;
+    }
+
+    .hanko-text {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      line-height: 1.05;
+      transform: rotate(-3deg);
+    }
+
+    .hanko-approved {
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+    }
+
+    .hanko-name {
+      max-width: 52px;
+      margin-top: 6px;
+      overflow: hidden;
+      font-size: 9px;
+      font-weight: 700;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .current-marker,
+    .waiting-marker {
+      width: 54px;
+      height: 54px;
+      margin-top: 6px;
+      border: 2px solid var(--steel);
+      color: var(--steel);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .current-marker {
+      background: var(--steel-soft);
+      box-shadow: 0 0 0 4px #fff, 0 0 0 5px rgba(59, 91, 125, 0.18);
+    }
+
+    .waiting-marker {
+      border-color: #b8c0c7;
+      color: #89939c;
+      background: #f4f5f6;
+    }
+
+    .step-role {
+      margin-top: 7px;
+      color: #2e3943;
+      font-size: 12px;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+
+    .step-person {
+      margin-top: 1px;
+      color: #65717c;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .step-status {
+      margin-top: 3px;
+      color: #7a858e;
+      font-size: 9.5px;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .step.current .step-status {
+      color: var(--steel);
+      font-weight: 700;
+    }
+
+    .step.waiting .step-status {
+      color: var(--waiting);
+    }
+
+    .action-panel {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 9px 11px 9px 14px;
+    }
+
+    .attachments {
+      display: flex;
+      min-width: 0;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .attachments-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #5d6872;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .paperclip {
+      width: 15px;
+      height: 15px;
+      color: var(--steel);
+    }
+
+    .file {
+      max-width: 142px;
+      overflow: hidden;
+      padding: 5px 8px;
+      border: 1px solid #c9d0d6;
+      border-radius: 3px;
+      background: #f7f8f9;
+      color: #384550;
+      font-size: 11px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .actions {
+      display: flex;
+      flex: 0 0 auto;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .btn {
+      height: 32px;
+      min-width: 75px;
+      padding: 0 14px;
+      border: 1px solid #aeb7bf;
+      border-radius: 3px;
+      color: #3f4a54;
+      background: linear-gradient(#fff, #edf0f2);
+      box-shadow: 0 1px 1px rgba(31, 45, 58, 0.07);
+      cursor: default;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .btn.reject {
+      color: #81282d;
+      border-color: #c7a3a5;
+    }
+
+    .btn.approve {
+      min-width: 86px;
+      color: #fff;
+      border-color: var(--steel-dark);
+      background: var(--steel);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 1px 1px rgba(31, 45, 58, 0.12);
+    }
+
+    .btn:focus-visible {
+      outline: 2px solid #1f6fa8;
+      outline-offset: 2px;
+    }
+
+    @media (max-width: 760px) {
+      .topbar,
+      .utilitybar {
+        padding-right: 12px;
+        padding-left: 12px;
+      }
+
+      main {
+        padding-right: 10px;
+        padding-left: 10px;
+      }
+
+      .meta-grid,
+      .document-titlebar {
+        padding-right: 10px;
+        padding-left: 10px;
+      }
+
+      .meta-item {
+        padding-right: 9px;
+        padding-left: 9px;
+      }
+
+      .stepper {
+        padding-right: 14px;
+        padding-left: 14px;
+      }
+
+      .action-panel {
+        gap: 8px;
+      }
+
+      .attachments {
+        gap: 5px;
+      }
+
+      .file {
+        max-width: 116px;
+        padding-right: 6px;
+        padding-left: 6px;
+      }
+
+      .btn {
+        min-width: 68px;
+        padding-right: 10px;
+        padding-left: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">DF</span>
+        <span>TNS Doc-Flow</span>
+      </div>
+      <div class="plant-select" aria-label="Selected plant">
+        <span>Plant 2 . Chonburi</span>
+        <span class="chevron" aria-hidden="true"></span>
+      </div>
+    </header>
+
+    <div class="utilitybar">
+      <div class="breadcrumb">Home / Purchase Requests / <strong>Approval</strong></div>
+      <div class="record-state"><span class="state-dot" aria-hidden="true"></span>Awaiting department approval</div>
+    </div>
+
+    <main>
+      <section class="panel document-head" aria-labelledby="document-title">
+        <div class="document-titlebar">
+          <div class="document-title">
+            <span class="document-id">PR-1132</span>
+            <h1 id="document-title">Tooling purchase</h1>
+          </div>
+          <span class="document-kind">Purchase Request</span>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <span class="meta-label">Requester</span>
+            <span class="meta-value">Anucha S.</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Amount</span>
+            <span class="meta-value amount">THB 184,500</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Request date</span>
+            <span class="meta-value">03 FEB 2020</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Cost center</span>
+            <span class="meta-value">P2-TOOL-04</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Priority</span>
+            <span class="meta-value priority-normal">Normal</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel route-panel" aria-labelledby="route-title">
+        <div class="section-heading">
+          <h2 id="route-title">Approval route</h2>
+          <span class="section-note">Route: Standard purchase · Revision 01</span>
+        </div>
+        <div class="stepper">
+          <div class="route-line" aria-hidden="true"></div>
+
+          <div class="step complete">
+            <span class="step-number">01</span>
+            <div class="route-marker hanko" aria-label="Approved by Anucha S.">
+              <span class="hanko-text">
+                <span class="hanko-approved">APPROVED</span>
+                <span class="hanko-name">Anucha S.</span>
+              </span>
+            </div>
+            <div class="step-role">Requester</div>
+            <div class="step-person">Anucha S.</div>
+            <div class="step-status">03 FEB 2020 · 08:42</div>
+          </div>
+
+          <div class="step complete">
+            <span class="step-number">02</span>
+            <div class="route-marker hanko" aria-label="Approved by Kenji T.">
+              <span class="hanko-text">
+                <span class="hanko-approved">APPROVED</span>
+                <span class="hanko-name">Kenji T.</span>
+              </span>
+            </div>
+            <div class="step-role">Section Head</div>
+            <div class="step-person">Kenji T.</div>
+            <div class="step-status">03 FEB 2020 · 10:16</div>
+          </div>
+
+          <div class="step current">
+            <span class="step-number">03</span>
+            <div class="route-marker current-marker">Pending</div>
+            <div class="step-role">Dept Manager</div>
+            <div class="step-person">Preecha W.</div>
+            <div class="step-status">Current approval</div>
+          </div>
+
+          <div class="step waiting">
+            <span class="step-number">04</span>
+            <div class="route-marker waiting-marker">Waiting</div>
+            <div class="step-role">Director</div>
+            <div class="step-person">Not assigned</div>
+            <div class="step-status">Waiting</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel action-panel" aria-label="Attachments and approval actions">
+        <div class="attachments">
+          <span class="attachments-label">
+            <svg class="paperclip" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M8.4 12.8l6.9-6.9a3.5 3.5 0 115 5L10.1 21.1a5.5 5.5 0 11-7.8-7.8l10-10a2.7 2.7 0 113.8 3.8L6.5 16.7a1.2 1.2 0 01-1.7-1.7l8.7-8.7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Attachments (2)
+          </span>
+          <span class="file">quotation.pdf</span>
+          <span class="file">spec_sheet.xlsx</span>
+        </div>
+        <div class="actions">
+          <button class="btn reject" type="button">Reject</button>
+          <button class="btn" type="button">Return</button>
+          <button class="btn approve" type="button">Approve</button>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
