@@ -272,37 +272,6 @@ a { color: inherit; }
 .screen-body--frame { padding: 0; }
 .screen-body--frame iframe { display: block; width: 100%; border: 0; }
 
-/* mockup primitives */
-.scr-title { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
-.scr-sub { font-size: 12px; color: var(--ink-soft); }
-.scr-section { margin-top: 16px; }
-.scr-head, .scr-row { display: flex; align-items: baseline; gap: 12px; }
-.scr-head { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); padding: 6px 0 4px; }
-.scr-row { padding: 7px 0; border-top: 1px solid var(--rule-soft); font-size: 13px; }
-.scr-fill { flex: 1; }
-.scr-num { font-family: var(--mono); font-size: 12px; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.scr-chip { display: inline-flex; align-items: center; gap: 5px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; border: 1px solid var(--ink); padding: 1px 6px 0; background: #fff; white-space: nowrap; }
-.scr-chip::before { content: ""; width: 6px; height: 6px; background: var(--ink); }
-.scr-chip.ok::before { background: var(--c-green); }
-.scr-chip.warn::before { background: var(--c-yellow); }
-.scr-chip.err::before { background: var(--c-led); }
-.scr-chip.info::before { background: var(--c-cyan); }
-.scr-chip.acc::before { background: var(--c-orange); }
-.scr-bar { display: inline-block; height: 10px; border: 1px solid var(--ink); background: #fff; vertical-align: middle; }
-.scr-bar i { display: block; height: 100%; background: var(--c-orange); }
-.scr-key { display: inline-block; font-family: var(--mono); font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; border: 1px solid var(--ink); padding: 4px 8px 3px; background: var(--chassis); box-shadow: 1.5px 1.5px 0 var(--ink); }
-.scr-input { display: flex; align-items: center; gap: 8px; border: 1px solid var(--ink); padding: 6px 10px; background: #fff; font-family: var(--mono); font-size: 11px; color: var(--ink-soft); }
-.scr-cellgrid { display: grid; gap: 4px; }
-.scr-cell { border: 1px solid var(--ink); min-height: 26px; background: #fff; }
-.scr-cell.occ { background: var(--ink); }
-.scr-cell.evt { background: var(--c-orange); }
-.scr-spark { display: flex; align-items: flex-end; gap: 2px; height: 28px; }
-.scr-spark i { flex: 1; background: var(--c-cyan); }
-.scr-chat { display: grid; gap: 8px; }
-.scr-msg { max-width: 85%; border: 1px solid var(--ink); padding: 8px 10px; font-size: 12px; justify-self: start; background: #fff; }
-.scr-msg.me { justify-self: end; background: var(--panel); }
-.scr-step { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--rule-soft); font-size: 13px; }
-
 /* ============ 02 LAB ============ */
 .carts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
 .cart { border: 1px solid var(--ink); display: flex; flex-direction: column; }
@@ -572,42 +541,21 @@ kbd {
             </div>
             <div class="proj-screens">
               <figure class="screen reveal">
-                <div class="screen-top"><span class="mono">THAIBULKSMS · HISTORY</span><span class="led" aria-hidden="true"></span></div>
-                <div class="screen-body" aria-hidden="true">
-                  <div class="scr-input">sender: THAIBULK · 01–15 JUL 2026 · status: all</div>
-                  <div class="scr-section">
-                    <div class="scr-head"><span style="width:72px">Time</span><span class="scr-fill">Recipient</span><span style="width:64px">Seg</span><span style="width:78px">Status</span></div>
-                    <div class="scr-row"><span class="scr-num" style="width:72px">09:42:18</span><span class="scr-fill">+66 81-xxx-1234</span><span class="scr-num" style="width:64px">01</span><span class="scr-chip ok">delivered</span></div>
-                    <div class="scr-row"><span class="scr-num" style="width:72px">09:37:04</span><span class="scr-fill">+66 89-xxx-1234</span><span class="scr-num" style="width:64px">02</span><span class="scr-chip ok">delivered</span></div>
-                    <div class="scr-row"><span class="scr-num" style="width:72px">09:31:55</span><span class="scr-fill">+66 86-xxx-1234</span><span class="scr-num" style="width:64px">01</span><span class="scr-chip warn">queued</span></div>
-                    <div class="scr-row"><span class="scr-num" style="width:72px">09:24:41</span><span class="scr-fill">+66 82-xxx-1234</span><span class="scr-num" style="width:64px">03</span><span class="scr-chip ok">delivered</span></div>
-                    <div class="scr-row"><span class="scr-num" style="width:72px">09:18:09</span><span class="scr-fill">+66 84-xxx-1234</span><span class="scr-num" style="width:64px">01</span><span class="scr-chip err">failed</span></div>
-                  </div>
-                  <div class="scr-section">
-                    <div class="scr-sub">volume · 7 days</div>
-                    <div class="scr-spark"><i style="height:42%"></i><i style="height:68%"></i><i style="height:55%"></i><i style="height:84%"></i><i style="height:73%"></i><i style="height:100%"></i><i style="height:61%"></i></div>
-                  </div>
+                <div class="screen-top"><span class="mono">SMS · HISTORY</span><span class="led" aria-hidden="true"></span></div>
+                <div class="screen-body screen-body--frame" aria-hidden="true">
+                  <iframe class="fit" src="mockups/sms-history.html" title="searchable delivery history across sender, date and status" loading="lazy" height="420"></iframe>
                 </div>
                 <figcaption class="mono">searchable delivery history across sender, date and status</figcaption>
               </figure>
               <figure class="screen reveal">
-                <div class="screen-top"><span class="mono">THAIBULKSMS · LEAD ROUTING</span><span class="led" aria-hidden="true"></span></div>
-                <div class="screen-body" aria-hidden="true">
-                  <div class="scr-title">Inbound leads → Pipedrive</div>
-                  <div class="scr-section">
-                    <div class="scr-head"><span class="scr-fill">Lead</span><span style="width:76px">Source</span><span style="width:148px">Rule → owner</span><span style="width:66px">Sync</span></div>
-                    <div class="scr-row"><span class="scr-fill">Siam Retail Co.</span><span style="width:76px">web form</span><span style="width:148px">SME → Nattapong</span><span class="scr-chip ok">synced</span></div>
-                    <div class="scr-row"><span class="scr-fill">Chao Phraya Foods</span><span style="width:76px">LINE</span><span style="width:148px">F&amp;B → Pimchanok</span><span class="scr-chip ok">synced</span></div>
-                    <div class="scr-row"><span class="scr-fill">Krung Siam Clinic</span><span style="width:76px">import</span><span style="width:148px">health → Kittisak</span><span class="scr-chip warn">retry</span></div>
-                    <div class="scr-row"><span class="scr-fill">Lanna Homeware</span><span style="width:76px">web form</span><span style="width:148px">north → Siriporn</span><span class="scr-chip ok">synced</span></div>
-                    <div class="scr-row"><span class="scr-fill">Andaman Logistics</span><span style="width:76px">LINE</span><span style="width:148px">enterprise → Thanawat</span><span class="scr-chip ok">synced</span></div>
-                  </div>
-                  <div class="scr-section"><span class="scr-key">ADD RULE</span> <span class="scr-key">RE-SYNC</span></div>
+                <div class="screen-top"><span class="mono">SMS · LEAD ROUTING</span><span class="led" aria-hidden="true"></span></div>
+                <div class="screen-body screen-body--frame" aria-hidden="true">
+                  <iframe class="fit" src="mockups/sms-routing.html" title="rule-based lead assignment with visible sync state" loading="lazy" height="400"></iframe>
                 </div>
                 <figcaption class="mono">rule-based lead assignment with visible sync state</figcaption>
               </figure>
               <figure class="screen reveal">
-                <div class="screen-top"><span class="mono">THAIBULKSMS · OWN STYLE</span><span class="led" aria-hidden="true"></span></div>
+                <div class="screen-top"><span class="mono">SMS · OWN STYLE</span><span class="led" aria-hidden="true"></span></div>
                 <div class="screen-body screen-body--frame" aria-hidden="true">
                   <iframe src="mockups/thaibulksms.html" title="ThaiBulkSMS dashboard mockup in its own product style" loading="lazy" height="540"></iframe>
                 </div>
@@ -630,58 +578,15 @@ kbd {
             <div class="proj-screens">
               <figure class="screen screen--phone reveal">
                 <div class="screen-top"><span class="mono">EKYC · ONBOARD</span><span class="led" aria-hidden="true"></span></div>
-                <div class="screen-body" aria-hidden="true">
-                  <div class="scr-step"><span class="scr-fill">1 · ID DOCUMENT</span><span class="scr-chip ok">done</span></div>
-                  <div class="scr-step"><span class="scr-fill">2 · LIVENESS</span><span class="scr-chip acc">active</span></div>
-                  <div class="scr-step"><span class="scr-fill">3 · REVIEW</span><span class="scr-chip">waiting</span></div>
-                  <div class="scr-section">
-                    <div style="border:1px solid var(--ink);height:120px;display:grid;place-items:center">
-                      <span class="scr-sub">align face in frame</span>
-                    </div>
-                    <div class="scr-row"><span class="scr-fill">good lighting</span><span class="scr-num">✓</span></div>
-                    <div class="scr-row"><span class="scr-fill">no glasses</span><span class="scr-num">✓</span></div>
-                    <div class="scr-row"><span class="scr-fill">hold still</span><span class="scr-num">…</span></div>
-                  </div>
-                  <div class="scr-section"><span class="scr-key">CONTINUE</span></div>
+                <div class="screen-body screen-body--frame" aria-hidden="true">
+                  <iframe class="fit" src="mockups/ekyc-onboard.html" title="mobile liveness capture checkpoint" loading="lazy" height="440"></iframe>
                 </div>
                 <figcaption class="mono">mobile liveness capture checkpoint</figcaption>
               </figure>
               <figure class="screen reveal">
                 <div class="screen-top"><span class="mono">EKYC · REVIEW CONSOLE</span><span class="led" aria-hidden="true"></span></div>
-                <div class="screen-body" aria-hidden="true">
-                  <div class="scr-head">
-                    <span class="scr-fill">Applicant</span>
-                    <span style="width:160px">Doc match</span>
-                    <span style="width:80px">Liveness</span>
-                    <span style="width:70px">Verdict</span>
-                  </div>
-                  <div class="scr-row">
-                    <span class="scr-fill">Narin Suksai · <span class="scr-num">1-1035-xxxxx-42-8</span></span>
-                    <span style="width:160px"><span class="scr-bar" style="width:112px"><i style="width:97%"></i></span> <span class="scr-num">97%</span></span>
-                    <span class="scr-num" style="width:80px">98%</span>
-                    <span style="width:70px"><span class="scr-chip ok">pass</span></span>
-                  </div>
-                  <div class="scr-row">
-                    <span class="scr-fill">Pimchanok Rattanakul · <span class="scr-num">3-2011-xxxxx-09-4</span></span>
-                    <span style="width:160px"><span class="scr-bar" style="width:96px"><i style="width:81%"></i></span> <span class="scr-num">81%</span></span>
-                    <span class="scr-num" style="width:80px">84%</span>
-                    <span style="width:70px"><span class="scr-chip warn">review</span></span>
-                  </div>
-                  <div class="scr-row">
-                    <span class="scr-fill">Thanawat Chaiyo · <span class="scr-num">1-4490-xxxxx-31-6</span></span>
-                    <span style="width:160px"><span class="scr-bar" style="width:72px"><i style="width:52%"></i></span> <span class="scr-num">52%</span></span>
-                    <span class="scr-num" style="width:80px">54%</span>
-                    <span style="width:70px"><span class="scr-chip err">fail</span></span>
-                  </div>
-                  <div class="scr-row">
-                    <span class="scr-fill">Kanyarat Boonmee · <span class="scr-num">2-7506-xxxxx-18-2</span></span>
-                    <span style="width:160px"><span class="scr-bar" style="width:104px"><i style="width:94%"></i></span> <span class="scr-num">94%</span></span>
-                    <span class="scr-num" style="width:80px">92%</span>
-                    <span style="width:70px"><span class="scr-chip ok">pass</span></span>
-                  </div>
-                  <div class="scr-section">
-                    <div class="scr-row"><span class="scr-sub scr-fill">queue · 12 pending</span><span class="scr-key">NEXT CASE</span></div>
-                  </div>
+                <div class="screen-body screen-body--frame" aria-hidden="true">
+                  <iframe class="fit" src="mockups/ekyc-review.html" title="analyst queue for document and liveness review" loading="lazy" height="340"></iframe>
                 </div>
                 <figcaption class="mono">analyst queue for document and liveness review</figcaption>
               </figure>
@@ -709,158 +614,35 @@ kbd {
             </div>
             <div class="proj-screens">
               <figure class="screen reveal">
-                <div class="screen-top"><span class="mono">DMMS · FLOORPLAN</span><span class="led" aria-hidden="true"></span></div>
-                <div class="screen-body" aria-hidden="true">
-                  <div class="scr-row" style="border-top:0;padding-top:0">
-                    <span class="scr-title">Zone B2 · BR-0412</span>
-                    <span class="scr-fill"></span>
-                    <span class="scr-chip acc">occupancy 92%</span>
-                  </div>
-                  <div class="scr-section">
-                    <div class="scr-cellgrid" style="grid-template-columns:repeat(8,1fr)">
-                      <span class="scr-cell occ" style="min-height:26px"></span>
-                      <span class="scr-cell occ" style="min-height:34px"></span>
-                      <span class="scr-cell evt" style="min-height:22px"></span>
-                      <span class="scr-cell occ" style="min-height:30px"></span>
-                      <span class="scr-cell" style="min-height:26px"></span>
-                      <span class="scr-cell occ" style="min-height:34px"></span>
-                      <span class="scr-cell occ" style="min-height:24px"></span>
-                      <span class="scr-cell occ" style="min-height:30px"></span>
-                      <span class="scr-cell occ" style="min-height:32px"></span>
-                      <span class="scr-cell" style="min-height:22px"></span>
-                      <span class="scr-cell occ" style="min-height:28px"></span>
-                      <span class="scr-cell occ" style="min-height:34px"></span>
-                      <span class="scr-cell evt" style="min-height:26px"></span>
-                      <span class="scr-cell occ" style="min-height:30px"></span>
-                      <span class="scr-cell" style="min-height:24px"></span>
-                      <span class="scr-cell occ" style="min-height:32px"></span>
-                    </div>
-                  </div>
-                  <div class="scr-section">
-                    <div class="scr-row">
-                      <span class="scr-sub">revenue overlay · ฿/m²</span>
-                      <span class="scr-fill"></span>
-                      <span class="scr-spark" style="width:112px"><i style="height:38%"></i><i style="height:56%"></i><i style="height:48%"></i><i style="height:76%"></i><i style="height:64%"></i><i style="height:92%"></i></span>
-                    </div>
-                  </div>
-                  <div class="scr-section">
-                    <span class="scr-key">BOOK EVENT</span>
-                    <span class="scr-key">OVERLAYS ▾</span>
-                  </div>
+                <div class="screen-top"><span class="mono">MALL OPS · FLOORPLAN</span><span class="led" aria-hidden="true"></span></div>
+                <div class="screen-body screen-body--frame" aria-hidden="true">
+                  <iframe class="fit" src="mockups/mallops-floorplan.html" title="live floorplan occupancy and revenue overlay" loading="lazy" height="280"></iframe>
                 </div>
                 <figcaption class="mono">live floorplan occupancy and revenue overlay</figcaption>
               </figure>
               <figure class="screen reveal">
-                <div class="screen-top"><span class="mono">DMMS · REPORT PIPELINE</span><span class="led" aria-hidden="true"></span></div>
-                <div class="screen-body" aria-hidden="true">
-                  <div class="scr-title">Monthly consolidation</div>
-                  <div class="scr-sub">2,148 branches · run #47</div>
-                  <div class="scr-section">
-                    <div class="scr-head">
-                      <span style="width:76px">Region</span>
-                      <span style="width:64px">Branches</span>
-                      <span style="width:104px">Validated</span>
-                      <span class="scr-fill">State</span>
-                    </div>
-                    <div class="scr-row">
-                      <span class="scr-num" style="width:76px">BKK-C</span>
-                      <span class="scr-num" style="width:64px">512</span>
-                      <span class="scr-bar" style="width:104px"><i style="width:100%"></i></span>
-                      <span class="scr-fill"></span>
-                      <span class="scr-chip ok">done</span>
-                    </div>
-                    <div class="scr-row">
-                      <span class="scr-num" style="width:76px">NORTH</span>
-                      <span class="scr-num" style="width:64px">486</span>
-                      <span class="scr-bar" style="width:104px"><i style="width:74%"></i></span>
-                      <span class="scr-fill"></span>
-                      <span class="scr-chip acc">running</span>
-                    </div>
-                    <div class="scr-row">
-                      <span class="scr-num" style="width:76px">NE</span>
-                      <span class="scr-num" style="width:64px">590</span>
-                      <span class="scr-bar" style="width:104px"><i style="width:12%"></i></span>
-                      <span class="scr-fill"></span>
-                      <span class="scr-chip">queued</span>
-                    </div>
-                    <div class="scr-row">
-                      <span class="scr-num" style="width:76px">SOUTH</span>
-                      <span class="scr-num" style="width:64px">560</span>
-                      <span class="scr-bar" style="width:104px"><i style="width:0%"></i></span>
-                      <span class="scr-fill"></span>
-                      <span class="scr-chip warn">2 rejected</span>
-                    </div>
-                  </div>
-                  <div class="scr-section">
-                    <div class="scr-row">
-                      <span class="scr-sub">overall validation</span>
-                      <span class="scr-fill"><span class="scr-bar" style="width:100%"><i style="width:46%"></i></span></span>
-                      <span class="scr-num">46%</span>
-                    </div>
-                  </div>
-                  <div class="scr-section">
-                    <span class="scr-key">EXPORT XLSX</span>
-                    <span class="scr-key">VALIDATION LOG</span>
-                  </div>
+                <div class="screen-top"><span class="mono">MALL OPS · REPORT PIPELINE</span><span class="led" aria-hidden="true"></span></div>
+                <div class="screen-body screen-body--frame" aria-hidden="true">
+                  <iframe class="fit" src="mockups/mallops-pipeline.html" title="monthly branch reporting consolidation status" loading="lazy" height="360"></iframe>
                 </div>
                 <figcaption class="mono">monthly branch reporting consolidation status</figcaption>
               </figure>
               <figure class="screen screen--phone reveal">
-                <div class="screen-top"><span class="mono">DMMS · FIELD OPS</span><span class="led" aria-hidden="true"></span></div>
-                <div class="screen-body" aria-hidden="true">
-                  <div class="scr-title">Task #1847 · BR-0412</div>
-                  <div class="scr-sub">signage check · zone B2</div>
-                  <div class="scr-row" style="margin-top:10px">
-                    <span class="scr-sub">SLA</span>
-                    <span class="scr-fill"></span>
-                    <span class="scr-num">04:12:33</span>
-                    <span class="scr-chip warn">due today</span>
-                  </div>
-                  <div class="scr-section">
-                    <div class="scr-sub">photo records · 2/4</div>
-                    <div class="scr-cellgrid" style="grid-template-columns:repeat(4,1fr);margin-top:6px">
-                      <span class="scr-cell occ" style="height:56px"></span>
-                      <span class="scr-cell occ" style="height:56px"></span>
-                      <span class="scr-cell" style="height:56px"></span>
-                      <span class="scr-cell" style="height:56px"></span>
-                    </div>
-                  </div>
-                  <div class="scr-row">
-                    <span class="scr-sub">assignee</span>
-                    <span class="scr-fill">Somchai P.</span>
-                    <span class="scr-chip info">on site</span>
-                  </div>
-                  <div class="scr-section">
-                    <span class="scr-key">CHECK IN</span>
-                    <span class="scr-key">UPLOAD</span>
-                  </div>
+                <div class="screen-top"><span class="mono">MALL OPS · FIELD OPS</span><span class="led" aria-hidden="true"></span></div>
+                <div class="screen-body screen-body--frame" aria-hidden="true">
+                  <iframe class="fit" src="mockups/mallops-field.html" title="field task check-in and photo record" loading="lazy" height="320"></iframe>
                 </div>
                 <figcaption class="mono">field task check-in and photo record</figcaption>
               </figure>
               <figure class="screen screen--phone reveal">
                 <div class="screen-top"><span class="mono">LINE OA · LEAD BOT</span><span class="led" aria-hidden="true"></span></div>
-                <div class="screen-body" aria-hidden="true">
-                  <div class="scr-chat">
-                    <div class="scr-msg">Reminder: lead L-2094 'Cha Tra Mue kiosk' has no contact in 3 days. Next action?</div>
-                    <div class="scr-msg">
-                      <div class="scr-title">L-2094 · Cha Tra Mue</div>
-                      <div class="scr-sub">zone B1 · 12 m² · ฿38,000/mo</div>
-                      <span class="scr-chip acc">negotiation</span>
-                    </div>
-                    <div class="scr-msg me">Booked call Thu 10:00 ✓</div>
-                    <div class="scr-msg">Logged. Status → follow-up scheduled.</div>
-                  </div>
-                  <div class="scr-row" style="margin-top:14px">
-                    <span class="scr-sub">pipeline</span>
-                    <span class="scr-fill"></span>
-                    <span class="scr-chip ok">12 active</span>
-                    <span class="scr-chip warn">3 stale</span>
-                  </div>
+                <div class="screen-body screen-body--frame" aria-hidden="true">
+                  <iframe class="fit" src="mockups/lineoa-bot.html" title="line oa lead follow-up assistant" loading="lazy" height="340"></iframe>
                 </div>
                 <figcaption class="mono">line oa lead follow-up assistant</figcaption>
               </figure>
               <figure class="screen reveal">
-                <div class="screen-top"><span class="mono">DMMS · OWN STYLE</span><span class="led" aria-hidden="true"></span></div>
+                <div class="screen-top"><span class="mono">MALL OPS · OWN STYLE</span><span class="led" aria-hidden="true"></span></div>
                 <div class="screen-body screen-body--frame" aria-hidden="true">
                   <iframe src="mockups/dmms.html" title="DMMS floorplan console mockup in its own product style" loading="lazy" height="560"></iframe>
                 </div>
@@ -883,34 +665,15 @@ kbd {
             <div class="proj-screens">
               <figure class="screen reveal">
                 <div class="screen-top"><span class="mono">PDPA · DSR QUEUE</span><span class="led" aria-hidden="true"></span></div>
-                <div class="screen-body" aria-hidden="true">
-                  <div class="scr-title">Data subject requests</div>
-                  <div class="scr-sub">SLA · 30 days statutory</div>
-                  <div class="scr-section">
-                    <div class="scr-head"><span style="width:108px">Request</span><span class="scr-fill">Type</span><span style="width:48px">Age</span><span style="width:96px">State</span></div>
-                    <div class="scr-row"><span class="scr-num" style="width:108px">DSR-2020-041</span><span class="scr-fill"><span class="scr-chip info">access</span></span><span class="scr-num" style="width:48px">D-06</span><span style="width:96px"><span class="scr-chip acc">in review</span></span></div>
-                    <div class="scr-row"><span class="scr-num" style="width:108px">DSR-2020-042</span><span class="scr-fill"><span class="scr-chip err">erasure</span></span><span class="scr-num" style="width:48px">D-02</span><span style="width:96px"><span class="scr-chip warn">escalate</span></span></div>
-                    <div class="scr-row"><span class="scr-num" style="width:108px">DSR-2020-043</span><span class="scr-fill"><span class="scr-chip">portability</span></span><span class="scr-num" style="width:48px">D-11</span><span style="width:96px"><span class="scr-chip ok">closed</span></span></div>
-                    <div class="scr-row"><span class="scr-num" style="width:108px">DSR-2020-044</span><span class="scr-fill"><span class="scr-chip info">access</span></span><span class="scr-num" style="width:48px">D-19</span><span style="width:96px"><span class="scr-chip ok">closed</span></span></div>
-                    <div class="scr-row"><span class="scr-num" style="width:108px">DSR-2020-045</span><span class="scr-fill"><span class="scr-chip err">erasure</span></span><span class="scr-num" style="width:48px">D-24</span><span style="width:96px"><span class="scr-chip acc">in review</span></span></div>
-                  </div>
-                  <div class="scr-section"><span class="scr-key">ASSIGN</span> <span class="scr-key">EXPORT AUDIT</span></div>
+                <div class="screen-body screen-body--frame" aria-hidden="true">
+                  <iframe class="fit" src="mockups/pdpa-dsr.html" title="statutory request queue and escalation controls" loading="lazy" height="380"></iframe>
                 </div>
                 <figcaption class="mono">statutory request queue and escalation controls</figcaption>
               </figure>
               <figure class="screen reveal">
                 <div class="screen-top"><span class="mono">PDPA · DATA MAP</span><span class="led" aria-hidden="true"></span></div>
-                <div class="screen-body" aria-hidden="true">
-                  <div class="scr-title">Personal-data inventory</div>
-                  <div class="scr-section">
-                    <div class="scr-head"><span style="width:90px">System</span><span class="scr-fill">Category</span><span style="width:110px">Lawful basis</span><span style="width:70px">Retention</span></div>
-                    <div class="scr-row"><span style="width:90px">CRM</span><span class="scr-fill">contact + id</span><span style="width:110px">consent</span><span class="scr-num" style="width:70px">2Y</span></div>
-                    <div class="scr-row"><span style="width:90px">Payroll</span><span class="scr-fill">financial</span><span style="width:110px">contract</span><span class="scr-num" style="width:70px">7Y</span></div>
-                    <div class="scr-row"><span style="width:90px">CCTV</span><span class="scr-fill">biometric</span><span style="width:110px">legit. interest</span><span class="scr-num" style="width:70px">30D</span></div>
-                    <div class="scr-row"><span style="width:90px">Visitor Log</span><span class="scr-fill">contact</span><span style="width:110px">legit. interest</span><span class="scr-num" style="width:70px">90D</span></div>
-                    <div class="scr-row"><span style="width:90px">Legacy HR</span><span class="scr-fill">employee id</span><span style="width:110px"><span class="scr-chip warn">no basis</span></span><span class="scr-num" style="width:70px">10Y</span></div>
-                  </div>
-                  <div class="scr-row scr-section"><span class="scr-sub">systems mapped</span><span class="scr-num">23/26</span><span class="scr-fill"></span><span class="scr-bar" style="width:120px"><i style="width:88%"></i></span></div>
+                <div class="screen-body screen-body--frame" aria-hidden="true">
+                  <iframe class="fit" src="mockups/pdpa-map.html" title="processing inventory with lawful-basis coverage" loading="lazy" height="360"></iframe>
                 </div>
                 <figcaption class="mono">processing inventory with lawful-basis coverage</figcaption>
               </figure>
@@ -938,16 +701,8 @@ kbd {
             <div class="proj-screens">
               <figure class="screen reveal">
                 <div class="screen-top"><span class="mono">DOC-FLOW · APPROVAL</span><span class="led" aria-hidden="true"></span></div>
-                <div class="screen-body" aria-hidden="true">
-                  <div class="scr-title">PR-1132 · Tooling purchase</div>
-                  <div class="scr-sub">requested by Anucha S. · plant 2 · ฿184,500</div>
-                  <div class="scr-section">
-                    <div class="scr-step"><span class="scr-fill">1 · REQUESTER · Anucha S.</span><span class="scr-num">03 FEB 09:14</span><span class="scr-chip ok">signed</span></div>
-                    <div class="scr-step"><span class="scr-fill">2 · SECTION HEAD · Kenji T.</span><span class="scr-num">03 FEB 15:40</span><span class="scr-chip ok">signed</span></div>
-                    <div class="scr-step"><span class="scr-fill">3 · DEPT MANAGER · Preecha W.</span><span class="scr-chip acc">pending</span></div>
-                    <div class="scr-step"><span class="scr-fill">4 · DIRECTOR</span><span class="scr-chip">waiting</span></div>
-                  </div>
-                  <div class="scr-row"><span class="scr-sub">route</span><span class="scr-fill"></span><span class="scr-num">2/4 approvals</span></div>
+                <div class="screen-body screen-body--frame" aria-hidden="true">
+                  <iframe class="fit" src="mockups/docflow-approval.html" title="factory purchase request sign-off route" loading="lazy" height="320"></iframe>
                 </div>
                 <figcaption class="mono">factory purchase request sign-off route</figcaption>
               </figure>
@@ -1219,6 +974,20 @@ document.addEventListener('keydown', (e) => {
     modules[i].scrollIntoView({ behavior: 'smooth', block: 'start' });
     click();
   }
+});
+
+// iframe screens: match frame height to content (same-origin)
+function fitFrame(f) {
+  try {
+    const d = f.contentDocument;
+    if (d && d.readyState === 'complete' && d.body && d.body.offsetHeight > 40) {
+      f.style.height = d.body.offsetHeight + 'px';
+    }
+  } catch (e) {}
+}
+document.querySelectorAll('iframe.fit').forEach((f) => {
+  f.addEventListener('load', () => fitFrame(f));
+  fitFrame(f); // already loaded before this script ran
 });
 
 // reveals: quantized slide-in, once
