@@ -1019,6 +1019,28 @@
         .spec tr:first-child th {
           border-top: 0;
         }
+        /* stack + ai toolchain: one card per row */
+        .stack-grid,
+        .ai-tools {
+          grid-template-columns: 1fr;
+        }
+        /* desktop mockups: keep desktop layout, render at fixed desktop width
+           and scale down to fit the column. --mzoom/--mh/--mzh set by
+           zoomFrames() in the page script. */
+        .screen:not(.screen--phone) .screen-body--frame {
+          position: relative;
+          overflow: hidden;
+          height: var(--mzh, 420px);
+        }
+        .screen:not(.screen--phone) .screen-body--frame iframe {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 720px; /* keep in sync with DESK_W in script */
+          height: var(--mh, 640px);
+          transform: scale(var(--mzoom, 0.5));
+          transform-origin: top left;
+        }
       }
     </style>
   </head>
@@ -2010,6 +2032,42 @@
       document.querySelectorAll("iframe.fit").forEach((f) => {
         f.addEventListener("load", () => fitFrame(f));
         fitFrame(f); // already loaded before this script ran
+      });
+
+      // mobile (≤720px): desktop mockups render at DESK_W and scale to fit —
+      // measures content height at desktop width, then sets the scale factor
+      // and the scaled container height consumed by the media-query CSS
+      const DESK_W = 720; // keep in sync with iframe width in the media query
+      const deskFrames = document.querySelectorAll(
+        ".screen:not(.screen--phone) .screen-body--frame",
+      );
+      function zoomFrames() {
+        deskFrames.forEach((b) => {
+          const f = b.querySelector("iframe");
+          if (!f) return;
+          let h = +f.getAttribute("height") || 560;
+          try {
+            const d = f.contentDocument;
+            if (d && d.body && d.body.offsetHeight > 40)
+              h = d.body.offsetHeight;
+          } catch (e) {}
+          if (f.classList.contains("fit")) f.style.height = h + "px";
+          const z = Math.min(1, b.clientWidth / DESK_W);
+          // zoom frames crop tall app pages to a window on desktop (--zoom-h);
+          // keep the same crop on mobile instead of a full-page strip
+          const cap = b.classList.contains("screen-body--zoom")
+            ? parseFloat(b.style.getPropertyValue("--zoom-h")) || 560
+            : Infinity;
+          b.style.setProperty("--mzoom", z);
+          b.style.setProperty("--mh", h + "px");
+          b.style.setProperty("--mzh", Math.min(h * z, cap) + "px");
+        });
+      }
+      zoomFrames();
+      window.addEventListener("resize", zoomFrames);
+      deskFrames.forEach((b) => {
+        const f = b.querySelector("iframe");
+        if (f) f.addEventListener("load", zoomFrames);
       });
 
       // reveals: quantized slide-in, once
