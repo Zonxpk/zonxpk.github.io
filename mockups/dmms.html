@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#1e293b">
-  <title>Mall Ops Floorplan — Zone B2</title>
+  <title>Mall Ops floorplan — Zone B2 live occupancy</title>
   <style>
     :root {
       color-scheme: light;
@@ -32,7 +32,7 @@
       --canvas: #f3f6f8;
       --border: #dce4ea;
       --text: #172033;
-      --muted: #68778b;
+      --muted: #626f83;
       --radius-input: 6px;
       --radius-card: 8px;
       --radius-panel: 10px;
@@ -45,18 +45,18 @@
 
     html,
     body {
-      width: 100%;
       height: 100%;
+      margin: 0;
       overflow: hidden;
     }
 
     body {
-      margin: 0;
       background: var(--canvas);
       color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      font-size: 13px;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 12.5px;
       line-height: 1.35;
+      font-variant-numeric: tabular-nums;
       -webkit-font-smoothing: antialiased;
     }
 
@@ -69,10 +69,12 @@
       display: grid;
       grid-template-columns: 142px minmax(0, 1fr);
       width: 100%;
-      height: 100%;
+      height: 100vh;
       min-width: 700px;
       background: var(--canvas);
     }
+
+    /* ---------- sidebar ---------- */
 
     .sidebar {
       display: flex;
@@ -116,7 +118,7 @@
       display: block;
       margin-top: 4px;
       color: var(--slate-400);
-      font-size: 8px;
+      font-size: 8.5px;
       line-height: 1;
       letter-spacing: 0.08em;
       white-space: nowrap;
@@ -149,6 +151,7 @@
       font-size: 12px;
       font-weight: 500;
       text-decoration: none;
+      transition: background-color 120ms ease, color 120ms ease;
     }
 
     .nav a svg {
@@ -176,6 +179,13 @@
       border-radius: 0 3px 3px 0;
       background: #34d399;
       content: "";
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .nav a:not(.active):hover {
+        color: #dbe4ee;
+        background: rgba(255, 255, 255, 0.06);
+      }
     }
 
     .sidebar-foot {
@@ -208,10 +218,12 @@
       font-variant-numeric: tabular-nums;
     }
 
+    /* ---------- shell ---------- */
+
     .shell {
       display: grid;
       min-width: 0;
-      grid-template-rows: 58px minmax(0, 1fr);
+      grid-template-rows: 52px minmax(0, 1fr);
     }
 
     .topbar {
@@ -269,7 +281,7 @@
 
     .search input {
       width: 100%;
-      height: 32px;
+      height: 30px;
       padding: 0 34px 0 31px;
       border: 1px solid var(--slate-200);
       border-radius: var(--radius-input);
@@ -285,7 +297,7 @@
 
     .search kbd {
       position: absolute;
-      top: 8px;
+      top: 7px;
       right: 8px;
       padding: 1px 4px;
       border: 1px solid var(--slate-200);
@@ -293,7 +305,7 @@
       background: var(--white);
       color: var(--slate-400);
       font-family: inherit;
-      font-size: 8px;
+      font-size: 8.5px;
       line-height: 13px;
     }
 
@@ -313,13 +325,15 @@
       letter-spacing: 0.02em;
     }
 
+    /* ---------- content ---------- */
+
     .content {
       display: grid;
       min-width: 0;
       min-height: 0;
       grid-template-rows: auto minmax(0, 1fr);
-      gap: 9px;
-      padding: 12px 14px 14px;
+      gap: 8px;
+      padding: 10px 14px 12px;
     }
 
     .page-head {
@@ -337,10 +351,10 @@
     h1 {
       margin: 0;
       color: var(--slate-900);
-      font-size: 19px;
+      font-size: 18px;
       font-weight: 720;
       line-height: 1.15;
-      letter-spacing: -0.025em;
+      letter-spacing: -0.02em;
     }
 
     .subtitle {
@@ -354,9 +368,10 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      padding-bottom: 1px;
-      color: var(--slate-500);
+      padding-bottom: 2px;
+      color: var(--muted);
       font-size: 9px;
+      font-variant-numeric: tabular-nums;
       white-space: nowrap;
     }
 
@@ -372,12 +387,14 @@
       display: grid;
       min-width: 0;
       min-height: 0;
-      grid-template-columns: minmax(0, 1fr) minmax(184px, 210px);
+      grid-template-columns: minmax(0, 1fr) minmax(196px, 218px);
       gap: 10px;
     }
 
+    /* ---------- floor card ---------- */
+
     .floor-card,
-    .insights {
+    .rail {
       min-width: 0;
       min-height: 0;
       border: 1px solid var(--border);
@@ -387,7 +404,7 @@
 
     .floor-card {
       display: grid;
-      grid-template-rows: 44px minmax(0, 1fr);
+      grid-template-rows: 40px minmax(0, 1fr);
       overflow: hidden;
       border-radius: var(--radius-panel);
     }
@@ -403,16 +420,20 @@
 
     .floor-title {
       display: flex;
+      flex: 1 1 auto;
       min-width: 0;
       align-items: center;
       gap: 8px;
+      overflow: hidden;
     }
 
     .floor-title strong {
+      overflow: hidden;
       color: var(--slate-800);
       font-size: 11px;
       font-weight: 650;
       white-space: nowrap;
+      text-overflow: ellipsis;
     }
 
     .floor-title small {
@@ -425,10 +446,10 @@
 
     .legend {
       display: flex;
+      flex: 0 0 auto;
       align-items: center;
       justify-content: flex-end;
-      gap: 7px;
-      min-width: 0;
+      gap: 9px;
     }
 
     .legend span {
@@ -436,30 +457,51 @@
       align-items: center;
       gap: 4px;
       color: var(--slate-500);
-      font-size: 8px;
+      font-size: 8.5px;
       white-space: nowrap;
     }
 
-    .legend i {
+    .ramp {
+      display: flex;
+      gap: 1px;
+    }
+
+    .ramp i {
       width: 8px;
       height: 8px;
+      border: 1px solid #4cb98c;
+    }
+
+    .ramp i:nth-child(1) { background: #e9f7f0; border-radius: 2px 0 0 2px; }
+    .ramp i:nth-child(2) { background: #cdeede; }
+    .ramp i:nth-child(3) { background: #abe3c8; border-radius: 0 2px 2px 0; }
+
+    .legend .sw {
+      position: relative;
+      width: 9px;
+      height: 9px;
       border: 1px solid;
       border-radius: 2px;
     }
 
-    .legend .occupied {
-      border-color: var(--emerald-500);
-      background: var(--emerald-100);
-    }
-
-    .legend .vacant {
-      border-color: var(--slate-300);
-      background: var(--white);
-    }
-
-    .legend .event {
-      border-color: var(--amber-400);
+    .legend .sw-expiring {
+      border-color: #d99b26;
       background: var(--amber-100);
+    }
+
+    .legend .sw-expiring::after {
+      position: absolute;
+      top: 0;
+      right: 0;
+      border-top: 4px solid var(--amber-700);
+      border-left: 4px solid transparent;
+      content: "";
+    }
+
+    .legend .sw-vacant {
+      border-color: var(--slate-400);
+      border-style: dashed;
+      background: var(--white);
     }
 
     .map-wrap {
@@ -481,15 +523,14 @@
       height: 100%;
     }
 
+    /* map fabric */
     .floorplan .site {
       fill: #ffffff;
-      stroke: #b9c5d1;
-      stroke-width: 1.2;
+      stroke: #b3c0cd;
+      stroke-width: 1.4;
     }
 
-    .floorplan .walkway {
-      fill: #eef2f5;
-    }
+    .floorplan .walkway { fill: #eef2f5; }
 
     .floorplan .walkline {
       fill: none;
@@ -498,40 +539,59 @@
       stroke-width: 1;
     }
 
-    .floorplan .stall {
-      stroke-width: 1.15;
+    .floorplan .void {
+      fill: #f8fafc;
+      stroke: #c3ceda;
+      stroke-dasharray: 2.5 2.5;
+      stroke-width: 1;
     }
 
-    .floorplan .stall-occupied {
-      fill: #d1fae5;
-      stroke: #10b981;
-    }
-
-    .floorplan .stall-event {
-      fill: #fef3c7;
-      stroke: #f59e0b;
-    }
-
-    .floorplan .stall-vacant {
+    .floorplan .fixture {
       fill: #ffffff;
-      stroke: #aebbc8;
-      stroke-dasharray: 2.4 2.4;
+      stroke: #c3ceda;
+      stroke-width: 1;
     }
 
-    .floorplan .code {
-      fill: #365167;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      font-size: 7.6px;
-      font-weight: 650;
-      text-anchor: middle;
+    .floorplan .fixture-line {
+      fill: none;
+      stroke: #c9d4de;
+      stroke-width: 0.9;
     }
 
-    .floorplan .zone-label {
-      fill: #77869a;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      font-size: 7px;
-      font-weight: 600;
-      letter-spacing: 0.12em;
+    .floorplan .seat {
+      fill: none;
+      stroke: #c9d4de;
+      stroke-width: 0.9;
+    }
+
+    /* units — occupied carries a 3-step sales/sqm tint */
+    .floorplan .u { stroke-width: 1.15; }
+    .floorplan .rev-lo  { fill: #e9f7f0; stroke: #52ab84; }
+    .floorplan .rev-mid { fill: #cdeede; stroke: #3d9e77; }
+    .floorplan .rev-hi  { fill: #abe3c8; stroke: #2e8f6a; }
+
+    .floorplan .u-expiring {
+      fill: #fdf3d7;
+      stroke: #d99b26;
+    }
+
+    .floorplan .u-vacant {
+      fill: #ffffff;
+      stroke: #9fadbc;
+      stroke-dasharray: 2.6 2.6;
+    }
+
+    .floorplan .tick { fill: var(--amber-700); }
+
+    .floorplan .u-selected {
+      stroke: var(--emerald-700);
+      stroke-width: 2;
+    }
+
+    .floorplan .select-halo {
+      fill: none;
+      stroke: rgba(4, 120, 87, 0.35);
+      stroke-width: 1.4;
     }
 
     .floorplan .service {
@@ -545,240 +605,297 @@
       stroke: #64748b;
       stroke-linecap: round;
       stroke-linejoin: round;
-      stroke-width: 1.25;
+      stroke-width: 1.2;
+    }
+
+    /* map text */
+    .floorplan text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+
+    .floorplan .code {
+      fill: #2f4658;
+      font-size: 7.4px;
+      font-weight: 680;
+      text-anchor: middle;
+    }
+
+    .floorplan .tname {
+      fill: #52657a;
+      font-size: 6.9px;
+      font-weight: 500;
+      text-anchor: middle;
+    }
+
+    .floorplan .vac-note {
+      fill: #7d8fa1;
+      font-size: 6.6px;
+      font-style: italic;
+      text-anchor: middle;
+    }
+
+    .floorplan .anchor-name {
+      fill: #29435a;
+      font-size: 8.6px;
+      font-weight: 680;
+      text-anchor: middle;
+    }
+
+    .floorplan .anchor-meta {
+      fill: #64788c;
+      font-size: 6.6px;
+      text-anchor: middle;
+    }
+
+    .floorplan .wayfind {
+      fill: #8a99ab;
+      font-size: 6.2px;
+      font-weight: 620;
+      letter-spacing: 0.14em;
     }
 
     .floorplan .gate {
-      fill: #047857;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      font-size: 7px;
+      fill: var(--emerald-700);
+      font-size: 6.8px;
       font-weight: 700;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.1em;
       text-anchor: middle;
     }
 
     .floorplan .gate-line {
       fill: none;
-      stroke: #10b981;
+      stroke: var(--emerald-500);
       stroke-width: 1.2;
     }
 
-    .insights {
+    /* selected-unit callout tag drawn in the corridor */
+    .floorplan .tag {
+      fill: #ffffff;
+      stroke: #c8d3dd;
+      stroke-width: 1;
+    }
+
+    .floorplan .tag-text {
+      fill: #29435a;
+      font-size: 7px;
+      font-weight: 650;
+      text-anchor: middle;
+    }
+
+    .floorplan .tag-sub {
+      fill: #64788c;
+      font-size: 6.4px;
+      text-anchor: middle;
+    }
+
+    /* ---------- right rail ---------- */
+
+    .rail {
       display: grid;
-      grid-template-rows: 116px 70px minmax(0, 1fr);
+      grid-template-rows: auto auto auto minmax(0, 1fr);
       overflow: hidden;
       border-radius: var(--radius-card);
     }
 
-    .insight-section {
+    .rail-sec {
       min-width: 0;
-      padding: 12px;
+      padding: 10px 12px 11px;
     }
 
-    .insight-section + .insight-section {
+    .rail-sec + .rail-sec {
       border-top: 1px solid #e7edf1;
     }
 
-    .occupancy {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 72px;
+    .sec-head {
+      display: flex;
       align-items: center;
-      gap: 7px;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 5px;
     }
 
     .eyebrow {
-      margin: 0 0 6px;
+      margin: 0;
       color: var(--slate-500);
       font-size: 9px;
-      font-weight: 600;
+      font-weight: 650;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 2px 8px;
+      border: 1px solid var(--emerald-200);
+      border-radius: 999px;
+      background: var(--emerald-50);
+      color: var(--emerald-700);
+      font-size: 9px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .chip i {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .tenant {
+      margin: 0;
+      color: var(--slate-900);
+      font-size: 13.5px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .tenant-meta {
+      margin: 2px 0 8px;
+      color: var(--muted);
+      font-size: 9px;
+    }
+
+    .stats {
+      display: grid;
+      gap: 0;
+      margin: 0;
+    }
+
+    .stats > div {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 4px 0;
+    }
+
+    .stats > div + div {
+      border-top: 1px solid #eef2f5;
+    }
+
+    .stats dt {
+      color: var(--slate-500);
+      font-size: 9.5px;
+    }
+
+    .stats dd {
+      margin: 0;
+      color: var(--slate-800);
+      font-size: 10.5px;
+      font-weight: 650;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
     }
 
     .metric {
       color: var(--slate-900);
-      font-size: 26px;
+      font-size: 22px;
       font-weight: 730;
-      line-height: 1;
-      letter-spacing: -0.04em;
+      line-height: 1.05;
+      letter-spacing: -0.035em;
       font-variant-numeric: tabular-nums;
     }
 
     .metric-note {
-      margin-top: 6px;
+      margin: 4px 0 0;
       color: var(--slate-500);
       font-size: 8.5px;
       line-height: 1.35;
     }
 
-    .donut {
-      position: relative;
-      width: 68px;
-      height: 68px;
-    }
-
-    .donut svg {
-      display: block;
-      width: 68px;
-      height: 68px;
-      transform: rotate(-90deg);
-    }
-
-    .donut .track {
-      fill: none;
-      stroke: #e7edf1;
-      stroke-width: 7;
-    }
-
-    .donut .value {
-      fill: none;
-      stroke: var(--emerald-500);
-      stroke-dasharray: 92 8;
-      stroke-linecap: round;
-      stroke-width: 7;
-    }
-
-    .donut-label {
-      position: absolute;
-      inset: 0;
-      display: grid;
-      place-items: center;
-      color: var(--emerald-700);
-      font-size: 10px;
-      font-weight: 750;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .revenue {
+    .mixbar {
       display: flex;
-      align-items: center;
+      gap: 2px;
+      height: 7px;
+      margin-top: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .mixbar i { height: 100%; border-radius: 2px; }
+    .mixbar .m-occ { flex: 12; background: var(--emerald-500); }
+    .mixbar .m-exp { flex: 3; background: var(--amber-400); }
+    .mixbar .m-vac { flex: 2; background: var(--slate-300); }
+
+    .rev-row {
+      display: flex;
+      align-items: flex-end;
       justify-content: space-between;
       gap: 10px;
     }
 
-    .revenue .metric {
-      font-size: 20px;
-      letter-spacing: -0.025em;
-      white-space: nowrap;
-    }
-
-    .revenue small {
-      display: block;
-      margin-top: 4px;
-      color: var(--slate-500);
-      font-size: 8.5px;
-    }
+    .rev-row .metric { font-size: 19px; white-space: nowrap; }
 
     .sparkline {
-      width: 55px;
-      height: 26px;
+      width: 62px;
+      height: 30px;
       flex: 0 0 auto;
     }
 
-    .sparkline polyline {
+    .sparkline .fill { fill: rgba(16, 185, 129, 0.12); }
+
+    .sparkline .line {
       fill: none;
       stroke: var(--emerald-600);
       stroke-linecap: round;
       stroke-linejoin: round;
-      stroke-width: 1.8;
+      stroke-width: 1.6;
     }
 
-    .events {
-      display: flex;
-      min-height: 0;
-      flex-direction: column;
-      padding-bottom: 8px;
+    .count {
+      color: var(--slate-900);
+      font-size: 15px;
+      font-weight: 730;
+      font-variant-numeric: tabular-nums;
     }
 
-    .events-head {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 8px;
-      margin-bottom: 7px;
-    }
-
-    .events-head strong {
-      color: var(--slate-800);
-      font-size: 10px;
-      font-weight: 650;
-    }
-
-    .events-head span {
-      color: var(--slate-400);
-      font-size: 8px;
-    }
-
-    .event-list {
+    .lease-list {
       display: grid;
       min-height: 0;
-      gap: 1px;
-      margin: 0;
+      margin: 2px 0 0;
       padding: 0;
       list-style: none;
     }
 
-    .event-item {
-      display: grid;
-      grid-template-columns: 32px minmax(0, 1fr);
+    .lease-item {
+      display: flex;
       align-items: center;
-      gap: 7px;
-      min-height: 43px;
-      padding: 4px 0;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 27px;
+      padding: 3px 0;
     }
 
-    .event-item + .event-item {
-      border-top: 1px solid #edf1f4;
+    .lease-item + .lease-item {
+      border-top: 1px solid #eef2f5;
     }
 
-    .date-tile {
-      display: grid;
-      width: 30px;
-      height: 32px;
-      place-content: center;
-      border: 1px solid #f2d28b;
-      border-radius: var(--radius-input);
-      background: #fffaf0;
-      color: var(--amber-700);
-      text-align: center;
+    .lease-who {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: var(--slate-700);
+      font-size: 9.5px;
+      font-weight: 620;
     }
 
-    .date-tile b {
-      display: block;
-      font-size: 12px;
-      line-height: 1;
+    .lease-who small {
+      margin-left: 5px;
+      color: var(--slate-500);
+      font-size: 8.5px;
+      font-weight: 500;
       font-variant-numeric: tabular-nums;
     }
 
-    .date-tile span {
-      display: block;
-      margin-top: 2px;
-      font-size: 7px;
-      font-weight: 650;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-    }
-
-    .event-copy {
-      min-width: 0;
-    }
-
-    .event-copy strong {
-      display: block;
-      overflow: hidden;
-      color: var(--slate-700);
-      font-size: 9px;
-      font-weight: 620;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .event-copy span {
-      display: block;
-      margin-top: 2px;
-      overflow: hidden;
-      color: var(--slate-500);
-      font-size: 8px;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+    .lease-days {
+      flex: 0 0 auto;
+      color: var(--slate-800);
+      font-size: 9.5px;
+      font-weight: 680;
+      font-variant-numeric: tabular-nums;
     }
 
     .visually-hidden {
@@ -794,72 +911,32 @@
 
     a:focus-visible,
     input:focus-visible {
-      outline: 2px solid #34d399;
+      outline: 2px solid var(--emerald-600);
       outline-offset: 2px;
     }
 
+    /* ---------- narrow ---------- */
+
+    /* keep the floor toolbar compact across the embedded (≤900px) range so the
+       legend never clips; the overlay caption + gradient hint only show wide */
+    @media (max-width: 980px) {
+      .floor-title small { display: none; }
+      .legend { gap: 6px; }
+      .legend .lg-ramp em { display: none; }
+    }
+
     @media (max-width: 760px) {
-      .app {
-        grid-template-columns: 116px minmax(0, 1fr);
-      }
-
-      .sidebar {
-        padding-inline: 9px;
-      }
-
-      .brand {
-        gap: 7px;
-        margin-inline: 3px;
-      }
-
-      .brand-mark {
-        width: 24px;
-        height: 24px;
-      }
-
-      .brand-name {
-        font-size: 13px;
-      }
-
-      .brand-sub {
-        display: none;
-      }
-
-      .nav a {
-        gap: 8px;
-        padding-inline: 8px;
-        font-size: 10.5px;
-      }
-
-      .nav a.active::before {
-        left: -9px;
-      }
-
-      .topbar {
-        gap: 10px;
-        padding-inline: 12px;
-      }
-
-      .breadcrumb span,
-      .breadcrumb em {
-        display: none;
-      }
-
-      .workspace {
-        grid-template-columns: minmax(0, 1fr) 184px;
-      }
-
-      .floor-title small {
-        display: none;
-      }
-
-      .legend {
-        gap: 5px;
-      }
-
-      .legend span {
-        font-size: 7.5px;
-      }
+      .app { grid-template-columns: 116px minmax(0, 1fr); }
+      .sidebar { padding-inline: 9px; }
+      .brand { gap: 7px; margin-inline: 3px; }
+      .brand-mark { width: 24px; height: 24px; }
+      .brand-name { font-size: 13px; }
+      .brand-sub { display: none; }
+      .nav a { gap: 8px; padding-inline: 8px; font-size: 10.5px; }
+      .nav a.active::before { left: -9px; }
+      .topbar { gap: 10px; padding-inline: 12px; }
+      .breadcrumb span, .breadcrumb em { display: none; }
+      .workspace { grid-template-columns: minmax(0, 1fr) 190px; }
     }
   </style>
 </head>
@@ -911,12 +988,12 @@
     <section class="shell">
       <header class="topbar">
         <div class="breadcrumb" aria-label="Current location">
-          <strong>Branch BR-0412</strong><span>·</span><em>Zone B2</em>
+          <strong>Branch BR-0412</strong><span>·</span><em>Zone B2 · Level 2</em>
         </div>
         <label class="search">
-          <span class="visually-hidden">Search stalls or tenants</span>
+          <span class="visually-hidden">Search units or tenants</span>
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
-          <input type="search" placeholder="Search stall or tenant">
+          <input type="search" placeholder="Search unit or tenant">
           <kbd>⌘K</kbd>
         </label>
         <div class="avatar" aria-label="Narin Chai, Mall Manager">NC</div>
@@ -926,151 +1003,214 @@
         <div class="page-head">
           <div class="title-wrap">
             <h1>Floorplan</h1>
-            <p class="subtitle">Zone B2 · Retail concourse · Level 2</p>
+            <p class="subtitle">Zone B2 · Level 2 · 17 leasable units · sales/sqm overlay</p>
           </div>
-          <div class="updated">Live · Updated 2 min ago</div>
+          <div class="updated">Live · updated 14:32</div>
         </div>
 
         <div class="workspace">
           <section class="floor-card" aria-labelledby="zone-heading">
             <header class="floor-toolbar">
               <div class="floor-title">
-                <strong id="zone-heading">Zone B2 overview</strong>
-                <small>36 leasable stalls</small>
+                <strong id="zone-heading">Zone B2 — live view</strong>
+                <small>Overlay: sales/sqm · Jul 2026</small>
               </div>
               <div class="legend" aria-label="Floorplan legend">
-                <span><i class="occupied"></i>Occupied</span>
-                <span><i class="vacant"></i>Vacant</span>
-                <span><i class="event"></i>Event</span>
+                <span class="lg-ramp"><i class="ramp"><i></i><i></i><i></i></i>Sales/sqm <em>low→high</em></span>
+                <span><i class="sw sw-expiring"></i>Expiring ≤90 d</span>
+                <span><i class="sw sw-vacant"></i>Vacant</span>
               </div>
             </header>
 
             <div class="map-wrap">
-              <svg class="floorplan" viewBox="0 0 480 370" role="img" aria-labelledby="map-title map-desc" preserveAspectRatio="xMidYMid meet">
-                <title id="map-title">Zone B2 mall floorplan</title>
-                <desc id="map-desc">Thirty-six stalls arranged around a cross-shaped concourse. Thirty-one are occupied, two are reserved for events, and three are vacant.</desc>
+              <svg class="floorplan" viewBox="0 0 560 420" role="img" preserveAspectRatio="xMidYMid meet"
+                   aria-label="Zone B2 floorplan: 17 units — 12 occupied, 3 leases expiring within 90 days, 2 vacant. Occupied units are tinted by sales per square metre. Selected unit B2-07, Nara coffee.">
 
-                <rect class="site" x="15" y="23" width="450" height="331" rx="5"/>
-                <path class="walkway" d="M209 23h62v331h-62zM15 176h450v55H15z"/>
-                <path class="walkline" d="M240 29v319M22 203.5h436"/>
+                <!-- building envelope with chamfered north-east corner -->
+                <polygon class="site" points="18,14 462,14 542,94 542,406 18,406"/>
 
-                <path class="gate-line" d="M225 23V10h30v13M240 10V3m-5 5 5-5 5 5"/>
-                <text class="gate" x="240" y="18">NORTH GATE</text>
+                <!-- corridors: full-width market walk + main concourse to the south entrance -->
+                <path class="walkway" d="M18 158h524v38H18z"/>
+                <path class="walkway" d="M248 196h48v210h-48z"/>
+                <path class="walkline" d="M26 177h508M272 200v198"/>
 
-                <text class="zone-label" x="27" y="39">NORTH ARCADE</text>
-                <text class="zone-label" x="283" y="39">MARKET WALK</text>
-                <text class="zone-label" x="27" y="248">SOUTH ARCADE</text>
-                <text class="zone-label" x="283" y="248">DINING WALK</text>
+                <!-- atrium void at the junction -->
+                <circle class="void" cx="272" cy="177" r="13"/>
 
-                <!-- North-west -->
-                <rect class="stall stall-occupied" x="28" y="49" width="52" height="34" rx="3"/><text class="code" x="54" y="69">B2-01</text>
-                <rect class="stall stall-occupied" x="91" y="49" width="52" height="34" rx="3"/><text class="code" x="117" y="69">B2-02</text>
-                <rect class="stall stall-occupied" x="154" y="49" width="43" height="34" rx="3"/><text class="code" x="175.5" y="69">B2-03</text>
-                <rect class="stall stall-occupied" x="28" y="94" width="52" height="34" rx="3"/><text class="code" x="54" y="114">B2-07</text>
-                <rect class="stall stall-vacant" x="91" y="94" width="52" height="34" rx="3"/><text class="code" x="117" y="114">B2-08</text>
-                <rect class="stall stall-occupied" x="154" y="94" width="43" height="34" rx="3"/><text class="code" x="175.5" y="114">B2-09</text>
-                <rect class="stall stall-occupied" x="28" y="139" width="52" height="25" rx="3"/><text class="code" x="54" y="155">B2-13</text>
-                <rect class="stall stall-occupied" x="91" y="139" width="52" height="25" rx="3"/><text class="code" x="117" y="155">B2-14</text>
-                <rect class="stall stall-occupied" x="154" y="139" width="43" height="25" rx="3"/><text class="code" x="175.5" y="155">B2-15</text>
+                <!-- escalator in the market walk -->
+                <g class="fixture-group">
+                  <rect class="fixture" x="316" y="165" width="58" height="24" rx="2"/>
+                  <path class="fixture-line" d="M324 165v24M332 165v24M340 165v24M348 165v24M356 165v24"/>
+                  <path class="service-icon" d="M363 181v-8m-2.5 2.5 2.5-2.5 2.5 2.5"/>
+                </g>
 
-                <!-- North-east -->
-                <rect class="stall stall-occupied" x="283" y="49" width="43" height="34" rx="3"/><text class="code" x="304.5" y="69">B2-04</text>
-                <rect class="stall stall-occupied" x="337" y="49" width="52" height="34" rx="3"/><text class="code" x="363" y="69">B2-05</text>
-                <rect class="stall stall-occupied" x="400" y="49" width="52" height="34" rx="3"/><text class="code" x="426" y="69">B2-06</text>
-                <rect class="stall stall-occupied" x="283" y="94" width="43" height="34" rx="3"/><text class="code" x="304.5" y="114">B2-10</text>
-                <rect class="stall stall-event" x="337" y="94" width="52" height="34" rx="3"/><text class="code" x="363" y="114">B2-11</text>
-                <rect class="stall stall-occupied" x="400" y="94" width="52" height="34" rx="3"/><text class="code" x="426" y="114">B2-12</text>
-                <rect class="stall stall-occupied" x="283" y="139" width="43" height="25" rx="3"/><text class="code" x="304.5" y="155">B2-16</text>
-                <rect class="stall stall-occupied" x="337" y="139" width="52" height="25" rx="3"/><text class="code" x="363" y="155">B2-17</text>
-                <rect class="stall stall-vacant" x="400" y="139" width="52" height="25" rx="3"/><text class="code" x="426" y="155">B2-18</text>
+                <!-- kiosks in the corridor -->
+                <rect class="u rev-hi" x="206" y="163" width="26" height="28" rx="2"/>
+                <text class="code" x="219" y="180" font-size="6.2">K-01</text>
+                <rect class="u u-vacant" x="396" y="163" width="26" height="28" rx="2"/>
+                <text class="code" x="409" y="180" font-size="6.2">K-02</text>
 
-                <!-- Service core -->
-                <rect class="service" x="215" y="91" width="50" height="69" rx="4"/>
-                <path class="service-icon" d="M227 105h26v15h-26zM231 109h4v7h-4zM239 109h4v7h-4zM247 109h3v7h-3zM229 132h22m-18-5 7 5-7 5m14-10-7 5 7 5"/>
-                <text class="zone-label" x="222" y="149">SERVICE</text>
+                <!-- wayfinding -->
+                <text class="wayfind" x="24" y="152">MARKET WALK</text>
+                <text class="wayfind" transform="rotate(-90 278.5 300)" x="242" y="304">MAIN CONCOURSE</text>
 
-                <rect class="service" x="215" y="246" width="50" height="70" rx="4"/>
-                <path class="service-icon" d="M228 260h24v17h-24zM232 264h16M232 269h16M235 277v6m10-6v6M230 287h20"/>
-                <text class="zone-label" x="222" y="305">LIFT LOBBY</text>
+                <!-- north band -->
+                <rect class="u rev-hi" x="18" y="14" width="140" height="144"/>
+                <text class="anchor-name" x="88" y="82">Gourmet market</text>
+                <text class="anchor-meta" x="88" y="94">AN-01 · 620 sqm</text>
 
-                <!-- South-west -->
-                <rect class="stall stall-occupied" x="28" y="247" width="52" height="25" rx="3"/><text class="code" x="54" y="263">B2-19</text>
-                <rect class="stall stall-occupied" x="91" y="247" width="52" height="25" rx="3"/><text class="code" x="117" y="263">B2-20</text>
-                <rect class="stall stall-occupied" x="154" y="247" width="43" height="25" rx="3"/><text class="code" x="175.5" y="263">B2-21</text>
-                <rect class="stall stall-occupied" x="28" y="283" width="52" height="25" rx="3"/><text class="code" x="54" y="299">B2-25</text>
-                <rect class="stall stall-event" x="91" y="283" width="52" height="25" rx="3"/><text class="code" x="117" y="299">B2-26</text>
-                <rect class="stall stall-occupied" x="154" y="283" width="43" height="25" rx="3"/><text class="code" x="175.5" y="299">B2-27</text>
-                <rect class="stall stall-occupied" x="28" y="319" width="52" height="23" rx="3"/><text class="code" x="54" y="334">B2-31</text>
-                <rect class="stall stall-occupied" x="91" y="319" width="52" height="23" rx="3"/><text class="code" x="117" y="334">B2-32</text>
-                <rect class="stall stall-occupied" x="154" y="319" width="43" height="23" rx="3"/><text class="code" x="175.5" y="334">B2-33</text>
+                <rect class="u rev-mid" x="158" y="14" width="66" height="144"/>
+                <text class="code" x="191" y="82">B2-01</text>
+                <text class="tname" x="191" y="93">Boots</text>
 
-                <!-- South-east -->
-                <rect class="stall stall-occupied" x="283" y="247" width="43" height="25" rx="3"/><text class="code" x="304.5" y="263">B2-22</text>
-                <rect class="stall stall-occupied" x="337" y="247" width="52" height="25" rx="3"/><text class="code" x="363" y="263">B2-23</text>
-                <rect class="stall stall-occupied" x="400" y="247" width="52" height="25" rx="3"/><text class="code" x="426" y="263">B2-24</text>
-                <rect class="stall stall-occupied" x="283" y="283" width="43" height="25" rx="3"/><text class="code" x="304.5" y="299">B2-28</text>
-                <rect class="stall stall-occupied" x="337" y="283" width="52" height="25" rx="3"/><text class="code" x="363" y="299">B2-29</text>
-                <rect class="stall stall-vacant" x="400" y="283" width="52" height="25" rx="3"/><text class="code" x="426" y="299">B2-30</text>
-                <rect class="stall stall-occupied" x="283" y="319" width="43" height="23" rx="3"/><text class="code" x="304.5" y="334">B2-34</text>
-                <rect class="stall stall-occupied" x="337" y="319" width="52" height="23" rx="3"/><text class="code" x="363" y="334">B2-35</text>
-                <rect class="stall stall-occupied" x="400" y="319" width="52" height="23" rx="3"/><text class="code" x="426" y="334">B2-36</text>
+                <rect class="u u-expiring" x="224" y="14" width="58" height="144"/>
+                <path class="tick" d="M272 14h10v10z"/>
+                <text class="code" x="253" y="82">B2-02</text>
+                <text class="tname" x="253" y="93">Kamu tea</text>
+
+                <rect class="u rev-lo" x="282" y="14" width="62" height="144"/>
+                <text class="code" x="313" y="82">B2-03</text>
+                <text class="tname" x="313" y="93">Jaymart</text>
+
+                <rect class="u rev-hi" x="344" y="14" width="66" height="144"/>
+                <text class="code" x="377" y="82">B2-04</text>
+                <text class="tname" x="377" y="93">After you</text>
+
+                <polygon class="u rev-mid" points="410,14 462,14 542,94 542,158 410,158"/>
+                <text class="code" x="478" y="112">B2-05</text>
+                <text class="tname" x="478" y="123">AIS shop</text>
+
+                <!-- south-west block -->
+                <rect class="u rev-lo" x="18" y="196" width="78" height="66"/>
+                <text class="code" x="57" y="226">B2-06</text>
+                <text class="tname" x="57" y="237">Naiin books</text>
+
+                <rect class="u rev-hi u-selected" x="96" y="196" width="76" height="66"/>
+                <rect class="select-halo" x="92.5" y="192.5" width="83" height="73" rx="2"/>
+                <text class="code" x="134" y="226">B2-07</text>
+                <text class="tname" x="134" y="237">Nara coffee</text>
+
+                <rect class="u u-vacant" x="172" y="196" width="76" height="66"/>
+                <text class="code" x="210" y="226">B2-08</text>
+                <text class="vac-note" x="210" y="237">Vacant</text>
+
+                <rect class="u rev-mid" x="18" y="262" width="230" height="144"/>
+                <text class="anchor-name" x="90" y="288">Food hall</text>
+                <text class="anchor-meta" x="90" y="300">FH-01 · 12 vendors</text>
+                <!-- counters + seating -->
+                <path class="fixture-line" d="M26 316h68M26 344h68M26 372h68"/>
+                <circle class="seat" cx="132" cy="330" r="5"/>
+                <circle class="seat" cx="158" cy="342" r="5"/>
+                <circle class="seat" cx="132" cy="360" r="5"/>
+                <circle class="seat" cx="186" cy="326" r="5"/>
+                <circle class="seat" cx="212" cy="344" r="5"/>
+                <circle class="seat" cx="186" cy="366" r="5"/>
+                <circle class="seat" cx="216" cy="380" r="5"/>
+                <circle class="seat" cx="158" cy="384" r="5"/>
+
+                <!-- concourse east column -->
+                <rect class="u u-expiring" x="296" y="196" width="72" height="72"/>
+                <path class="tick" d="M358 196h10v10z"/>
+                <text class="code" x="332" y="229">B2-09</text>
+                <text class="tname" x="332" y="240">Oppo shop</text>
+
+                <rect class="u rev-lo" x="296" y="268" width="72" height="68"/>
+                <text class="code" x="332" y="299">B2-10</text>
+                <text class="tname" x="332" y="310">Kerry express</text>
+
+                <!-- service core: lifts + restrooms -->
+                <rect class="service" x="296" y="336" width="72" height="70" rx="3"/>
+                <path class="service-icon" d="M312 356h16v20h-16zM317 362v8m6-8v8M338 356h14M340 362v12m10-12v12M345 356v-3"/>
+                <text class="anchor-meta" x="332" y="392">Lifts · restrooms</text>
+
+                <!-- east wing -->
+                <rect class="u rev-mid" x="368" y="196" width="90" height="72"/>
+                <text class="code" x="413" y="229">B2-11</text>
+                <text class="tname" x="413" y="240">Swensen's</text>
+
+                <rect class="u u-expiring" x="458" y="196" width="84" height="72"/>
+                <path class="tick" d="M532 196h10v10z"/>
+                <text class="code" x="500" y="229">B2-12</text>
+                <text class="tname" x="500" y="240">Mister Donut</text>
+
+                <rect class="u rev-lo" x="368" y="268" width="174" height="138"/>
+                <text class="anchor-name" x="455" y="332">Jetts fitness</text>
+                <text class="anchor-meta" x="455" y="344">AN-02 · 480 sqm</text>
+
+                <!-- south main entrance -->
+                <path class="gate-line" d="M252 406v7M292 406v7M252 413h40M272 419v-4"/>
+                <path class="gate-line" d="M258 406a10 10 0 0 1 10-10M286 406a10 10 0 0 0-10-10"/>
+                <text class="gate" x="272" y="390">MAIN</text>
+                <text class="gate" x="272" y="399">ENTRANCE</text>
+
+                <!-- east carpark link -->
+                <path class="gate-line" d="M542 166v22M549 177h8m-3-3 3 3-3 3"/>
+                <text class="gate" transform="rotate(90 552 148)" x="552" y="148">CARPARK</text>
+
+                <!-- selected-unit callout in the corridor -->
+                <g>
+                  <rect class="tag" x="82" y="160" width="104" height="26" rx="5"/>
+                  <polygon class="tag" points="128,186 140,186 134,193"/>
+                  <text class="tag-text" x="134" y="171">Nara coffee · B2-07</text>
+                  <text class="tag-sub" x="134" y="181">฿9,420 /sqm · Jul MTD</text>
+                </g>
               </svg>
             </div>
           </section>
 
-          <aside class="insights" aria-label="Zone B2 performance">
-            <section class="insight-section occupancy">
-              <div>
-                <p class="eyebrow">Occupancy</p>
-                <div class="metric">92%</div>
-                <div class="metric-note">33 of 36 stalls leased or booked</div>
+          <aside class="rail" aria-label="Zone B2 performance">
+            <section class="rail-sec" aria-labelledby="sel-heading">
+              <div class="sec-head">
+                <p class="eyebrow" id="sel-heading">Selected unit</p>
+                <span class="chip"><i></i>B2-07</span>
               </div>
-              <div class="donut" aria-label="Occupancy 92 percent">
-                <svg viewBox="0 0 42 42" aria-hidden="true">
-                  <circle class="track" cx="21" cy="21" r="15.9155"/>
-                  <circle class="value" cx="21" cy="21" r="15.9155"/>
+              <h2 class="tenant">Nara coffee</h2>
+              <p class="tenant-meta">Café · 42 sqm · lease to Mar 2027</p>
+              <dl class="stats">
+                <div><dt>Base rent</dt><dd>฿38,500 /mo</dd></div>
+                <div><dt>Sales density</dt><dd>฿9,420 /sqm</dd></div>
+                <div><dt>Occupancy cost</dt><dd>9.7% of sales</dd></div>
+              </dl>
+            </section>
+
+            <section class="rail-sec">
+              <p class="eyebrow">Occupancy</p>
+              <div class="metric">88.2%</div>
+              <div class="mixbar" role="img" aria-label="Occupancy mix: 12 occupied, 3 expiring, 2 vacant">
+                <i class="m-occ"></i><i class="m-exp"></i><i class="m-vac"></i>
+              </div>
+              <p class="metric-note">15 of 17 leased · 12 occupied · 3 expiring · 2 vacant</p>
+            </section>
+
+            <section class="rail-sec">
+              <p class="eyebrow">MTD revenue</p>
+              <div class="rev-row">
+                <div class="metric">฿3.86M</div>
+                <svg class="sparkline" viewBox="0 0 62 30" role="img" aria-label="Revenue trend for July 1 to 18, rising">
+                  <path class="fill" d="M2 24 10 21 18 22 26 16 34 17 42 11 50 12 58 6V28H2Z"/>
+                  <polyline class="line" points="2,24 10,21 18,22 26,16 34,17 42,11 50,12 58,6"/>
                 </svg>
-                <span class="donut-label">92%</span>
               </div>
+              <p class="metric-note">Rent + CAM + turnover · Jul 1–18 · tracking +6.2% vs Jun</p>
             </section>
 
-            <section class="insight-section revenue">
-              <div>
-                <p class="eyebrow">Revenue</p>
-                <div class="metric">THB 1.2M</div>
-                <small>per month · Zone B2</small>
+            <section class="rail-sec" aria-labelledby="exp-heading">
+              <div class="sec-head">
+                <p class="eyebrow" id="exp-heading">Expiring ≤90 days</p>
+                <strong class="count">3</strong>
               </div>
-              <svg class="sparkline" viewBox="0 0 58 28" aria-label="Revenue trend rising">
-                <polyline points="2,23 10,20 18,22 26,14 34,16 42,9 50,11 56,5"/>
-              </svg>
-            </section>
-
-            <section class="insight-section events" id="events">
-              <div class="events-head">
-                <strong>Upcoming events</strong>
-                <span>Next 14 days</span>
-              </div>
-              <ol class="event-list">
-                <li class="event-item">
-                  <div class="date-tile"><b>21</b><span>Jul</span></div>
-                  <div class="event-copy">
-                    <strong>Bangkok Craft Week</strong>
-                    <span>B2-11 · 10:00–20:00</span>
-                  </div>
+              <ol class="lease-list">
+                <li class="lease-item">
+                  <span class="lease-who">Kamu tea<small>B2-02</small></span>
+                  <span class="lease-days">34 d</span>
                 </li>
-                <li class="event-item">
-                  <div class="date-tile"><b>25</b><span>Jul</span></div>
-                  <div class="event-copy">
-                    <strong>Thai Designer Pop-up</strong>
-                    <span>B2-26 · 11:00–21:00</span>
-                  </div>
+                <li class="lease-item">
+                  <span class="lease-who">Oppo shop<small>B2-09</small></span>
+                  <span class="lease-days">58 d</span>
                 </li>
-                <li class="event-item">
-                  <div class="date-tile"><b>02</b><span>Aug</span></div>
-                  <div class="event-copy">
-                    <strong>Local Food Showcase</strong>
-                    <span>North gate · 12:00–19:00</span>
-                  </div>
+                <li class="lease-item">
+                  <span class="lease-who">Mister Donut<small>B2-12</small></span>
+                  <span class="lease-days">82 d</span>
                 </li>
               </ol>
             </section>

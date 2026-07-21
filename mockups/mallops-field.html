@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#1e293b">
-  <title>Mall Ops — Field Tasks</title>
+  <meta name="theme-color" content="#ffffff">
+  <title>Mall Ops — Field check-in</title>
   <style>
     :root {
       color-scheme: light;
@@ -25,9 +25,7 @@
       --emerald-200: #a7f3d0;
       --emerald-100: #d1fae5;
       --emerald-50: #ecfdf5;
-      --amber-700: #b45309;
-      --amber-400: #fbbf24;
-      --amber-100: #fef3c7;
+      --line-green: #06c755;
       --canvas: #f3f6f8;
       --white: #ffffff;
       --border: #dce4ea;
@@ -40,410 +38,513 @@
         0 4px 12px rgba(30, 41, 59, 0.045);
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     html,
     body {
+      height: 100%;
+      margin: 0;
       overflow: hidden;
     }
 
     body {
-      margin: 0;
       background: var(--canvas);
       color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      font-size: 14px;
+      font-size: 13.5px;
       line-height: 1.35;
       -webkit-font-smoothing: antialiased;
     }
 
-    button {
-      font: inherit;
-    }
+    button { font: inherit; }
 
     .app {
-      display: flex;
+      display: grid;
       width: 320px;
       max-width: 100%;
-      height: 600px;
-      flex-direction: column;
+      height: 100vh;
+      margin-inline: auto;
+      grid-template-rows: 52px minmax(0, 1fr) 64px;
       overflow: hidden;
       background: var(--canvas);
     }
 
+    /* ---- LINE LIFF header ---- */
+
     .app-bar {
       display: flex;
-      height: 76px;
-      flex: 0 0 76px;
       align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 0 14px;
-      background: var(--slate-900);
-      box-shadow: inset 0 -1px rgba(255, 255, 255, 0.05);
-      color: var(--white);
+      gap: 6px;
+      padding: 0 8px 0 4px;
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
     }
+
+    .nav-btn {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      flex: 0 0 auto;
+      place-items: center;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--slate-700);
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .nav-btn svg { width: 20px; height: 20px; }
 
     .app-title {
       display: flex;
+      flex: 1 1 auto;
       min-width: 0;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
     }
 
+    .app-title > div { min-width: 0; }
+
     .brand-mark {
-      width: 30px;
-      height: 30px;
+      width: 24px;
+      height: 24px;
       flex: 0 0 auto;
     }
 
     .brand-name {
       display: block;
-      margin-bottom: 3px;
-      color: var(--slate-400);
-      font-size: 10px;
-      font-weight: 650;
+      margin-bottom: 1px;
+      color: var(--slate-500);
+      font-size: 9px;
+      font-weight: 700;
       line-height: 1;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.05em;
     }
 
     h1 {
       margin: 0;
-      color: var(--slate-50);
-      font-size: 18px;
+      overflow: hidden;
+      color: var(--slate-900);
+      font-size: 14px;
       font-weight: 720;
       line-height: 1.1;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.015em;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
-    .branch-chip {
+    .bar-right {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      margin-left: auto;
+    }
+
+    .line-badge {
       display: inline-flex;
-      min-height: 28px;
+      width: 24px;
+      height: 24px;
       flex: 0 0 auto;
       align-items: center;
-      padding: 0 9px;
-      border: 1px solid rgba(167, 243, 208, 0.18);
-      border-radius: var(--radius-input);
-      background: rgba(16, 185, 129, 0.14);
-      color: #d8fff0;
-      font-size: 11px;
-      font-weight: 700;
-      font-variant-numeric: tabular-nums;
-      letter-spacing: 0.025em;
+      justify-content: center;
+      border-radius: 7px;
+      background: var(--line-green);
+      color: var(--white);
     }
+
+    .line-badge svg { width: 16px; height: 16px; flex: 0 0 auto; }
+
+    /* ---- main ---- */
 
     main {
       display: flex;
+      min-width: 0;
       min-height: 0;
-      flex: 1 1 auto;
       flex-direction: column;
-      padding: 14px;
+      padding: 10px 12px;
     }
 
+    /* task card */
+
     .task-card {
-      overflow: hidden;
+      margin-bottom: 8px;
+      padding: 9px 12px 10px;
       border: 1px solid var(--border);
       border-radius: var(--radius-panel);
       background: var(--white);
       box-shadow: var(--shadow-card);
     }
 
-    .task-copy {
-      padding: 15px 16px 14px;
-    }
-
     .task-kicker {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      margin-bottom: 7px;
-      color: var(--emerald-700);
-      font-size: 11px;
+      margin-bottom: 3px;
+      color: var(--slate-500);
+      font-size: 10.5px;
       font-weight: 700;
-    }
-
-    .task-kicker::before {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--emerald-500);
-      box-shadow: 0 0 0 3px var(--emerald-100);
-      content: "";
+      font-variant-numeric: tabular-nums;
+      line-height: 1.25;
     }
 
     h2 {
-      margin: 0;
+      margin: 0 0 7px;
       color: var(--slate-900);
-      font-size: 17px;
-      font-weight: 700;
-      line-height: 1.32;
-      letter-spacing: -0.015em;
-      text-wrap: balance;
+      font-size: 14.5px;
+      font-weight: 720;
+      line-height: 1.25;
+      letter-spacing: -0.01em;
     }
 
-    .sla-row {
+    .task-meta {
       display: flex;
-      min-height: 54px;
+      min-height: 16px;
       align-items: center;
-      gap: 10px;
-      padding: 0 14px 0 16px;
-      border-top: 1px solid #e7edf1;
-      background: var(--slate-50);
+      gap: 5px;
     }
 
-    .sla-label {
-      color: var(--slate-500);
-      font-size: 11px;
-      font-weight: 650;
+    .task-meta svg {
+      width: 12px;
+      height: 12px;
+      flex: 0 0 auto;
+      color: var(--slate-400);
     }
 
-    .countdown {
-      margin-right: auto;
-      color: var(--slate-900);
-      font-size: 19px;
-      font-weight: 750;
-      font-variant-numeric: tabular-nums;
-      letter-spacing: 0.025em;
-    }
-
-    .due-chip,
-    .site-chip {
-      display: inline-flex;
-      min-height: 26px;
-      align-items: center;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 700;
+    .branch {
+      min-width: 0;
+      overflow: hidden;
+      color: var(--slate-600);
+      font-size: 11.5px;
+      font-weight: 620;
+      text-overflow: ellipsis;
       white-space: nowrap;
     }
 
     .due-chip {
-      padding: 0 9px;
-      border: 1px solid #f2d28b;
-      background: var(--amber-100);
-      color: var(--amber-700);
+      display: inline-flex;
+      height: 18px;
+      flex: 0 0 auto;
+      align-items: center;
+      margin-left: auto;
+      padding: 0 7px;
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-input);
+      background: var(--slate-100);
+      color: var(--slate-700);
+      font-size: 10.5px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
     }
 
-    .photos {
-      margin-top: 16px;
+    /* check-in state */
+
+    .checkin {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      padding: 8px 11px;
+      border: 1px solid var(--emerald-200);
+      border-radius: var(--radius-card);
+      background: var(--emerald-50);
     }
+
+    .checkin-icon {
+      display: grid;
+      width: 30px;
+      height: 30px;
+      flex: 0 0 auto;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--emerald-100);
+      color: var(--emerald-700);
+    }
+
+    .checkin-icon svg { width: 17px; height: 17px; }
+
+    .checkin-copy { min-width: 0; flex: 1 1 auto; }
+
+    .checkin-title {
+      display: block;
+      margin-bottom: 2px;
+      color: var(--emerald-700);
+      font-size: 12.5px;
+      font-weight: 720;
+      line-height: 1.25;
+    }
+
+    .checkin-sub {
+      display: block;
+      overflow: hidden;
+      color: var(--slate-600);
+      font-size: 10.5px;
+      font-weight: 600;
+      line-height: 1.3;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .checkin-time {
+      flex: 0 0 auto;
+      color: var(--slate-800);
+      font-size: 12.5px;
+      font-weight: 750;
+      font-variant-numeric: tabular-nums;
+      text-align: right;
+      line-height: 1.25;
+    }
+
+    .checkin-time small {
+      display: block;
+      color: var(--slate-500);
+      font-size: 9.5px;
+      font-weight: 650;
+    }
+
+    /* sections */
 
     .section-head {
       display: flex;
       align-items: baseline;
-      justify-content: space-between;
-      margin-bottom: 9px;
+      gap: 6px;
+      margin-bottom: 6px;
     }
 
     .section-head h3 {
       margin: 0;
       color: var(--slate-800);
-      font-size: 13px;
-      font-weight: 680;
+      font-size: 12.5px;
+      font-weight: 700;
+      line-height: 1.25;
     }
 
-    .progress {
-      color: var(--emerald-700);
-      font-size: 12px;
+    .req {
+      color: var(--slate-500);
+      font-size: 9.5px;
+      font-weight: 650;
+    }
+
+    .count {
+      margin-left: auto;
+      font-size: 11.5px;
       font-weight: 750;
       font-variant-numeric: tabular-nums;
     }
+
+    .count.accent { color: var(--emerald-700); }
+    .count.plain { color: var(--slate-500); }
+
+    /* photo record grid */
+
+    .photos { margin-bottom: 10px; }
 
     .photo-grid {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 6px;
     }
 
-    .photo-slot {
+    .shot {
       position: relative;
-      display: grid;
-      min-width: 0;
-      height: 70px;
-      place-items: center;
+      height: 84px;
+      margin: 0;
       overflow: hidden;
-      border-radius: var(--radius-card);
-    }
-
-    .photo-slot.filled {
-      border: 1px solid var(--emerald-200);
-      background-color: var(--emerald-50);
-      background-image:
-        linear-gradient(135deg, rgba(16, 185, 129, 0.075) 25%, transparent 25%),
-        linear-gradient(315deg, rgba(16, 185, 129, 0.075) 25%, transparent 25%);
-      background-position: 0 0, 6px 6px;
-      background-size: 12px 12px;
-      color: var(--emerald-700);
-    }
-
-    .photo-slot.empty {
-      border: 1px dashed #aebbc8;
-      background: rgba(255, 255, 255, 0.52);
-      color: var(--slate-400);
-    }
-
-    .photo-slot svg {
-      width: 22px;
-      height: 22px;
-      fill: none;
-      stroke: currentColor;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      stroke-width: 1.65;
-    }
-
-    .photo-index {
-      position: absolute;
-      right: 5px;
-      bottom: 4px;
-      color: var(--emerald-700);
-      font-size: 9px;
-      font-weight: 750;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .assignee {
-      display: flex;
-      min-height: 64px;
-      align-items: center;
-      gap: 11px;
-      margin-top: 16px;
-      padding: 0 12px;
       border: 1px solid var(--border);
-      border-radius: var(--radius-card);
-      background: rgba(255, 255, 255, 0.72);
+      border-radius: var(--radius-input);
+      background: var(--white);
+      box-shadow: 0 1px 2px rgba(30, 41, 59, 0.05);
     }
 
-    .avatar {
-      display: grid;
-      width: 36px;
-      height: 36px;
-      flex: 0 0 auto;
-      place-items: center;
-      border-radius: 50%;
-      background: var(--slate-700);
-      color: var(--slate-50);
-      font-size: 11px;
-      font-weight: 750;
-      letter-spacing: 0.03em;
-    }
-
-    .assignee-copy {
-      min-width: 0;
-      flex: 1 1 auto;
-    }
-
-    .assignee-label {
+    .shot .scene {
       display: block;
-      margin-bottom: 2px;
-      color: var(--slate-500);
-      font-size: 10px;
-      font-weight: 600;
+      width: 100%;
+      height: 100%;
     }
 
-    .assignee-name {
-      display: block;
-      color: var(--slate-800);
-      font-size: 14px;
-      font-weight: 700;
+    /* signature detail: EXIF-style evidence stamp burned into each captured photo */
+    .stamp {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      display: flex;
+      height: 16px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 5px;
+      background: rgba(15, 23, 42, 0.84);
+      color: var(--slate-100);
+      font-size: 9px;
+      font-weight: 650;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.02em;
+      line-height: 1;
     }
 
-    .site-chip {
-      gap: 6px;
-      padding: 0 9px;
-      background: var(--emerald-100);
-      color: var(--emerald-700);
-    }
-
-    .site-chip::before {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--emerald-500);
-      content: "";
-    }
-
-    .actions {
-      display: grid;
-      grid-template-columns: minmax(0, 1.58fr) minmax(0, 1fr);
-      gap: 10px;
-      margin-top: auto;
-      padding-top: 18px;
-    }
-
-    .action {
-      display: inline-flex;
-      min-width: 0;
-      height: 50px;
+    .shot.add {
+      display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      padding: 0 16px;
-      border-radius: var(--radius-card);
-      font-size: 15px;
-      font-weight: 720;
+      gap: 5px;
+      padding: 0;
+      border: 1px dashed #a3b1c0;
+      background: rgba(255, 255, 255, 0.55);
+      box-shadow: none;
+      color: var(--slate-600);
       cursor: pointer;
       touch-action: manipulation;
+      transition: border-color 120ms ease, background-color 120ms ease;
     }
 
-    .action svg {
-      width: 18px;
-      height: 18px;
-      flex: 0 0 auto;
-      fill: none;
-      stroke: currentColor;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      stroke-width: 1.8;
+    .shot.add svg {
+      width: 20px;
+      height: 20px;
+      color: var(--slate-500);
     }
 
-    .action.primary {
-      border: 1px solid var(--emerald-600);
-      background: var(--emerald-600);
-      box-shadow: 0 1px 2px rgba(4, 120, 87, 0.18),
-        0 5px 12px rgba(4, 120, 87, 0.14);
-      color: var(--white);
+    .shot.add span {
+      font-size: 10px;
+      font-weight: 680;
+      line-height: 1.2;
     }
 
-    .action.secondary {
-      border: 1px solid var(--slate-300);
+    /* checklist */
+
+    .check-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-panel);
       background: var(--white);
-      box-shadow: 0 1px 2px rgba(30, 41, 59, 0.04);
+      box-shadow: var(--shadow-card);
+    }
+
+    .check-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .check-list li {
+      display: flex;
+      min-height: 35px;
+      align-items: center;
+      gap: 9px;
+      padding: 0 11px;
+    }
+
+    .check-list li + li { border-top: 1px solid #e9eef3; }
+
+    .mark {
+      display: grid;
+      width: 17px;
+      height: 17px;
+      flex: 0 0 auto;
+      place-items: center;
+      border-radius: 50%;
+    }
+
+    li.done .mark {
+      background: var(--slate-100);
       color: var(--slate-700);
     }
 
-    .action:active {
-      transform: scale(0.98);
+    li.pending .mark {
+      border: 1.5px dashed var(--slate-400);
     }
 
-    .action:focus-visible {
-      outline: 3px solid rgba(16, 185, 129, 0.36);
+    .mark svg { width: 11px; height: 11px; }
+
+    .check-label {
+      min-width: 0;
+      flex: 1 1 auto;
+      overflow: hidden;
+      font-size: 12px;
+      font-weight: 620;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    li.done .check-label { color: var(--slate-700); }
+    li.pending .check-label { color: var(--slate-900); font-weight: 680; }
+
+    .check-time {
+      flex: 0 0 auto;
+      color: var(--slate-500);
+      font-size: 10.5px;
+      font-weight: 650;
+      font-variant-numeric: tabular-nums;
+    }
+
+    li.pending .check-time { font-style: normal; }
+
+    /* ---- action bar ---- */
+
+    .action-bar {
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+      border-top: 1px solid var(--border);
+      background: var(--white);
+    }
+
+    .submit {
+      display: inline-flex;
+      width: 100%;
+      height: 48px;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 1px solid var(--emerald-700);
+      border-radius: var(--radius-card);
+      background: var(--emerald-700);
+      box-shadow: 0 1px 2px rgba(4, 120, 87, 0.18),
+        0 5px 12px rgba(4, 120, 87, 0.14);
+      color: var(--white);
+      font-size: 14.5px;
+      font-weight: 720;
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: background-color 120ms ease;
+    }
+
+    .submit svg { width: 18px; height: 18px; flex: 0 0 auto; }
+
+    .submit:active,
+    .shot.add:active { transform: scale(0.985); }
+
+    :focus-visible {
+      outline: 3px solid var(--emerald-700);
       outline-offset: 2px;
     }
 
-    @media (hover: hover) and (pointer: fine) {
-      .action.primary:hover {
-        background: var(--emerald-700);
-      }
+    /* shared stroke family */
+    .icon {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.7;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
 
-      .action.secondary:hover {
-        border-color: var(--slate-400);
-        background: var(--slate-50);
+    @media (hover: hover) and (pointer: fine) {
+      .submit:hover { background: #03654a; border-color: #03654a; }
+      .shot.add:hover {
+        border-color: var(--slate-500);
+        background: var(--white);
       }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .action {
-        transition: none;
-      }
+      .submit:active,
+      .shot.add:active { transform: none; }
     }
   </style>
 </head>
 <body>
   <div class="app">
     <header class="app-bar">
+      <button class="nav-btn" type="button" aria-label="Back to chat">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg>
+      </button>
       <div class="app-title">
         <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
           <rect x="1.5" y="1.5" width="29" height="29" rx="7" fill="#10b981"/>
@@ -452,83 +553,151 @@
         </svg>
         <div>
           <span class="brand-name">Mall Ops</span>
-          <h1>Field Tasks</h1>
+          <h1>Field check-in</h1>
         </div>
       </div>
-      <span class="branch-chip">BR-0412</span>
+      <div class="bar-right">
+        <button class="nav-btn" type="button" aria-label="More options">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>
+        </button>
+        <span class="line-badge" role="img" aria-label="Runs inside LINE as a mini-app">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3C6.9 3 3 6.4 3 10.5c0 3.7 3.2 6.8 7.5 7.4.3.05.7.2.8.5.07.25.05.6.02.85l-.13.8c-.04.24-.2.94.83.5 1.02-.43 5.5-3.24 7.5-5.55C21.2 13.4 21 12 21 10.5 21 6.4 17.1 3 12 3z"/></svg>
+        </span>
+      </div>
     </header>
 
     <main>
       <section class="task-card" aria-labelledby="task-title">
-        <div class="task-copy">
-          <div class="task-kicker">Active assignment</div>
-          <h2 id="task-title">Task #1847 · Signage check · Zone B2</h2>
+        <p class="task-kicker">Active task · T-2481</p>
+        <h2 id="task-title">Shelf compliance — beverages</h2>
+        <div class="task-meta">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 21s6-5.1 6-11a6 6 0 1 0-12 0c0 5.9 6 11 6 11z"/>
+            <circle cx="12" cy="10" r="2.2"/>
+          </svg>
+          <span class="branch">Lotus's Ladprao · 2F, zone B</span>
+          <span class="due-chip">Due 17:00</span>
         </div>
-        <div class="sla-row" aria-label="Service level agreement due in 4 hours 12 minutes 33 seconds">
-          <span class="sla-label">SLA</span>
-          <strong class="countdown">04:12:33</strong>
-          <span class="due-chip">Due today</span>
+      </section>
+
+      <section class="checkin" aria-label="Check-in status: checked in, GPS verified, 14:32, 18 July 2026">
+        <span class="checkin-icon" aria-hidden="true">
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M12 21s6-5.1 6-11a6 6 0 1 0-12 0c0 5.9 6 11 6 11z"/>
+            <path d="m9.6 9.9 1.7 1.7 3.2-3.4"/>
+          </svg>
+        </span>
+        <div class="checkin-copy">
+          <strong class="checkin-title">Checked in — GPS verified</strong>
+          <span class="checkin-sub">28 m from branch pin · Central Ladprao</span>
         </div>
+        <div class="checkin-time">14:32<small>18 Jul 2026</small></div>
       </section>
 
       <section class="photos" aria-labelledby="photos-title">
         <div class="section-head">
-          <h3 id="photos-title">Photo records</h3>
-          <span class="progress">2/4</span>
+          <h3 id="photos-title">Photo record</h3>
+          <span class="req">Required</span>
+          <span class="count accent">2 of 3</span>
         </div>
         <div class="photo-grid">
-          <div class="photo-slot filled" role="img" aria-label="Photo record 1 complete">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
+          <figure class="shot" role="img" aria-label="Captured photo 1 of 3: beverage shelf, zone B, stamped 14:36">
+            <svg class="scene" viewBox="0 0 96 68" aria-hidden="true">
+              <rect width="96" height="68" fill="#eef2f7"/>
+              <path d="M14 8v46M82 8v46" fill="none" stroke="#94a3b8" stroke-width="2"/>
+              <path d="M10 22.5h76M10 37.5h76M10 52.5h76" fill="none" stroke="#64748b" stroke-width="2"/>
+              <g fill="#cbd5e1" stroke="#64748b">
+                <rect x="20" y="13" width="7" height="8.5" rx="1.5"/>
+                <rect x="31" y="13" width="7" height="8.5" rx="1.5"/>
+                <rect x="42" y="13" width="7" height="8.5" rx="1.5"/>
+                <rect x="53" y="13" width="7" height="8.5" rx="1.5"/>
+                <rect x="64" y="13" width="7" height="8.5" rx="1.5"/>
+              </g>
+              <g fill="#e2e8f0" stroke="#64748b">
+                <rect x="20" y="27" width="12" height="9.5" rx="1"/>
+                <rect x="36" y="27" width="12" height="9.5" rx="1"/>
+                <rect x="52" y="27" width="12" height="9.5" rx="1"/>
+              </g>
+              <g fill="#cbd5e1" stroke="#64748b">
+                <rect x="20" y="44" width="8" height="7.5" rx="2"/>
+                <rect x="31" y="44" width="8" height="7.5" rx="2"/>
+                <rect x="53" y="44" width="8" height="7.5" rx="2"/>
+                <rect x="64" y="44" width="8" height="7.5" rx="2"/>
+              </g>
+            </svg>
+            <figcaption class="stamp" aria-hidden="true"><span>14:36</span><span>2F-B</span></figcaption>
+          </figure>
+          <figure class="shot" role="img" aria-label="Captured photo 2 of 3: storefront entrance, stamped 14:41">
+            <svg class="scene" viewBox="0 0 96 68" aria-hidden="true">
+              <rect width="96" height="68" fill="#eef2f7"/>
+              <rect x="12" y="8" width="72" height="9" rx="2" fill="#e2e8f0" stroke="#64748b"/>
+              <path d="M24 8v9M36 8v9M48 8v9M60 8v9M72 8v9" fill="none" stroke="#94a3b8"/>
+              <rect x="16" y="19" width="64" height="36" fill="#f8fafc" stroke="#64748b"/>
+              <rect x="22" y="26" width="14" height="15" fill="#e2e8f0" stroke="#94a3b8"/>
+              <rect x="60" y="26" width="14" height="15" fill="#e2e8f0" stroke="#94a3b8"/>
+              <rect x="41" y="28" width="14" height="27" fill="#e2e8f0" stroke="#64748b"/>
+              <circle cx="52" cy="42" r="1.3" fill="#64748b"/>
+              <path d="M10 55h76" fill="none" stroke="#64748b" stroke-width="2"/>
+            </svg>
+            <figcaption class="stamp" aria-hidden="true"><span>14:41</span><span>2F-B</span></figcaption>
+          </figure>
+          <button class="shot add" type="button" aria-label="Add required photo 3 of 3: chiller front">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M4 7.5h3l1.5-2h7l1.5 2h3v11H4z"/>
               <circle cx="12" cy="13" r="3.2"/>
             </svg>
-            <span class="photo-index">01</span>
-          </div>
-          <div class="photo-slot filled" role="img" aria-label="Photo record 2 complete">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M4 7.5h3l1.5-2h7l1.5 2h3v11H4z"/>
-              <circle cx="12" cy="13" r="3.2"/>
-            </svg>
-            <span class="photo-index">02</span>
-          </div>
-          <div class="photo-slot empty" role="img" aria-label="Empty photo slot 3">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M12 7v10M7 12h10"/>
-            </svg>
-          </div>
-          <div class="photo-slot empty" role="img" aria-label="Empty photo slot 4">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M12 7v10M7 12h10"/>
-            </svg>
-          </div>
+            <span>Chiller front</span>
+          </button>
         </div>
       </section>
 
-      <section class="assignee" aria-label="Assignee">
-        <span class="avatar" aria-hidden="true">SP</span>
-        <div class="assignee-copy">
-          <span class="assignee-label">Assignee</span>
-          <strong class="assignee-name">Somchai P.</strong>
+      <section aria-labelledby="checklist-title">
+        <div class="section-head">
+          <h3 id="checklist-title">Checklist</h3>
+          <span class="count plain">3 of 4</span>
         </div>
-        <span class="site-chip">On site</span>
+        <div class="check-card">
+          <ul class="check-list">
+            <li class="done">
+              <span class="mark" aria-hidden="true">
+                <svg class="icon" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>
+              </span>
+              <span class="check-label">Planogram matches shelf layout</span>
+              <span class="check-time">14:44</span>
+            </li>
+            <li class="done">
+              <span class="mark" aria-hidden="true">
+                <svg class="icon" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>
+              </span>
+              <span class="check-label">Promo price tags updated</span>
+              <span class="check-time">14:52</span>
+            </li>
+            <li class="done">
+              <span class="mark" aria-hidden="true">
+                <svg class="icon" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>
+              </span>
+              <span class="check-label">Facings counted — water 600 ml</span>
+              <span class="check-time">15:01</span>
+            </li>
+            <li class="pending">
+              <span class="mark" aria-hidden="true"></span>
+              <span class="check-label">Chiller temperature logged</span>
+              <span class="check-time">To do</span>
+            </li>
+          </ul>
+        </div>
       </section>
-
-      <div class="actions">
-        <button class="action primary" type="button">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 21s6-5.1 6-11a6 6 0 1 0-12 0c0 5.9 6 11 6 11z"/>
-            <path d="m9.5 10.3 1.7 1.7 3.4-3.6"/>
-          </svg>
-          Check in
-        </button>
-        <button class="action secondary" type="button">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5M5 14v5h14v-5"/>
-          </svg>
-          Upload
-        </button>
-      </div>
     </main>
+
+    <footer class="action-bar">
+      <button class="submit" type="button">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="8.5"/>
+          <path d="m8.5 12.3 2.3 2.3 4.7-5"/>
+        </svg>
+        Submit task record
+      </button>
+    </footer>
   </div>
 </body>
 </html>

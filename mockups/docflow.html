@@ -3,7 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Doc-Flow | Purchase Request Approval</title>
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#26323d">
+  <title>Doc-Flow · Purchase request sign-off</title>
   <style>
     :root {
       --chrome: #f1f3f5;
@@ -17,301 +19,258 @@
       --steel-dark: #2e4965;
       --steel-soft: #e8eef4;
       --stamp: #b42b32;
-      --waiting: #9aa3ac;
+      --waiting: #6b7681;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
-    html,
-    body {
-      width: 100%;
+    html, body {
       height: 100%;
+      margin: 0;
       overflow: hidden;
     }
 
     body {
-      margin: 0;
       background: #dfe3e7;
       color: var(--ink);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
-      font-size: 13px;
+      font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+      font-size: 12.5px;
       line-height: 1.35;
+      -webkit-font-smoothing: antialiased;
     }
 
-    button {
-      font: inherit;
-    }
+    button { font: inherit; }
+
+    .tnum { font-variant-numeric: tabular-nums; }
 
     .app-shell {
-      width: 100%;
       height: 100vh;
       min-width: 700px;
       background: var(--chrome);
     }
 
+    /* ---- chrome ---- */
+
     .topbar {
-      height: 48px;
+      height: 40px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 18px;
-      color: #fff;
-      background: var(--steel);
-      border-bottom: 1px solid #29435d;
-      box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+      padding: 0 16px;
+      color: #e8edf1;
+      background: var(--ink);
+      border-bottom: 1px solid #1b252e;
     }
 
     .brand {
       display: flex;
       align-items: center;
-      gap: 10px;
-      font-size: 17px;
+      gap: 9px;
+      font-size: 13.5px;
       font-weight: 650;
       letter-spacing: 0.01em;
     }
 
     .brand-mark {
-      width: 27px;
-      height: 27px;
+      width: 22px;
+      height: 22px;
       display: grid;
       place-items: center;
-      border: 1px solid rgba(255, 255, 255, 0.72);
-      border-radius: 3px;
-      background: rgba(255, 255, 255, 0.08);
-      font-size: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.55);
+      border-radius: 4px;
+      font-size: 9px;
       font-weight: 700;
       letter-spacing: 0.08em;
     }
 
-    .plant-select {
-      min-width: 176px;
-      height: 29px;
+    .topbar-right {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-      padding: 0 10px;
-      border: 1px solid rgba(255, 255, 255, 0.42);
-      border-radius: 3px;
-      background: rgba(20, 41, 60, 0.22);
-      font-size: 12px;
+      gap: 8px;
+      font-size: 11px;
     }
 
-    .chevron {
-      width: 7px;
-      height: 7px;
-      border-right: 1px solid currentColor;
-      border-bottom: 1px solid currentColor;
-      transform: rotate(45deg) translateY(-2px);
-      opacity: 0.8;
+    .plant-select {
+      height: 26px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 9px;
+      border: 1px solid rgba(255, 255, 255, 0.32);
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.06);
+      color: #dfe6ec;
     }
+
+    .plant-select svg { opacity: 0.75; }
+
+    .user-chip { color: #aeb9c3; }
+    .user-chip strong { color: #e8edf1; font-weight: 600; }
 
     .utilitybar {
-      height: 32px;
+      height: 26px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 18px;
-      background: #e7eaed;
-      border-bottom: 1px solid #c3c9cf;
+      padding: 0 16px;
+      background: #e9ecef;
+      border-bottom: 1px solid #c9cfd5;
       color: #5d6872;
-      font-size: 11.5px;
+      font-size: 11px;
     }
 
-    .breadcrumb strong {
-      color: var(--ink);
-      font-weight: 600;
-    }
+    .breadcrumb strong { color: var(--ink); font-weight: 600; }
 
-    .record-state {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-    }
-
-    .state-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--steel);
-      box-shadow: 0 0 0 2px rgba(59, 91, 125, 0.15);
-    }
-
-    main {
-      height: calc(100vh - 80px);
-      display: grid;
-      grid-template-rows: 112px minmax(0, 1fr) 64px;
-      gap: 10px;
-      padding: 12px 14px;
-    }
-
-    .panel {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 4px;
-      box-shadow: 0 1px 2px rgba(31, 45, 58, 0.08);
-    }
-
-    .document-head {
-      overflow: hidden;
-    }
-
-    .document-titlebar {
-      height: 46px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 14px;
-      border-bottom: 1px solid #d8dde2;
-      background: #fbfcfd;
-    }
-
-    .document-title {
-      display: flex;
-      align-items: baseline;
-      gap: 11px;
-      min-width: 0;
-    }
-
-    .document-title h1 {
-      margin: 0;
-      color: #202b35;
-      font-size: 17px;
-      font-weight: 650;
-      letter-spacing: -0.01em;
-      white-space: nowrap;
-    }
-
-    .document-id {
-      color: var(--steel);
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.03em;
-      white-space: nowrap;
-    }
-
-    .document-kind {
-      padding: 3px 7px;
-      border: 1px solid #bdc6ce;
-      border-radius: 3px;
-      color: #596672;
-      background: #f2f4f6;
-      font-size: 10.5px;
-      white-space: nowrap;
-    }
-
-    .meta-grid {
-      height: calc(100% - 46px);
-      display: grid;
-      grid-template-columns: 1.05fr 1.05fr 1.28fr 1fr 0.8fr;
-      align-items: center;
-      padding: 0 14px;
-    }
-
-    .meta-item {
-      min-width: 0;
-      padding: 0 14px;
-      border-left: 1px solid #e0e4e8;
-    }
-
-    .meta-item:first-child {
-      padding-left: 0;
-      border-left: 0;
-    }
-
-    .meta-label {
-      display: block;
-      margin-bottom: 3px;
-      color: #77828c;
-      font-size: 10.5px;
-      letter-spacing: 0.025em;
-    }
-
-    .meta-value {
-      display: block;
-      overflow: hidden;
-      color: #25313c;
-      font-size: 13px;
-      font-weight: 600;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .amount {
-      font-variant-numeric: tabular-nums;
-    }
-
-    .priority-normal {
+    .state-chip {
       display: inline-flex;
       align-items: center;
       gap: 6px;
+      padding: 2px 9px;
+      border: 1px solid rgba(59, 91, 125, 0.35);
+      border-radius: 999px;
+      color: var(--steel);
+      background: var(--steel-soft);
+      font-size: 10.5px;
+      font-weight: 600;
     }
 
-    .priority-normal::before {
-      width: 7px;
-      height: 7px;
+    .state-chip::before {
       content: "";
-      border: 1px solid #87929c;
+      width: 6px;
+      height: 6px;
       border-radius: 50%;
-      background: #eef0f2;
+      background: currentColor;
     }
 
-    .route-panel {
+    /* ---- layout ---- */
+
+    main {
+      height: calc(100vh - 68px);
+      display: grid;
+      grid-template-rows: 54px 140px minmax(0, 1fr) 44px;
+      gap: 8px;
+      padding: 10px 12px;
+    }
+
+    .panel {
       min-height: 0;
       overflow: hidden;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      box-shadow: 0 1px 2px rgba(31, 45, 58, 0.06), 0 2px 6px rgba(31, 45, 58, 0.05);
     }
 
     .section-heading {
-      height: 37px;
+      height: 28px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 0 14px;
-      border-bottom: 1px solid #d7dce1;
-      background: #f7f8f9;
+      border-bottom: 1px solid #dde1e5;
+      background: #f8f9fa;
     }
 
     .section-heading h2 {
       margin: 0;
-      font-size: 13px;
+      font-size: 11.5px;
       font-weight: 650;
     }
 
     .section-note {
-      color: #7a858f;
+      color: #68747f;
+      font-size: 10px;
+    }
+
+    /* ---- document head ---- */
+
+    .doc-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 0 14px;
+    }
+
+    .doc-main { min-width: 0; }
+
+    .doc-line1 {
+      display: flex;
+      align-items: baseline;
+      gap: 9px;
+      white-space: nowrap;
+    }
+
+    .doc-id {
+      color: var(--steel);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .doc-head h1 {
+      margin: 0;
+      overflow: hidden;
+      font-size: 13.5px;
+      font-weight: 650;
+      letter-spacing: -0.01em;
+      text-overflow: ellipsis;
+    }
+
+    .doc-kind {
+      flex: 0 0 auto;
+      padding: 1px 7px;
+      border: 1px solid #c3cad1;
+      border-radius: 3px;
+      color: #596672;
+      background: #f2f4f6;
+      font-size: 9.5px;
+    }
+
+    .doc-line2 {
+      margin-top: 2px;
+      overflow: hidden;
+      color: var(--muted);
       font-size: 10.5px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
-    .stepper {
-      position: relative;
-      height: calc(100% - 37px);
+    .doc-line2 b { color: #47535e; font-weight: 600; }
+
+    .doc-amount {
+      flex: 0 0 auto;
+      text-align: right;
+    }
+
+    .doc-amount-label {
+      display: block;
+      color: #68747f;
+      font-size: 9px;
+      letter-spacing: 0.05em;
+    }
+
+    .doc-amount-value {
+      display: block;
+      font-size: 16px;
+      font-weight: 650;
+      letter-spacing: -0.01em;
+    }
+
+    /* ---- approval route ---- */
+
+    .route {
+      height: calc(100% - 28px);
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      padding: 15px 24px 8px;
-    }
-
-    .route-line {
-      position: absolute;
-      z-index: 0;
-      top: 51px;
-      left: 13%;
-      right: 13%;
-      height: 3px;
-      background: linear-gradient(
-        to right,
-        var(--stamp) 0%,
-        var(--stamp) 34%,
-        var(--line-dark) 34%,
-        var(--line-dark) 100%
-      );
-      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+      grid-template-columns: repeat(5, 1fr);
+      margin: 0;
+      padding: 12px 18px 0;
+      list-style: none;
+      counter-reset: step;
     }
 
     .step {
       position: relative;
-      z-index: 1;
       display: flex;
       min-width: 0;
       flex-direction: column;
@@ -319,170 +278,184 @@
       text-align: center;
     }
 
-    .step-number {
+    .step::after {
+      content: "";
       position: absolute;
-      top: -4px;
-      left: 50%;
-      margin-left: 27px;
-      color: #8a949d;
-      font-size: 10px;
-      font-variant-numeric: tabular-nums;
+      top: 31px;
+      left: calc(50% + 27px);
+      width: calc(100% - 54px);
+      height: 2px;
+      background: var(--line-dark);
     }
 
-    .route-marker {
-      width: 66px;
-      height: 66px;
+    .step.is-current::after,
+    .step.is-next::after {
+      height: 0;
+      background: none;
+      border-top: 2px dashed #c6cdd3;
+    }
+
+    .step:last-child::after { content: none; }
+
+    .marker {
+      position: relative;
+      z-index: 1;
+      width: 40px;
+      height: 40px;
       display: grid;
-      flex: 0 0 auto;
       place-items: center;
       border-radius: 50%;
       background: #fff;
     }
 
-    .hanko {
-      position: relative;
-      border: 2px solid var(--stamp);
+    /* signature detail: vermillion inkan seals on signed steps */
+    .seal {
+      border: 1.5px solid var(--stamp);
       color: var(--stamp);
-      transform: rotate(-7deg);
-      box-shadow: inset 0 0 0 2px #fff, inset 0 0 0 3px rgba(180, 43, 50, 0.72);
-    }
-
-    .hanko::before,
-    .hanko::after {
-      position: absolute;
-      left: 10px;
-      right: 10px;
-      height: 1px;
-      content: "";
-      background: rgba(180, 43, 50, 0.6);
-    }
-
-    .hanko::before {
-      top: 20px;
-    }
-
-    .hanko::after {
-      bottom: 18px;
-    }
-
-    .hanko-text {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      line-height: 1.05;
-      transform: rotate(-3deg);
-    }
-
-    .hanko-approved {
-      font-size: 9px;
-      font-weight: 800;
-      letter-spacing: 0.06em;
-    }
-
-    .hanko-name {
-      max-width: 52px;
-      margin-top: 6px;
-      overflow: hidden;
-      font-size: 9px;
+      box-shadow: inset 0 0 0 1.5px #fff, inset 0 0 0 3px rgba(180, 43, 50, 0.55);
+      font-size: 8.5px;
       font-weight: 700;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      letter-spacing: 0.02em;
+      transform: rotate(-6deg);
     }
 
-    .current-marker,
-    .waiting-marker {
-      width: 54px;
-      height: 54px;
-      margin-top: 6px;
+    .step:nth-child(2) .seal { transform: rotate(4deg); }
+    .step:nth-child(3) .seal { transform: rotate(-9deg); }
+
+    .marker-current {
       border: 2px solid var(--steel);
       color: var(--steel);
-      font-size: 11px;
+      background: var(--steel-soft);
+      box-shadow: 0 0 0 3px rgba(59, 91, 125, 0.16);
+      font-size: 13px;
       font-weight: 700;
     }
 
-    .current-marker {
-      background: var(--steel-soft);
-      box-shadow: 0 0 0 4px #fff, 0 0 0 5px rgba(59, 91, 125, 0.18);
-    }
-
-    .waiting-marker {
-      border-color: #b8c0c7;
-      color: #89939c;
-      background: #f4f5f6;
+    .marker-next {
+      border: 1.5px dashed #b4bcc4;
+      color: #6b7681;
+      background: #f7f8f9;
+      font-size: 13px;
+      font-weight: 600;
     }
 
     .step-role {
       margin-top: 7px;
+      overflow: hidden;
+      max-width: 100%;
       color: #2e3943;
-      font-size: 12px;
+      font-size: 11.5px;
       font-weight: 650;
+      text-overflow: ellipsis;
       white-space: nowrap;
     }
 
     .step-person {
       margin-top: 1px;
-      color: #65717c;
-      font-size: 11px;
+      color: var(--muted);
+      font-size: 10.5px;
       white-space: nowrap;
     }
 
     .step-status {
-      margin-top: 3px;
-      color: #7a858e;
-      font-size: 9.5px;
-      font-variant-numeric: tabular-nums;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 4px;
+      color: #6b7681;
+      font-size: 10px;
       white-space: nowrap;
     }
 
-    .step.current .step-status {
-      color: var(--steel);
-      font-weight: 700;
+    .step.is-current .step-status { color: var(--steel); font-weight: 700; }
+    .step.is-next .step-status { color: var(--waiting); }
+
+    /* ---- line items ---- */
+
+    .items-wrap {
+      height: calc(100% - 28px);
+      overflow: hidden;
     }
 
-    .step.waiting .step-status {
-      color: var(--waiting);
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11.5px;
     }
 
-    .action-panel {
+    th, td {
+      padding: 0 12px;
+      white-space: nowrap;
+    }
+
+    thead th {
+      height: 24px;
+      border-bottom: 1px solid #d7dce1;
+      color: #6b7681;
+      background: #fbfcfd;
+      font-size: 10px;
+      font-weight: 600;
+      text-align: left;
+    }
+
+    tbody td {
+      height: 25px;
+      border-bottom: 1px solid #eceff1;
+    }
+
+    .item-name { font-weight: 600; color: #2e3943; }
+
+    .item-detail { color: #6b7681; font-size: 10.5px; }
+
+    td.num, th.num { text-align: right; }
+
+    tbody td.num, tfoot td.num { font-variant-numeric: tabular-nums; }
+
+    tfoot td {
+      height: 26px;
+      border-top: 1px solid #d7dce1;
+      background: #fbfcfd;
+      font-size: 11px;
+    }
+
+    .total-label {
+      color: #5d6872;
+      font-weight: 600;
+      text-align: right;
+    }
+
+    tfoot .grand { font-size: 12px; font-weight: 700; }
+
+    /* ---- actions ---- */
+
+    .action-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 14px;
-      padding: 9px 11px 9px 14px;
+      padding: 0 8px 0 14px;
     }
 
     .attachments {
       display: flex;
       min-width: 0;
       align-items: center;
-      gap: 8px;
-    }
-
-    .attachments-label {
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      gap: 7px;
       color: #5d6872;
-      font-size: 11px;
-      font-weight: 600;
-      white-space: nowrap;
+      font-size: 10.5px;
     }
 
-    .paperclip {
-      width: 15px;
-      height: 15px;
-      color: var(--steel);
-    }
+    .attachments svg { flex: 0 0 auto; color: #7a858f; }
 
     .file {
-      max-width: 142px;
+      max-width: 150px;
       overflow: hidden;
-      padding: 5px 8px;
-      border: 1px solid #c9d0d6;
+      padding: 3px 8px;
+      border: 1px solid #ccd2d8;
       border-radius: 3px;
-      background: #f7f8f9;
-      color: #384550;
-      font-size: 11px;
+      background: #f6f7f8;
+      color: #414d58;
+      font-size: 10.5px;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
@@ -495,84 +468,50 @@
     }
 
     .btn {
-      height: 32px;
-      min-width: 75px;
-      padding: 0 14px;
-      border: 1px solid #aeb7bf;
-      border-radius: 3px;
+      height: 30px;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 0 13px;
+      border: 1px solid #b3bcc3;
+      border-radius: 4px;
       color: #3f4a54;
-      background: linear-gradient(#fff, #edf0f2);
-      box-shadow: 0 1px 1px rgba(31, 45, 58, 0.07);
-      cursor: default;
+      background: #fff;
+      box-shadow: 0 1px 1px rgba(31, 45, 58, 0.06);
+      cursor: pointer;
       font-size: 12px;
       font-weight: 600;
+      transition: background-color 0.12s ease;
     }
 
-    .btn.reject {
-      color: #81282d;
-      border-color: #c7a3a5;
-    }
-
-    .btn.approve {
-      min-width: 86px;
+    .btn-approve {
       color: #fff;
       border-color: var(--steel-dark);
       background: var(--steel);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 1px 1px rgba(31, 45, 58, 0.12);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 1px 1px rgba(31, 45, 58, 0.12);
     }
 
     .btn:focus-visible {
-      outline: 2px solid #1f6fa8;
+      outline: 2px solid var(--steel-dark);
       outline-offset: 2px;
     }
 
+    @media (hover: hover) and (pointer: fine) {
+      .btn:hover { background-color: #f2f4f6; }
+      .btn-approve:hover { background-color: var(--steel-dark); }
+    }
+
+    /* ---- narrow viewport ---- */
+
     @media (max-width: 760px) {
-      .topbar,
-      .utilitybar {
-        padding-right: 12px;
-        padding-left: 12px;
-      }
-
-      main {
-        padding-right: 10px;
-        padding-left: 10px;
-      }
-
-      .meta-grid,
-      .document-titlebar {
-        padding-right: 10px;
-        padding-left: 10px;
-      }
-
-      .meta-item {
-        padding-right: 9px;
-        padding-left: 9px;
-      }
-
-      .stepper {
-        padding-right: 14px;
-        padding-left: 14px;
-      }
-
-      .action-panel {
-        gap: 8px;
-      }
-
-      .attachments {
-        gap: 5px;
-      }
-
-      .file {
-        max-width: 116px;
-        padding-right: 6px;
-        padding-left: 6px;
-      }
-
-      .btn {
-        min-width: 68px;
-        padding-right: 10px;
-        padding-left: 10px;
-      }
+      .topbar, .utilitybar { padding-right: 10px; padding-left: 10px; }
+      main { padding-right: 8px; padding-left: 8px; }
+      .doc-head, .section-heading { padding-right: 10px; padding-left: 10px; }
+      .route { padding-right: 8px; padding-left: 8px; }
+      th, td { padding-right: 8px; padding-left: 8px; }
+      .action-bar { padding-left: 10px; }
+      .file { max-width: 110px; }
+      .user-chip { display: none; }
     }
   </style>
 </head>
@@ -583,117 +522,167 @@
         <span class="brand-mark" aria-hidden="true">DF</span>
         <span>Doc-Flow</span>
       </div>
-      <div class="plant-select" aria-label="Selected plant">
-        <span>Plant 2 . Chonburi</span>
-        <span class="chevron" aria-hidden="true"></span>
+      <div class="topbar-right">
+        <span class="user-chip">Signed in as <strong>Wichai P. · Plant director</strong></span>
+        <span class="plant-select">
+          Plant 2 · Chonburi
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
       </div>
     </header>
 
     <div class="utilitybar">
-      <div class="breadcrumb">Home / Purchase Requests / <strong>Approval</strong></div>
-      <div class="record-state"><span class="state-dot" aria-hidden="true"></span>Awaiting department approval</div>
+      <nav class="breadcrumb" aria-label="Breadcrumb">Purchase requests / <strong>PR-2607-0142</strong></nav>
+      <span class="state-chip">Awaiting plant director</span>
     </div>
 
     <main>
-      <section class="panel document-head" aria-labelledby="document-title">
-        <div class="document-titlebar">
-          <div class="document-title">
-            <span class="document-id">PR-1132</span>
-            <h1 id="document-title">Tooling purchase</h1>
+      <section class="panel doc-head" aria-labelledby="doc-title">
+        <div class="doc-main">
+          <div class="doc-line1">
+            <span class="doc-id">PR-2607-0142</span>
+            <h1 id="doc-title">Tooling and consumables purchase</h1>
+            <span class="doc-kind">Purchase request · rev 01</span>
           </div>
-          <span class="document-kind">Purchase Request</span>
+          <p class="doc-line2">Requesting section <b>Assembly line 2</b> · Cost center <b>P2-ASM-02</b> · Requested <b>14 Jul 2026</b> · Priority normal</p>
         </div>
-        <div class="meta-grid">
-          <div class="meta-item">
-            <span class="meta-label">Requester</span>
-            <span class="meta-value">Anucha S.</span>
-          </div>
-          <div class="meta-item">
-            <span class="meta-label">Amount</span>
-            <span class="meta-value amount">THB 184,500</span>
-          </div>
-          <div class="meta-item">
-            <span class="meta-label">Request date</span>
-            <span class="meta-value">03 FEB 2020</span>
-          </div>
-          <div class="meta-item">
-            <span class="meta-label">Cost center</span>
-            <span class="meta-value">P2-TOOL-04</span>
-          </div>
-          <div class="meta-item">
-            <span class="meta-label">Priority</span>
-            <span class="meta-value priority-normal">Normal</span>
-          </div>
+        <div class="doc-amount">
+          <span class="doc-amount-label">Total excl. VAT</span>
+          <span class="doc-amount-value tnum">THB 184,500</span>
         </div>
       </section>
 
-      <section class="panel route-panel" aria-labelledby="route-title">
+      <section class="panel" aria-labelledby="route-title">
         <div class="section-heading">
           <h2 id="route-title">Approval route</h2>
-          <span class="section-note">Route: Standard purchase · Revision 01</span>
+          <span class="section-note">Standard purchase · amounts ≥ THB 100,000 require plant director</span>
         </div>
-        <div class="stepper">
-          <div class="route-line" aria-hidden="true"></div>
+        <ol class="route">
+          <li class="step is-done">
+            <span class="marker seal" aria-hidden="true">Anucha</span>
+            <span class="step-role">Requester</span>
+            <span class="step-person">Anucha S.</span>
+            <span class="step-status tnum">Signed 14 Jul 08:42</span>
+          </li>
+          <li class="step is-done">
+            <span class="marker seal" aria-hidden="true">Somsak</span>
+            <span class="step-role">Section head</span>
+            <span class="step-person">Somsak T.</span>
+            <span class="step-status tnum">Signed 14 Jul 10:16</span>
+          </li>
+          <li class="step is-done">
+            <span class="marker seal" aria-hidden="true">Kenji</span>
+            <span class="step-role">Dept. manager</span>
+            <span class="step-person">Kenji T.</span>
+            <span class="step-status tnum">Signed 15 Jul 13:05</span>
+          </li>
+          <li class="step is-current" aria-current="step">
+            <span class="marker marker-current" aria-hidden="true">4</span>
+            <span class="step-role">Plant director</span>
+            <span class="step-person">Wichai P.</span>
+            <span class="step-status">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
+                <path d="M12 7v5l3.5 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Awaiting approval
+            </span>
+          </li>
+          <li class="step is-next">
+            <span class="marker marker-next" aria-hidden="true">5</span>
+            <span class="step-role">Procurement</span>
+            <span class="step-person">Malee K.</span>
+            <span class="step-status">Queued</span>
+          </li>
+        </ol>
+      </section>
 
-          <div class="step complete">
-            <span class="step-number">01</span>
-            <div class="route-marker hanko" aria-label="Approved by Anucha S.">
-              <span class="hanko-text">
-                <span class="hanko-approved">APPROVED</span>
-                <span class="hanko-name">Anucha S.</span>
-              </span>
-            </div>
-            <div class="step-role">Requester</div>
-            <div class="step-person">Anucha S.</div>
-            <div class="step-status">03 FEB 2020 · 08:42</div>
-          </div>
-
-          <div class="step complete">
-            <span class="step-number">02</span>
-            <div class="route-marker hanko" aria-label="Approved by Kenji T.">
-              <span class="hanko-text">
-                <span class="hanko-approved">APPROVED</span>
-                <span class="hanko-name">Kenji T.</span>
-              </span>
-            </div>
-            <div class="step-role">Section Head</div>
-            <div class="step-person">Kenji T.</div>
-            <div class="step-status">03 FEB 2020 · 10:16</div>
-          </div>
-
-          <div class="step current">
-            <span class="step-number">03</span>
-            <div class="route-marker current-marker">Pending</div>
-            <div class="step-role">Dept Manager</div>
-            <div class="step-person">Preecha W.</div>
-            <div class="step-status">Current approval</div>
-          </div>
-
-          <div class="step waiting">
-            <span class="step-number">04</span>
-            <div class="route-marker waiting-marker">Waiting</div>
-            <div class="step-role">Director</div>
-            <div class="step-person">Not assigned</div>
-            <div class="step-status">Waiting</div>
-          </div>
+      <section class="panel" aria-labelledby="items-title">
+        <div class="section-heading">
+          <h2 id="items-title">Line items</h2>
+          <span class="section-note">4 items · quotation Q-26-0713</span>
+        </div>
+        <div class="items-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">No.</th>
+                <th scope="col">Item</th>
+                <th scope="col" class="num">Qty</th>
+                <th scope="col">Unit</th>
+                <th scope="col" class="num">Unit price</th>
+                <th scope="col" class="num">Amount (THB)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="num tnum">1</td>
+                <td><span class="item-name">Stepper motor VID-29-05</span> <span class="item-detail">· gauge needle drive</span></td>
+                <td class="num">1,200</td>
+                <td>pcs</td>
+                <td class="num">86.50</td>
+                <td class="num">103,800</td>
+              </tr>
+              <tr>
+                <td class="num tnum">2</td>
+                <td><span class="item-name">LCD segment panel 3.5 in</span> <span class="item-detail">· odometer display</span></td>
+                <td class="num">150</td>
+                <td>pcs</td>
+                <td class="num">412.00</td>
+                <td class="num">61,800</td>
+              </tr>
+              <tr>
+                <td class="num tnum">3</td>
+                <td><span class="item-name">Solder paste SAC305, 500 g</span> <span class="item-detail">· SMT lines 1–2</span></td>
+                <td class="num">24</td>
+                <td>jar</td>
+                <td class="num">685.00</td>
+                <td class="num">16,440</td>
+              </tr>
+              <tr>
+                <td class="num tnum">4</td>
+                <td><span class="item-name">Placement nozzle 503</span> <span class="item-detail">· Panasonic CM402</span></td>
+                <td class="num">8</td>
+                <td>pcs</td>
+                <td class="num">307.50</td>
+                <td class="num">2,460</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td class="total-label" colspan="5">Total excl. VAT</td>
+                <td class="num grand">184,500</td>
+              </tr>
+            </tfoot>
+          </table>
         </div>
       </section>
 
-      <section class="panel action-panel" aria-label="Attachments and approval actions">
+      <section class="panel action-bar" aria-label="Attachments and approval actions">
         <div class="attachments">
-          <span class="attachments-label">
-            <svg class="paperclip" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M8.4 12.8l6.9-6.9a3.5 3.5 0 115 5L10.1 21.1a5.5 5.5 0 11-7.8-7.8l10-10a2.7 2.7 0 113.8 3.8L6.5 16.7a1.2 1.2 0 01-1.7-1.7l8.7-8.7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            Attachments (2)
-          </span>
-          <span class="file">quotation.pdf</span>
-          <span class="file">spec_sheet.xlsx</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M8.4 12.8l6.9-6.9a3.5 3.5 0 115 5L10.1 21.1a5.5 5.5 0 11-7.8-7.8l10-10a2.7 2.7 0 113.8 3.8L6.5 16.7a1.2 1.2 0 01-1.7-1.7l8.7-8.7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Attachments</span>
+          <span class="file">quotation_Q-26-0713.pdf</span>
+          <span class="file">spec_sheet_VID-29.xlsx</span>
         </div>
         <div class="actions">
-          <button class="btn reject" type="button">Reject</button>
-          <button class="btn" type="button">Return</button>
-          <button class="btn approve" type="button">Approve</button>
+          <button class="btn" type="button">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M9 14L4 9l5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M4 9h10a6 6 0 016 6v4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Return with comment
+          </button>
+          <button class="btn btn-approve" type="button">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M4 12.5l5.5 5.5L20 6.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Approve
+          </button>
         </div>
       </section>
     </main>

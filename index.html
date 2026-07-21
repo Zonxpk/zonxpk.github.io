@@ -260,15 +260,27 @@ a { color: inherit; }
 .proj-dl > div { display: grid; grid-template-columns: 92px 1fr; gap: 12px; padding: 9px 0 8px; border-bottom: 1px solid var(--rule-soft); }
 .proj-dl dt { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); padding-top: 2px; }
 .proj-dl dd { font-size: 13px; }
-.proj-screens { display: grid; gap: 28px; min-width: 0; }
+.proj-screens { display: flex; flex-wrap: wrap; gap: 28px; min-width: 0; align-items: flex-start; justify-content: flex-start; }
+.proj-screens > .screen { flex: 1 1 100%; }
+.proj-keys { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+.proj-keys .key { padding: 6px 10px 5px; font-size: 11px; box-shadow: 1.5px 1.5px 0 var(--ink); }
+.proj-keys .key:active { transform: translate(1.5px, 1.5px); box-shadow: none; }
 
 /* mockup screens */
 .screen { border: 1px solid var(--ink); background: #fff; box-shadow: 2px 2px 0 var(--ink); }
 .screen--phone { width: min(320px, 100%); margin-inline: auto; }
+/* phones pack multiple per row instead of one full-width row each */
+.proj-screens > .screen--phone { flex: 0 1 288px; margin-inline: 0; }
+/* browser-window screens sit on the same row as a phone, wrapping when narrow */
+.proj-screens > .screen--web { flex: 0 1 560px; }
+.screen-top .plat { font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); border: 1px solid var(--rule-soft); padding: 2px 6px; }
+.screen-top .led { margin-left: auto; }
 .screen-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 12px; border-bottom: 1px solid var(--ink); background: var(--chassis); }
 .screen-top .led { width: 8px; height: 8px; border-radius: 50%; background: var(--c-green); }
 .screen-body { padding: 16px; }
 .screen figcaption { border-top: 1px solid var(--rule-soft); padding: 8px 12px; color: var(--ink-soft); }
+/* uniform caption block so phones sharing a row bottom-align despite 1- vs 2-line captions */
+.screen--phone figcaption { display: flex; align-items: center; min-height: 54px; }
 .screen-body--frame { padding: 0; }
 .screen-body--frame iframe { display: block; width: 100%; border: 0; }
 
@@ -522,47 +534,11 @@ kbd {
     <section class="module m-work" id="work" data-code="01 work">
       <div class="rail" aria-hidden="true"><span class="chip"></span><span class="mono">01</span></div>
       <div class="module-body">
-        <div class="module-head"><h2>Work / built systems</h2></div>
+        <div class="module-head"><h2>Selected work</h2></div>
         <p class="module-lede reveal">Six years of systems, drawn as screens.</p>
         <p class="module-note reveal">Every role rebuilt as its interface. These aren't screenshots: internal systems stay internal, so every screen is a mockup rebuilt from the work, in the product's own style.</p>
 
         <div class="projects">
-
-          <article class="proj">
-            <div class="proj-meta reveal">
-              <span class="period mono">2026–now</span>
-              <h3>1Moby / ThaiBulkSMS</h3>
-              <p class="story">Full-stack support for a bulk-messaging platform: lead flow, campaign banners, and delivery history at scale.</p>
-              <dl class="proj-dl">
-                <div><dt>Role</dt><dd>Software Engineer</dd></div>
-                <div><dt>Scope</dt><dd>Lead routing · banners · history search</dd></div>
-                <div><dt>Stack</dt><dd>Next.js · NestJS · Pipedrive</dd></div>
-              </dl>
-            </div>
-            <div class="proj-screens">
-              <figure class="screen reveal">
-                <div class="screen-top"><span class="mono">SMS · DASHBOARD</span><span class="led" aria-hidden="true"></span></div>
-                <div class="screen-body screen-body--frame" aria-hidden="true">
-                  <iframe class="fit" src="mockups/thaibulksms.html" title="campaign dashboard · credits, delivery, volume" loading="lazy" height="540"></iframe>
-                </div>
-                <figcaption class="mono">campaign dashboard · credits, delivery, volume</figcaption>
-              </figure>
-              <figure class="screen reveal">
-                <div class="screen-top"><span class="mono">SMS · HISTORY</span><span class="led" aria-hidden="true"></span></div>
-                <div class="screen-body screen-body--frame" aria-hidden="true">
-                  <iframe class="fit" src="mockups/sms-history.html" title="searchable delivery history across sender, date and status" loading="lazy" height="460"></iframe>
-                </div>
-                <figcaption class="mono">searchable delivery history across sender, date and status</figcaption>
-              </figure>
-              <figure class="screen reveal">
-                <div class="screen-top"><span class="mono">SMS · LEAD ROUTING</span><span class="led" aria-hidden="true"></span></div>
-                <div class="screen-body screen-body--frame" aria-hidden="true">
-                  <iframe class="fit" src="mockups/sms-routing.html" title="rule-based lead assignment with visible sync state" loading="lazy" height="440"></iframe>
-                </div>
-                <figcaption class="mono">rule-based lead assignment with visible sync state</figcaption>
-              </figure>
-            </div>
-          </article>
 
           <article class="proj">
             <div class="proj-meta reveal">
@@ -577,16 +553,23 @@ kbd {
             </div>
             <div class="proj-screens">
               <figure class="screen screen--phone reveal">
-                <div class="screen-top"><span class="mono">EKYC · ONBOARD</span><span class="led" aria-hidden="true"></span></div>
+                <div class="screen-top"><span class="mono">EKYC · ONBOARD</span><span class="plat">Android · iOS</span><span class="led" aria-hidden="true"></span></div>
                 <div class="screen-body screen-body--frame" aria-hidden="true">
                   <iframe class="fit" src="mockups/ekyc.html" title="mobile liveness capture checkpoint" loading="lazy" height="640"></iframe>
                 </div>
                 <figcaption class="mono">mobile liveness capture checkpoint</figcaption>
               </figure>
+              <figure class="screen screen--web reveal">
+                <div class="screen-top"><span class="mono">EKYC · ONBOARD</span><span class="plat">Web</span><span class="led" aria-hidden="true"></span></div>
+                <div class="screen-body screen-body--frame" aria-hidden="true">
+                  <iframe class="fit" src="mockups/ekyc-web.html" title="browser liveness capture checkpoint" loading="lazy" height="640"></iframe>
+                </div>
+                <figcaption class="mono">same liveness step, browser onboarding</figcaption>
+              </figure>
               <figure class="screen reveal">
                 <div class="screen-top"><span class="mono">EKYC · REVIEW CONSOLE</span><span class="led" aria-hidden="true"></span></div>
                 <div class="screen-body screen-body--frame" aria-hidden="true">
-                  <iframe class="fit" src="mockups/ekyc-review.html" title="analyst queue for document and liveness review" loading="lazy" height="440"></iframe>
+                  <iframe class="fit" src="mockups/ekyc-review.html" title="analyst queue for document and liveness review" loading="lazy" height="560"></iframe>
                 </div>
                 <figcaption class="mono">analyst queue for document and liveness review</figcaption>
               </figure>
@@ -613,13 +596,6 @@ kbd {
                 </div>
                 <figcaption class="mono">live floorplan occupancy and revenue overlay</figcaption>
               </figure>
-              <figure class="screen reveal">
-                <div class="screen-top"><span class="mono">MALL OPS · REPORT PIPELINE</span><span class="led" aria-hidden="true"></span></div>
-                <div class="screen-body screen-body--frame" aria-hidden="true">
-                  <iframe class="fit" src="mockups/mallops-pipeline.html" title="monthly branch reporting consolidation status" loading="lazy" height="500"></iframe>
-                </div>
-                <figcaption class="mono">monthly branch reporting consolidation status</figcaption>
-              </figure>
               <figure class="screen screen--phone reveal">
                 <div class="screen-top"><span class="mono">MALL OPS · FIELD OPS</span><span class="led" aria-hidden="true"></span></div>
                 <div class="screen-body screen-body--frame" aria-hidden="true">
@@ -634,56 +610,12 @@ kbd {
                 </div>
                 <figcaption class="mono">line oa lead follow-up assistant</figcaption>
               </figure>
-            </div>
-          </article>
-
-          <article class="proj">
-            <div class="proj-meta reveal">
-              <span class="period mono">2020–2021</span>
-              <h3>Softnix</h3>
-              <p class="story">PDPA delivery led as product owner: data-subject requests, consent, and the data map behind them.</p>
-              <dl class="proj-dl">
-                <div><dt>Role</dt><dd>SWE · Product Owner</dd></div>
-                <div><dt>Scope</dt><dd>PDPA · DSR · data inventory</dd></div>
-                <div><dt>Stack</dt><dd>Vue · Node.js</dd></div>
-              </dl>
-            </div>
-            <div class="proj-screens">
-              <figure class="screen reveal">
-                <div class="screen-top"><span class="mono">PDPA · DSR QUEUE</span><span class="led" aria-hidden="true"></span></div>
+              <figure class="screen screen--phone reveal">
+                <div class="screen-top"><span class="mono">LINE OA · PHOTO REPORT</span><span class="led" aria-hidden="true"></span></div>
                 <div class="screen-body screen-body--frame" aria-hidden="true">
-                  <iframe class="fit" src="mockups/pdpa.html" title="statutory request queue and escalation controls" loading="lazy" height="540"></iframe>
+                  <iframe class="fit" src="mockups/lineoa-report.html" title="line oa photo capture into a branch report" loading="lazy" height="580"></iframe>
                 </div>
-                <figcaption class="mono">statutory request queue and escalation controls</figcaption>
-              </figure>
-              <figure class="screen reveal">
-                <div class="screen-top"><span class="mono">PDPA · DATA MAP</span><span class="led" aria-hidden="true"></span></div>
-                <div class="screen-body screen-body--frame" aria-hidden="true">
-                  <iframe class="fit" src="mockups/pdpa-map.html" title="processing inventory with lawful-basis coverage" loading="lazy" height="440"></iframe>
-                </div>
-                <figcaption class="mono">processing inventory with lawful-basis coverage</figcaption>
-              </figure>
-            </div>
-          </article>
-
-          <article class="proj">
-            <div class="proj-meta reveal">
-              <span class="period mono">2020 · 7 mo</span>
-              <h3>Thai Nippon Seiki</h3>
-              <p class="story">Factory document approval with multi-level sign-off, plus ERP pipeline maintenance on the plant floor.</p>
-              <dl class="proj-dl">
-                <div><dt>Role</dt><dd>Programmer</dd></div>
-                <div><dt>Scope</dt><dd>Approvals · factory ERP</dd></div>
-                <div><dt>Stack</dt><dd>C# · SQL</dd></div>
-              </dl>
-            </div>
-            <div class="proj-screens">
-              <figure class="screen reveal">
-                <div class="screen-top"><span class="mono">DOC-FLOW · APPROVAL</span><span class="led" aria-hidden="true"></span></div>
-                <div class="screen-body screen-body--frame" aria-hidden="true">
-                  <iframe class="fit" src="mockups/docflow.html" title="factory purchase request sign-off route" loading="lazy" height="540"></iframe>
-                </div>
-                <figcaption class="mono">factory purchase request sign-off route</figcaption>
+                <figcaption class="mono">capture a photo, auto-logged as a branch report</figcaption>
               </figure>
             </div>
           </article>
@@ -698,48 +630,89 @@ kbd {
       <div class="module-body">
         <div class="module-head"><h2>Lab / prototypes</h2></div>
         <p class="module-lede reveal">Product bets, made clickable.</p>
-        <p class="module-note reveal">Three product explorations turned into runnable interfaces. Each cartridge opens a working prototype.</p>
+        <p class="module-note reveal">Three product explorations turned into runnable interfaces. Each preview below is the live prototype — click into it, or open it full-screen.</p>
 
-        <div class="carts">
-          <article class="cart reveal">
-            <div class="cart-top"><span class="mono">empeo</span><span class="led" aria-hidden="true"></span></div>
-            <div class="cart-glyph" aria-hidden="true">
-              <svg viewBox="0 0 72 48"><rect x="4" y="28" width="10" height="16"/><rect x="20" y="18" width="10" height="26"/><rect x="36" y="8" width="10" height="36"/><path d="M52 44 V24 l8 6 8-12"/></svg>
+        <div class="projects">
+
+          <article class="proj">
+            <div class="proj-meta reveal">
+              <span class="period mono">empeo</span>
+              <h3>Performance Results</h3>
+              <p class="story">A 360° review turned into a manager decision report: weighted scores become gap flags, a trend read, and merit, bonus, and promotion suggestions.</p>
+              <dl class="proj-dl">
+                <div><dt>Kind</dt><dd>PM prototype</dd></div>
+                <div><dt>Focus</dt><dd>360° review → decision</dd></div>
+                <div><dt>Output</dt><dd>Manager decision report</dd></div>
+              </dl>
+              <div class="proj-keys">
+                <a class="key" href="performance-management/index.html">Open full-screen</a>
+                <a class="key" href="performance-management/handoff.html">Engineering handoff</a>
+              </div>
             </div>
-            <h3>Performance Results</h3>
-            <p>A 360° review turned into a manager decision report: weighted scores become gap flags, a trend read, and merit, bonus, and promotion suggestions.</p>
-            <div class="cart-keys">
-              <a class="key" href="performance-management/index.html">Results report</a>
-              <a class="key" href="performance-management/handoff.html">Engineering handoff</a>
+            <div class="proj-screens">
+              <figure class="screen reveal">
+                <div class="screen-top"><span class="mono">EMPEO · RESULTS REPORT</span><span class="led" aria-hidden="true"></span></div>
+                <div class="screen-body screen-body--frame">
+                  <iframe src="performance-management/index.html" title="Performance Results prototype — weighted scores, gaps, and merit suggestions" loading="lazy" height="560"></iframe>
+                </div>
+                <figcaption class="mono">weighted scores · gap flags · merit and promotion suggestions</figcaption>
+              </figure>
             </div>
           </article>
 
-          <article class="cart reveal">
-            <div class="cart-top"><span class="mono">thaimart</span><span class="led" aria-hidden="true"></span></div>
-            <div class="cart-glyph" aria-hidden="true">
-              <svg viewBox="0 0 72 48"><circle cx="36" cy="24" r="16"/><path d="M36 8 l5 -4 M36 8 l5 4"/><path d="M36 40 l-5 -4 M36 40 l-5 4"/><circle cx="36" cy="24" r="4"/></svg>
+          <article class="proj">
+            <div class="proj-meta reveal">
+              <span class="period mono">thaimart</span>
+              <h3>Marketplace Flywheel</h3>
+              <p class="story">A PM-style set that starts from business leverage: demand, fulfillment, and supply, each turned into a runnable interface with flows and metrics.</p>
+              <dl class="proj-dl">
+                <div><dt>Kind</dt><dd>PM prototype set</dd></div>
+                <div><dt>Focus</dt><dd>Demand · fulfillment · supply</dd></div>
+                <div><dt>Set</dt><dd>Three runnable modules</dd></div>
+              </dl>
+              <div class="proj-keys">
+                <a class="key" href="thaimart/index.html">Open full-screen</a>
+                <a class="key" href="thaimart/01-smartrewards.html">SmartRewards</a>
+                <a class="key" href="thaimart/02-localpick.html">LocalPick</a>
+                <a class="key" href="thaimart/03-vendorexpress.html">VendorExpress</a>
+              </div>
             </div>
-            <h3>Marketplace Flywheel</h3>
-            <p>A PM-style set that starts from business leverage: demand, fulfillment, and supply, each turned into a runnable interface with flows and metrics.</p>
-            <div class="cart-keys">
-              <a class="key" href="thaimart/index.html">Prototype hub</a>
-              <a class="key" href="thaimart/01-smartrewards.html">SmartRewards</a>
-              <a class="key" href="thaimart/02-localpick.html">LocalPick</a>
-              <a class="key" href="thaimart/03-vendorexpress.html">VendorExpress</a>
+            <div class="proj-screens">
+              <figure class="screen reveal">
+                <div class="screen-top"><span class="mono">THAIMART · PROTOTYPE HUB</span><span class="led" aria-hidden="true"></span></div>
+                <div class="screen-body screen-body--frame">
+                  <iframe src="thaimart/index.html" title="Marketplace Flywheel prototype hub — demand, fulfillment, supply" loading="lazy" height="560"></iframe>
+                </div>
+                <figcaption class="mono">flywheel hub · demand, fulfillment and supply modules</figcaption>
+              </figure>
             </div>
           </article>
 
-          <article class="cart reveal">
-            <div class="cart-top"><span class="mono">edusight</span><span class="led" aria-hidden="true"></span></div>
-            <div class="cart-glyph" aria-hidden="true">
-              <svg viewBox="0 0 72 48"><path d="M4 24 h12 l4 -14 6 28 6 -20 4 6 h12"/><path d="M56 14 v20 l14 -10 z"/></svg>
+          <article class="proj">
+            <div class="proj-meta reveal">
+              <span class="period mono">edusight</span>
+              <h3>Cognitive Replay</h3>
+              <p class="story">A behavior diagnostic for coding classes: capture IDE-like learning signals, detect support moments, and show progress evidence in one view.</p>
+              <dl class="proj-dl">
+                <div><dt>Kind</dt><dd>Diagnostic prototype</dd></div>
+                <div><dt>Focus</dt><dd>Learning-signal capture</dd></div>
+                <div><dt>Output</dt><dd>Support moments · progress evidence</dd></div>
+              </dl>
+              <div class="proj-keys">
+                <a class="key" href="edusight/index.html">Open full-screen</a>
+              </div>
             </div>
-            <h3>Cognitive Replay</h3>
-            <p>A behavior diagnostic for coding classes: capture IDE-like learning signals, detect support moments, and show progress evidence in one view.</p>
-            <div class="cart-keys">
-              <a class="key" href="edusight/index.html">Open prototype</a>
+            <div class="proj-screens">
+              <figure class="screen reveal">
+                <div class="screen-top"><span class="mono">EDUSIGHT · REPLAY</span><span class="led" aria-hidden="true"></span></div>
+                <div class="screen-body screen-body--frame">
+                  <iframe src="edusight/index.html" title="Cognitive Replay prototype — learning signals and support detection" loading="lazy" height="560"></iframe>
+                </div>
+                <figcaption class="mono">learning signals · support detection · progress in one view</figcaption>
+              </figure>
             </div>
           </article>
+
         </div>
       </div>
     </section>

@@ -3,12 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
   <meta name="theme-color" content="#f5f7fb">
-  <title>Personal-data inventory — PDPA Center</title>
+  <title>Processing inventory — PDPA Center</title>
   <style>
     :root {
+      color-scheme: light;
       --indigo-50: #eef2ff;
       --indigo-100: #e0e7ff;
+      --indigo-200: #c7d2fe;
       --indigo-500: #6366f1;
       --indigo-600: #4f46e5;
       --indigo-700: #4338ca;
@@ -25,48 +28,38 @@
       --slate-900: #111c2e;
       --amber-50: #fff9e8;
       --amber-100: #fef0bd;
-      --amber-500: #d97706;
-      --green-50: #ecfdf5;
-      --green-600: #15803d;
-      --sky-50: #eff8ff;
-      --sky-600: #0369a1;
-      --violet-50: #f5f3ff;
-      --violet-600: #6d28d9;
-      --space-1: 4px;
-      --space-2: 8px;
-      --space-3: 12px;
-      --space-4: 16px;
-      --space-5: 20px;
+      --amber-800: #92400e;
+      --radius-card: 10px;
       --radius-button: 6px;
-      --radius-card: 8px;
+      --radius-bar: 4px;
       --radius-pill: 999px;
       --shadow-card: 0 1px 2px rgba(30, 41, 59, .04), 0 5px 14px rgba(30, 41, 59, .035);
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     html,
     body {
-      width: 100%;
+      height: 100%;
+      margin: 0;
       overflow: hidden;
     }
 
     body {
-      margin: 0;
       background: var(--slate-50);
       color: var(--slate-800);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      font-size: 13px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 12.5px;
       line-height: 1.4;
       -webkit-font-smoothing: antialiased;
     }
 
-    .app-shell {
-      width: min(100%, 1040px);
-      margin: 0 auto;
-      background: var(--slate-50);
+    button { font: inherit; }
+
+    a:focus-visible,
+    button:focus-visible {
+      outline: 3px solid var(--indigo-600);
+      outline-offset: 2px;
     }
 
     .skip-link {
@@ -81,39 +74,38 @@
       transform: translateY(-150%);
     }
 
-    .skip-link:focus {
-      transform: translateY(0);
+    .skip-link:focus { transform: translateY(0); }
+
+    .app-shell {
+      height: 100vh;
+      min-width: 700px;
+      max-width: 1040px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-rows: 52px minmax(0, 1fr);
     }
 
+    /* ── Topbar: 52px ─────────────────────────────── */
     .topbar {
-      height: 58px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: var(--space-4);
-      padding: 0 var(--space-5);
+      gap: 16px;
+      padding: 0 20px;
       background: rgba(255, 255, 255, .96);
       border-bottom: 1px solid var(--slate-200);
     }
 
-    .brand-lockup,
-    .topbar-meta,
-    .org,
-    .page-heading,
-    .coverage-copy,
-    .coverage-meter {
+    .brand-lockup {
       display: flex;
       align-items: center;
-    }
-
-    .brand-lockup {
-      min-width: 0;
       gap: 10px;
+      min-width: 0;
     }
 
     .brand-mark {
-      width: 30px;
-      height: 30px;
+      width: 28px;
+      height: 28px;
       flex: 0 0 auto;
       display: grid;
       place-items: center;
@@ -122,14 +114,11 @@
       box-shadow: 0 1px 2px rgba(49, 46, 129, .2), 0 4px 10px rgba(79, 70, 229, .16);
     }
 
-    .brand-mark svg {
-      width: 18px;
-      height: 18px;
-    }
+    .brand-mark svg { width: 17px; height: 17px; }
 
     .wordmark {
       color: var(--slate-900);
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 700;
       letter-spacing: -.015em;
       white-space: nowrap;
@@ -148,80 +137,145 @@
       text-transform: uppercase;
     }
 
-    .topbar-meta {
-      min-width: 0;
-      gap: var(--space-4);
-    }
-
     .org {
-      gap: var(--space-2);
+      display: flex;
+      align-items: center;
+      gap: 8px;
       color: var(--slate-600);
-      font-size: 12px;
+      font-size: 11.5px;
       font-weight: 600;
       white-space: nowrap;
     }
 
-    .org svg {
-      width: 15px;
-      height: 15px;
-      color: var(--slate-400);
-    }
+    .org svg { width: 15px; height: 15px; color: var(--slate-400); }
 
+    /* ── Main: 388px = 12 + 88 + 10 + 264 + 14 ────── */
     main {
-      padding: 15px var(--space-5) 17px;
-    }
-
-    .page-header {
-      min-height: 44px;
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: var(--space-4);
-      margin-bottom: 12px;
-    }
-
-    .page-heading {
-      align-items: flex-start;
-      gap: var(--space-3);
-      min-width: 0;
-    }
-
-    .module-icon {
-      width: 34px;
-      height: 34px;
-      flex: 0 0 auto;
       display: grid;
-      place-items: center;
-      border: 1px solid var(--indigo-100);
-      border-radius: 8px;
-      background: var(--indigo-50);
-      color: var(--indigo-600);
+      grid-template-rows: 88px minmax(0, 1fr);
+      row-gap: 10px;
+      padding: 12px 20px 14px;
+      min-height: 0;
     }
 
-    .module-icon svg {
-      width: 18px;
-      height: 18px;
+    /* Coverage hero */
+    .coverage-hero {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 28px;
+      padding: 0 18px;
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-card);
+      background: #fff;
+      box-shadow: var(--shadow-card);
     }
 
-    .section-label {
-      margin: 0 0 2px;
+    .coverage-copy { min-width: 0; }
+
+    .eyebrow {
+      margin: 0 0 3px;
       color: var(--slate-500);
       font-size: 9px;
       font-weight: 750;
       letter-spacing: .11em;
       text-transform: uppercase;
+      white-space: nowrap;
     }
 
-    h1 {
+    .coverage-headline {
       margin: 0;
       color: var(--slate-900);
-      font-size: 18px;
-      line-height: 1.25;
-      font-weight: 700;
-      letter-spacing: -.025em;
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
     }
 
+    .coverage-headline strong {
+      color: var(--indigo-700);
+      font-size: 24px;
+      font-weight: 750;
+      letter-spacing: -.03em;
+      font-variant-numeric: tabular-nums;
+      margin-right: 4px;
+    }
+
+    .coverage-sub {
+      margin: 2px 0 0;
+      color: var(--slate-500);
+      font-size: 10px;
+      white-space: nowrap;
+    }
+
+    .coverage-meter {
+      flex: 1 1 auto;
+      min-width: 0;
+      max-width: 420px;
+    }
+
+    .meter-track {
+      display: flex;
+      height: 10px;
+      overflow: hidden;
+      border-radius: var(--radius-bar);
+      background: var(--slate-100);
+      box-shadow: inset 0 0 0 1px rgba(30, 41, 59, .05);
+    }
+
+    .seg-recorded { width: 89.4%; background: var(--indigo-600); }
+
+    .seg-remediation {
+      width: 4.3%;
+      background: repeating-linear-gradient(-45deg,
+        var(--indigo-200) 0 3px, var(--indigo-50) 3px 6px);
+    }
+
+    .seg-missing {
+      width: 6.3%;
+      background: repeating-linear-gradient(-45deg,
+        var(--slate-300) 0 3px, var(--slate-100) 3px 6px);
+    }
+
+    .meter-legend {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-top: 7px;
+      color: var(--slate-600);
+      font-size: 10px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .swatch {
+      width: 9px;
+      height: 9px;
+      flex: 0 0 auto;
+      border-radius: 2px;
+    }
+
+    .swatch-recorded { background: var(--indigo-600); }
+    .swatch-remediation { background: repeating-linear-gradient(-45deg, var(--indigo-200) 0 2px, var(--indigo-50) 2px 4px); box-shadow: inset 0 0 0 1px var(--indigo-200); }
+    .swatch-missing { background: repeating-linear-gradient(-45deg, var(--slate-300) 0 2px, var(--slate-100) 2px 4px); box-shadow: inset 0 0 0 1px var(--slate-300); }
+
+    .legend-pct {
+      margin-left: auto;
+      color: var(--slate-500);
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Inventory table card: 264px = 1 + 38 + 26 + 6×33 + 1 */
     .table-card {
+      display: grid;
+      grid-template-rows: 38px minmax(0, 1fr);
       overflow: hidden;
       border: 1px solid var(--slate-200);
       border-radius: var(--radius-card);
@@ -230,43 +284,83 @@
     }
 
     .table-toolbar {
-      height: 45px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: var(--space-4);
+      gap: 16px;
       padding: 0 14px;
       border-bottom: 1px solid var(--slate-200);
     }
 
     .table-title {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
       min-width: 0;
     }
 
-    .table-title h2 {
+    .table-title h1 {
       margin: 0;
       color: var(--slate-800);
-      font-size: 12px;
+      font-size: 12.5px;
       font-weight: 700;
+      letter-spacing: -.01em;
+      white-space: nowrap;
     }
 
     .table-title p {
-      margin: 1px 0 0;
-      color: var(--slate-400);
-      font-size: 9px;
+      margin: 0;
+      color: var(--slate-500);
+      font-size: 9.5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-variant-numeric: tabular-nums;
     }
 
-    .inventory-count {
-      min-height: 21px;
+    .filters {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .filter {
       display: inline-flex;
       align-items: center;
-      padding: 0 8px;
+      gap: 5px;
+      height: 24px;
+      padding: 0 9px;
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-button);
+      background: var(--slate-25);
+      color: var(--slate-600);
+      font-size: 10px;
+      font-weight: 650;
+      white-space: nowrap;
+      cursor: default;
+    }
+
+    .filter svg { width: 11px; height: 11px; }
+
+    .filter-active {
+      border-color: var(--slate-400);
+      background: #fff;
+      color: var(--slate-800);
+    }
+
+    .filter-count {
+      padding: 0 5px;
       border-radius: var(--radius-pill);
-      background: var(--indigo-50);
-      color: var(--indigo-700);
+      background: var(--slate-100);
+      color: var(--slate-600);
       font-size: 9px;
       font-weight: 700;
-      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .filter:hover { border-color: var(--slate-300); background: #fff; }
+      tbody tr:hover td { background: var(--slate-25); }
     }
 
     table {
@@ -275,198 +369,142 @@
       table-layout: fixed;
     }
 
-    col.system-col { width: 25%; }
-    col.category-col { width: 32%; }
-    col.basis-col { width: 27%; }
-    col.retention-col { width: 16%; }
+    col.activity-col { width: 21%; }
+    col.system-col { width: 13%; }
+    col.category-col { width: 19%; }
+    col.basis-col { width: 22%; }
+    col.retention-col { width: 10%; }
+    col.status-col { width: 15%; }
 
-    thead {
-      background: var(--slate-25);
-    }
+    thead { background: var(--slate-25); }
 
     th {
-      height: 31px;
+      height: 26px;
       padding: 0 10px;
       border-bottom: 1px solid var(--slate-200);
       color: var(--slate-500);
       font-size: 9px;
-      font-weight: 650;
+      font-weight: 700;
+      letter-spacing: .07em;
+      text-transform: uppercase;
       text-align: left;
       white-space: nowrap;
     }
 
-    th:first-child,
-    td:first-child {
-      padding-left: 14px;
-    }
+    th:first-child, td:first-child { padding-left: 14px; }
+    th:last-child, td:last-child { padding-right: 14px; }
 
-    th:last-child,
-    td:last-child {
-      padding-right: 14px;
-      text-align: right;
-    }
-
-    tbody tr {
-      height: 41px;
-      border-bottom: 1px solid var(--slate-100);
-    }
-
-    tbody tr:last-child {
-      border-bottom: 0;
-    }
+    tbody tr { border-bottom: 1px solid var(--slate-100); }
+    tbody tr:last-child { border-bottom: 0; }
 
     td {
-      height: 41px;
+      height: 32px;
       padding: 0 10px;
       color: var(--slate-600);
-      font-size: 10px;
+      font-size: 10.5px;
       vertical-align: middle;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .system-name {
-      color: var(--slate-700);
-      font-size: 10px;
-      font-weight: 700;
+    .activity-name {
+      color: var(--slate-800);
+      font-weight: 650;
     }
 
-    .type-badge,
-    .flag-pill {
-      min-height: 21px;
-      display: inline-flex;
-      align-items: center;
-      padding: 0 8px;
-      border-radius: var(--radius-pill);
-      font-size: 9px;
-      font-weight: 700;
-    }
-
-    .type-contact {
-      background: var(--sky-50);
-      color: var(--sky-600);
-    }
-
-    .type-financial {
-      background: var(--green-50);
-      color: var(--green-600);
-    }
-
-    .type-biometric {
-      background: var(--violet-50);
-      color: var(--violet-600);
-    }
-
-    .type-employee {
-      background: var(--slate-100);
+    .system {
       color: var(--slate-600);
+      font-weight: 600;
     }
 
-    .flag-pill {
-      border: 1px solid var(--amber-100);
-      background: var(--amber-50);
-      color: var(--amber-500);
+    .categories { color: var(--slate-500); }
+
+    .basis { color: var(--slate-700); font-weight: 600; }
+
+    /* Signature detail: statute tag — every lawful basis cites its PDPA section */
+    .statute {
+      margin-left: 5px;
+      padding: 1px 4px;
+      border: 1px solid var(--slate-200);
+      border-radius: 3px;
+      color: var(--slate-500);
+      font-size: 8.5px;
+      font-weight: 650;
+      letter-spacing: .02em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .basis-missing {
+      color: var(--slate-500);
+      font-style: italic;
+      font-weight: 500;
+    }
+
+    .basis-proposed {
+      margin-left: 5px;
+      color: var(--slate-500);
+      font-size: 9px;
+      font-weight: 600;
+      font-style: italic;
     }
 
     .retention {
       color: var(--slate-700);
-      font-weight: 700;
+      font-weight: 650;
       font-variant-numeric: tabular-nums;
     }
 
-    .coverage {
-      min-height: 52px;
-      display: flex;
+    .retention-unset { color: var(--slate-500); font-weight: 500; }
+
+    .status {
+      display: inline-flex;
       align-items: center;
-      justify-content: space-between;
-      gap: var(--space-5);
-      padding: 0 14px;
-      background: var(--slate-25);
-      border-top: 1px solid var(--slate-200);
-    }
-
-    .coverage-copy {
-      gap: var(--space-2);
-      color: var(--slate-600);
-      font-size: 10px;
+      gap: 5px;
       font-weight: 600;
-      white-space: nowrap;
     }
 
-    .coverage-copy strong {
-      color: var(--slate-800);
-      font-size: 11px;
-      font-weight: 700;
-      font-variant-numeric: tabular-nums;
-    }
+    .status svg { width: 12px; height: 12px; flex: 0 0 auto; }
 
-    .coverage-meter {
-      width: min(42%, 240px);
-      gap: var(--space-2);
-    }
+    .status-recorded { color: var(--slate-500); }
 
-    .coverage-track {
-      width: 100%;
-      height: 6px;
-      overflow: hidden;
+    .status-chip {
+      min-height: 18px;
+      padding: 0 7px;
       border-radius: var(--radius-pill);
-      background: var(--indigo-100);
-      box-shadow: inset 0 1px 1px rgba(49, 46, 129, .06);
-    }
-
-    .coverage-fill {
-      display: block;
-      width: 88%;
-      height: 100%;
-      border-radius: inherit;
-      background: var(--indigo-600);
-    }
-
-    .coverage-percent {
-      min-width: 28px;
-      color: var(--indigo-700);
-      font-size: 10px;
+      font-size: 9.5px;
       font-weight: 700;
-      text-align: right;
-      font-variant-numeric: tabular-nums;
     }
 
-    @media (max-width: 720px) {
-      .topbar,
-      main {
-        padding-inline: 16px;
-      }
-
-      .product-tag,
-      .table-title p {
-        display: none;
-      }
-
-      col.system-col { width: 24%; }
-      col.category-col { width: 31%; }
-      col.basis-col { width: 29%; }
-      col.retention-col { width: 16%; }
+    .status-missing {
+      border: 1px solid var(--amber-100);
+      background: var(--amber-50);
+      color: var(--amber-800);
     }
 
-    @media (max-width: 560px) {
-      .org svg {
-        display: none;
-      }
+    .status-remediation {
+      border: 1px solid var(--indigo-100);
+      background: var(--indigo-50);
+      color: var(--indigo-700);
+    }
 
-      .coverage {
-        gap: var(--space-3);
-      }
+    .row-gap td { background: #fffdf4; }
+    .row-gap td:first-child { box-shadow: inset 3px 0 0 var(--amber-800); }
 
-      .coverage-meter {
-        width: 38%;
-      }
+    @media (max-width: 780px) {
+      .topbar, main { padding-inline: 14px; }
+      .product-tag { display: none; }
+      .coverage-hero { gap: 18px; padding-inline: 14px; }
+      .category-col, th.categories-th, td.categories { display: none; }
+      col.activity-col { width: 26%; }
+      col.system-col { width: 16%; }
+      col.basis-col { width: 28%; }
+      col.retention-col { width: 12%; }
+      col.status-col { width: 18%; }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      *,
-      *::before,
-      *::after {
+      *, *::before, *::after {
         scroll-behavior: auto !important;
         transition: none !important;
       }
@@ -474,7 +512,7 @@
   </style>
 </head>
 <body>
-  <a class="skip-link" href="#main-content">Skip to inventory</a>
+  <a class="skip-link" href="#inventory">Skip to inventory</a>
 
   <div class="app-shell">
     <header class="topbar">
@@ -488,104 +526,175 @@
         <span class="wordmark">PDPA Center</span>
         <span class="product-tag">Governance</span>
       </div>
-
-      <div class="topbar-meta">
-        <div class="org">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M4 20V6.5L12 3v17M12 8h8v12M2.5 20h19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M7 9h2M7 12.5h2M7 16h2M15 12h2M15 15.5h2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-          </svg>
-          <span>Head Office · TH</span>
-        </div>
+      <div class="org">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M4 20V6.5L12 3v17M12 8h8v12M2.5 20h19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M7 9h2M7 12.5h2M7 16h2M15 12h2M15 15.5h2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        <span>Head Office · TH</span>
       </div>
     </header>
 
-    <main id="main-content">
-      <div class="page-header">
-        <div class="page-heading">
-          <div class="module-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none">
-              <ellipse cx="8" cy="6" rx="4" ry="2.2" stroke="currentColor" stroke-width="1.6"/>
-              <path d="M4 6v5c0 1.2 1.8 2.2 4 2.2s4-1 4-2.2V6M4 11v5c0 1.2 1.8 2.2 4 2.2s4-1 4-2.2v-5M15.5 8h4M15.5 12h4M15.5 16h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-            </svg>
+    <main>
+      <section class="coverage-hero" aria-label="Lawful-basis coverage summary">
+        <div class="coverage-copy">
+          <p class="eyebrow">Record of processing · lawful-basis coverage</p>
+          <p class="coverage-headline"><strong>42 of 47</strong> activities have a lawful basis recorded</p>
+          <p class="coverage-sub">Across 12 systems · last review 14 Jul 2026</p>
+        </div>
+        <div class="coverage-meter">
+          <div class="meter-track" role="img" aria-label="Coverage bar: 42 of 47 activities recorded, 2 in remediation, 3 missing a lawful basis">
+            <span class="seg-recorded"></span>
+            <span class="seg-remediation"></span>
+            <span class="seg-missing"></span>
           </div>
-          <div>
-            <p class="section-label">Data map</p>
-            <h1>Personal-data inventory</h1>
+          <div class="meter-legend" aria-hidden="true">
+            <span class="legend-item"><span class="swatch swatch-recorded"></span>42 recorded</span>
+            <span class="legend-item"><span class="swatch swatch-remediation"></span>2 in remediation</span>
+            <span class="legend-item"><span class="swatch swatch-missing"></span>3 missing</span>
+            <span class="legend-pct">89%</span>
           </div>
         </div>
-      </div>
+      </section>
 
-      <section class="table-card" aria-labelledby="inventory-heading">
+      <section class="table-card" id="inventory" aria-labelledby="inventory-heading">
         <div class="table-toolbar">
           <div class="table-title">
-            <h2 id="inventory-heading">System inventory</h2>
-            <p>Personal-data categories, legal grounds, and retention rules</p>
+            <h1 id="inventory-heading">Processing activities</h1>
+            <p>47 activities · showing 6 · sorted by risk</p>
           </div>
-          <span class="inventory-count">5 systems shown</span>
+          <div class="filters" aria-label="Inventory filters">
+            <button class="filter" type="button">
+              All systems
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="m8 10 4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <button class="filter filter-active" type="button" aria-pressed="true">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M12 4.5 21 19H3L12 4.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+                <path d="M12 10.5v3.5M12 16.6h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+              Gaps first
+              <span class="filter-count">5</span>
+            </button>
+          </div>
         </div>
 
         <table>
           <colgroup>
+            <col class="activity-col">
             <col class="system-col">
             <col class="category-col">
             <col class="basis-col">
             <col class="retention-col">
+            <col class="status-col">
           </colgroup>
           <thead>
             <tr>
+              <th scope="col">Activity</th>
               <th scope="col">System</th>
-              <th scope="col">Data category</th>
+              <th class="categories-th" scope="col">Data categories</th>
               <th scope="col">Lawful basis</th>
               <th scope="col">Retention</th>
+              <th scope="col">Status</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td><span class="system-name">CRM</span></td>
-              <td><span class="type-badge type-contact">contact + id</span></td>
-              <td>consent</td>
-              <td><span class="retention">2y</span></td>
+            <tr class="row-gap">
+              <td><span class="activity-name">Newsletter campaigns</span></td>
+              <td><span class="system">CRM</span></td>
+              <td class="categories">Contact, preferences</td>
+              <td><span class="basis-missing">Not recorded</span></td>
+              <td><span class="retention retention-unset">—</span></td>
+              <td>
+                <span class="status status-chip status-missing">
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M12 4.5 21 19H3L12 4.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+                    <path d="M12 10.5v3.5M12 16.6h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                  </svg>
+                  Basis missing
+                </span>
+              </td>
             </tr>
             <tr>
-              <td><span class="system-name">Payroll</span></td>
-              <td><span class="type-badge type-financial">financial</span></td>
-              <td>contract</td>
-              <td><span class="retention">7y</span></td>
+              <td><span class="activity-name">Legacy HR archive</span></td>
+              <td><span class="system">HRIS (legacy)</span></td>
+              <td class="categories">Employment records</td>
+              <td><span class="basis">Contract</span><span class="statute">s.24(3)</span><span class="basis-proposed">proposed</span></td>
+              <td><span class="retention">10 y → 7 y</span></td>
+              <td>
+                <span class="status status-chip status-remediation">
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M4.5 12a7.5 7.5 0 0 1 12.8-5.3L19.5 9M19.5 12a7.5 7.5 0 0 1-12.8 5.3L4.5 15" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M19.5 4.5V9H15M4.5 19.5V15H9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  In remediation
+                </span>
+              </td>
             </tr>
             <tr>
-              <td><span class="system-name">CCTV</span></td>
-              <td><span class="type-badge type-biometric">biometric</span></td>
-              <td>legit. interest</td>
-              <td><span class="retention">30d</span></td>
+              <td><span class="activity-name">Customer onboarding</span></td>
+              <td><span class="system">CRM</span></td>
+              <td class="categories">Contact, national ID</td>
+              <td><span class="basis">Consent</span><span class="statute">s.19</span></td>
+              <td><span class="retention">2 y</span></td>
+              <td>
+                <span class="status status-recorded">
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="m5 12.5 4.5 4.5L19 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  Recorded
+                </span>
+              </td>
             </tr>
             <tr>
-              <td><span class="system-name">Visitor Log</span></td>
-              <td><span class="type-badge type-contact">contact</span></td>
-              <td>legit. interest</td>
-              <td><span class="retention">90d</span></td>
+              <td><span class="activity-name">Payroll processing</span></td>
+              <td><span class="system">HRIS</span></td>
+              <td class="categories">Financial, tax ID</td>
+              <td><span class="basis">Contract</span><span class="statute">s.24(3)</span></td>
+              <td><span class="retention">7 y</span></td>
+              <td>
+                <span class="status status-recorded">
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="m5 12.5 4.5 4.5L19 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  Recorded
+                </span>
+              </td>
             </tr>
             <tr>
-              <td><span class="system-name">Legacy HR</span></td>
-              <td><span class="type-badge type-employee">employee id</span></td>
-              <td><span class="flag-pill">No basis</span></td>
-              <td><span class="retention">10y</span></td>
+              <td><span class="activity-name">Invoice issuance</span></td>
+              <td><span class="system">Billing</span></td>
+              <td class="categories">Financial, contact</td>
+              <td><span class="basis">Legal obligation</span><span class="statute">s.24(6)</span></td>
+              <td><span class="retention">10 y</span></td>
+              <td>
+                <span class="status status-recorded">
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="m5 12.5 4.5 4.5L19 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  Recorded
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td><span class="activity-name">Premises CCTV</span></td>
+              <td><span class="system">CCTV</span></td>
+              <td class="categories">Video image</td>
+              <td><span class="basis">Legitimate interest</span><span class="statute">s.24(5)</span></td>
+              <td><span class="retention">30 d</span></td>
+              <td>
+                <span class="status status-recorded">
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="m5 12.5 4.5 4.5L19 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  Recorded
+                </span>
+              </td>
             </tr>
           </tbody>
         </table>
-
-        <footer class="coverage" aria-label="Systems mapped 23/26">
-          <div class="coverage-copy">
-            <span>Systems mapped</span>
-            <strong>23/26</strong>
-          </div>
-          <div class="coverage-meter">
-            <div class="coverage-track" role="progressbar" aria-label="Systems mapped" aria-valuemin="0" aria-valuemax="100" aria-valuenow="88">
-              <span class="coverage-fill"></span>
-            </div>
-            <span class="coverage-percent">88%</span>
-          </div>
-        </footer>
       </section>
     </main>
   </div>

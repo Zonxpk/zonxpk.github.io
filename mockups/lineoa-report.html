@@ -5,17 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
   <meta name="theme-color" content="#202a36">
-  <title>Leasing assistant — LINE OA conversation</title>
+  <title>Site report — LINE OA photo capture</title>
   <style>
     :root {
       --line-green: #06c755;
-      --line-green-ink: #067a3f;      /* accent text on white, 5.4:1 */
-      --sent-bubble: #9fe870;          /* authentic LINE sent tint */
-      --sent-ink: #163312;             /* 9.4:1 on sent bubble */
+      --line-green-ink: #067a3f;
+      --sent-bubble: #9fe870;
+      --sent-ink: #163312;
       --chrome: #26323d;
       --chrome-deep: #202a36;
-      --chat-bg: #7a92b5;              /* LINE chat blue */
-      --meta-ink: #1a2839;             /* 4.68:1 on chat blue */
+      --chat-bg: #7a92b5;
+      --meta-ink: #1a2839;
       --ink: #1c2430;
       --ink-soft: #5b6875;
       --hairline: #e8ecf0;
@@ -68,8 +68,6 @@
       background: var(--chrome-deep);
     }
 
-    .app-bar svg { flex: 0 0 auto; }
-
     .icon-btn {
       display: flex;
       align-items: center;
@@ -79,10 +77,7 @@
       color: #cdd6e0;
     }
 
-    .oa {
-      min-width: 0;
-      flex: 1;
-    }
+    .oa { min-width: 0; flex: 1; }
 
     .oa-name {
       display: flex;
@@ -94,18 +89,13 @@
     }
 
     .oa-name .badge { flex: 0 0 auto; }
-
-    .oa-sub {
-      margin-top: 1px;
-      color: #aeb9c6;
-      font-size: 9px;
-    }
+    .oa-sub { margin-top: 1px; color: #aeb9c6; font-size: 9px; }
 
     /* ---- thread ---- */
     .thread {
       display: flex;
       flex-direction: column;
-      justify-content: flex-end;   /* chat anchors to the composer */
+      justify-content: flex-end;
       overflow: hidden;
       padding: 10px 10px 6px;
     }
@@ -122,23 +112,10 @@
       font-variant-numeric: tabular-nums;
     }
 
-    .messages {
-      display: flex;
-      flex-direction: column;
-      margin: 0;
-      padding: 0;
-      list-style: none;
-    }
+    .messages { display: flex; flex-direction: column; margin: 0; padding: 0; list-style: none; }
 
-    .msg {
-      display: flex;
-      align-items: flex-end;
-      gap: 6px;
-      margin-bottom: 11px;
-    }
-
+    .msg { display: flex; align-items: flex-end; gap: 6px; margin-bottom: 11px; }
     .msg:last-child { margin-bottom: 0; }
-
     .msg.received { padding-right: 24px; }
 
     .avatar {
@@ -174,9 +151,6 @@
       content: "";
     }
 
-    .bubble.tailless { border-radius: 16px; }
-    .bubble.tailless::before { content: none; }
-
     .time {
       flex: 0 0 auto;
       color: var(--meta-ink);
@@ -187,11 +161,7 @@
     }
 
     /* ---- sent ---- */
-    .msg.sent {
-      justify-content: flex-end;
-      padding-left: 40px;
-      margin-top: 2px;
-    }
+    .msg.sent { justify-content: flex-end; padding-left: 40px; margin-top: 2px; }
 
     .sent-meta {
       align-self: flex-end;
@@ -204,22 +174,53 @@
 
     .sent-meta span { display: block; }
 
-    .sent .bubble {
-      border-radius: 16px 4px 16px 16px;
-      color: var(--sent-ink);
-      background: var(--sent-bubble);
-      font-weight: 550;
+    /* ---- captured photo message ---- */
+    .photo {
+      position: relative;
+      width: 202px;
+      height: 152px;
+      overflow: hidden;
+      border-radius: 14px;
+      background: #10202e;
+      box-shadow: 0 2px 6px rgba(20, 32, 46, 0.22);
     }
 
-    .sent .bubble::before {
-      left: auto;
-      right: -5px;
-      background: var(--sent-bubble);
-      clip-path: polygon(0 0, 100% 0, 0 100%);
+    .photo svg.shot { display: block; width: 100%; height: 100%; }
+
+    .photo .stamp {
+      position: absolute;
+      left: 8px;
+      bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 7px 3px;
+      border-radius: 6px;
+      background: rgba(8, 16, 24, 0.62);
+      color: #eaf1f7;
+      font-size: 9px;
+      font-weight: 650;
+      letter-spacing: 0.02em;
+      font-variant-numeric: tabular-nums;
     }
 
-    /* ---- flex message card ---- */
-    .lead-card {
+    .photo .stamp svg { width: 10px; height: 10px; color: #9fe870; }
+
+    .photo .geo {
+      position: absolute;
+      right: 8px;
+      bottom: 8px;
+      padding: 2px 7px 3px;
+      border-radius: 6px;
+      background: rgba(8, 16, 24, 0.62);
+      color: #c8d3de;
+      font-size: 9px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ---- auto-generated report card ---- */
+    .report-card {
       width: 226px;
       overflow: hidden;
       border-radius: 13px;
@@ -229,21 +230,11 @@
 
     .card-body { padding: 11px 12px 10px; }
 
-    .card-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 6px;
-    }
+    .card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
 
-    .kicker {
-      color: #6a7480;      /* 4.75:1 on white at 9px */
-      font-size: 9px;
-      font-weight: 650;
-      letter-spacing: 0.03em;
-    }
+    .kicker { color: #6a7480; font-size: 9px; font-weight: 650; letter-spacing: 0.03em; }
 
-    .lead-id {
+    .rep-id {
       padding: 2px 6px;
       border-radius: 5px;
       color: #47535f;
@@ -253,19 +244,14 @@
       font-variant-numeric: tabular-nums;
     }
 
-    .card-title {
-      margin: 0 0 7px;
-      font-size: 15px;
-      font-weight: 700;
-      letter-spacing: -0.012em;
-    }
+    .card-title { margin: 0 0 7px; font-size: 15px; font-weight: 700; letter-spacing: -0.012em; }
 
     .fact {
       display: grid;
       grid-template-columns: 14px 1fr;
       align-items: center;
       column-gap: 7px;
-      margin-bottom: 5px;
+      margin: 0 0 5px;
       color: var(--ink-soft);
       font-size: 11.5px;
       font-variant-numeric: tabular-nums;
@@ -274,8 +260,7 @@
 
     .fact svg { color: #8b96a2; }
 
-    /* signature detail: the silence meter — days since last contact vs SLA */
-    .silence {
+    .status {
       display: flex;
       align-items: center;
       gap: 6px;
@@ -284,29 +269,30 @@
       border-top: 1px dashed var(--hairline);
     }
 
-    .ticks { display: flex; gap: 3px; }
-
-    .ticks i {
-      width: 14px;
-      height: 5px;
-      border-radius: 2.5px;
-      background: #e3e8ed;
+    .status .dot {
+      width: 15px;
+      height: 15px;
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: rgba(6, 199, 85, 0.14);
+      color: var(--line-green-ink);
     }
 
-    .ticks i.on { background: #47535f; }
+    .status .dot svg { width: 9px; height: 9px; }
 
-    .silence-label {
-      color: var(--ink-soft);
-      font-size: 9px;
-      font-weight: 650;
-      font-variant-numeric: tabular-nums;
+    .status-label {
+      color: var(--line-green-ink);
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
     }
 
-    .card-actions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      border-top: 1px solid var(--hairline);
-    }
+    .status-label b { color: var(--ink-soft); font-weight: 650; }
+
+    .card-actions { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--hairline); }
 
     .card-actions button {
       height: 36px;
@@ -320,18 +306,10 @@
       transition: background-color 0.12s ease;
     }
 
-    .card-actions button + button {
-      border-left: 1px solid var(--hairline);
-      color: #47535f;
-    }
+    .card-actions button + button { border-left: 1px solid var(--hairline); color: #47535f; }
 
     /* ---- quick replies ---- */
-    .quick {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      padding: 0 10px;
-    }
+    .quick { display: flex; align-items: center; gap: 7px; padding: 0 10px; }
 
     .chip {
       height: 26px;
@@ -361,6 +339,8 @@
 
     .composer .icon-btn { color: #5b6675; }
 
+    .composer .icon-btn.cam { color: var(--line-green-ink); }
+
     .field {
       height: 32px;
       flex: 1;
@@ -383,7 +363,7 @@
   </style>
 </head>
 <body>
-  <main class="phone" aria-label="LINE chat with the leasing lead follow-up assistant">
+  <main class="phone" aria-label="LINE chat with the site report bot">
 
     <header class="app-bar">
       <button class="icon-btn" aria-label="Back">
@@ -393,19 +373,14 @@
       </button>
       <div class="oa">
         <div class="oa-name">
-          <span>Leasing assistant</span>
+          <span>Site report</span>
           <svg class="badge" width="13" height="13" viewBox="0 0 14 14" aria-label="Verified account">
             <path d="M7 .8 12.6 3v4.3c0 3.2-2.4 5.3-5.6 6.2C3.8 12.6 1.4 10.5 1.4 7.3V3Z" fill="#06c755"/>
             <path d="m4.6 7.1 1.7 1.7 3.1-3.4" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </div>
-        <div class="oa-sub">Official account · DMMS leasing</div>
+        <div class="oa-sub">Official account · DMMS field</div>
       </div>
-      <button class="icon-btn" aria-label="Call">
-        <svg width="17" height="17" viewBox="0 0 20 20" aria-hidden="true">
-          <path d="M4 3.2h3l1.3 3.4-1.8 1.5a10.8 10.8 0 0 0 5.4 5.4l1.5-1.8 3.4 1.3v3c-7.2.6-13.4-5.6-12.8-12.8Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
       <button class="icon-btn" aria-label="Menu">
         <svg width="17" height="17" viewBox="0 0 20 20" aria-hidden="true">
           <path d="M3.5 5.5h13M3.5 10h13M3.5 14.5h13" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
@@ -420,90 +395,117 @@
         <li class="msg received">
           <div class="avatar" aria-hidden="true">
             <svg width="30" height="30" viewBox="0 0 30 30">
-              <path d="M8.5 13.5h13V23h-13z" fill="none" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/>
-              <path d="M7 9h16l-1.2 4.5H8.2Z" fill="none" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/>
-              <path d="M12.5 23v-5h5v5" fill="none" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/>
+              <path d="M6.5 8.5A1.5 1.5 0 0 1 8 7h1.6l1-1.6h5.8l1 1.6H20a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 20 19H8a1.5 1.5 0 0 1-1.5-1.5Z" fill="none" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/>
+              <circle cx="14" cy="12.6" r="3" fill="none" stroke="#fff" stroke-width="1.4"/>
             </svg>
           </div>
-          <div class="bubble">Lead L-2094 has been quiet for 3 days. Here&rsquo;s the summary:</div>
-          <span class="time">09:12</span>
+          <div class="bubble">Snap a photo of the issue at your kiosk and I&rsquo;ll open a branch report with your location.</div>
+          <span class="time">18:41</span>
+        </li>
+
+        <li class="msg sent" aria-label="You sent a photo, delivered 18:42">
+          <span class="sent-meta"><span>อ่านแล้ว</span><span>18:42</span></span>
+          <div class="photo" role="img" aria-label="Photo: signage light panel with one dark segment above kiosk K-12">
+            <svg class="shot" viewBox="0 0 202 152" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+              <defs>
+                <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#243447"/>
+                  <stop offset="1" stop-color="#16222f"/>
+                </linearGradient>
+                <radialGradient id="glow" cx="0.5" cy="0.28" r="0.6">
+                  <stop offset="0" stop-color="#f4e6b0" stop-opacity="0.5"/>
+                  <stop offset="1" stop-color="#f4e6b0" stop-opacity="0"/>
+                </radialGradient>
+              </defs>
+              <rect width="202" height="152" fill="url(#sky)"/>
+              <!-- floor -->
+              <path d="M0 118h202v34H0z" fill="#0e1822"/>
+              <path d="M0 118h202" stroke="#31465b" stroke-width="1"/>
+              <!-- reflection tiles -->
+              <path d="M28 152l14-34M74 152l10-34M126 152l-8-34M172 152l-14-34" stroke="#1b2b3a" stroke-width="1.2"/>
+              <!-- storefront frame -->
+              <rect x="42" y="44" width="118" height="74" fill="#1a2937"/>
+              <rect x="42" y="44" width="118" height="74" fill="none" stroke="#33485d" stroke-width="1.4"/>
+              <rect x="50" y="66" width="46" height="52" fill="#12202c" stroke="#2c4155" stroke-width="1"/>
+              <rect x="106" y="66" width="46" height="52" fill="#12202c" stroke="#2c4155" stroke-width="1"/>
+              <!-- signage board: 4 light segments, 2nd is out -->
+              <rect x="42" y="30" width="118" height="16" rx="2" fill="#0d1620" stroke="#33485d" stroke-width="1"/>
+              <rect x="48" y="33" width="24" height="10" rx="1.5" fill="#f6e7a6"/>
+              <rect x="76" y="33" width="24" height="10" rx="1.5" fill="#2a3846"/>
+              <rect x="104" y="33" width="24" height="10" rx="1.5" fill="#f6e7a6"/>
+              <rect x="132" y="33" width="22" height="10" rx="1.5" fill="#f6e7a6"/>
+              <!-- glow from lit signage -->
+              <ellipse cx="101" cy="40" rx="96" ry="46" fill="url(#glow)"/>
+              <!-- attention marker on the dark panel -->
+              <circle cx="88" cy="38" r="9" fill="none" stroke="#ff6b5e" stroke-width="2"/>
+              <path d="M88 34.5v4.2M88 41.2v.2" stroke="#ff6b5e" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <span class="stamp">
+              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M8 14.5S3 9.9 3 6.5a5 5 0 0 1 10 0c0 3.4-5 8-5 8Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+                <circle cx="8" cy="6.5" r="1.6" stroke="currentColor" stroke-width="1.6"/>
+              </svg>
+              K-12 · ZONE B2
+            </span>
+            <span class="geo">18:42</span>
+          </div>
         </li>
 
         <li class="msg received">
           <span class="avatar-spacer" aria-hidden="true"></span>
-          <article class="lead-card" aria-label="Lead follow-up card for L-2094">
+          <article class="report-card" aria-label="Auto-generated report R-0471">
             <div class="card-body">
               <div class="card-top">
-                <span class="kicker">Lead follow-up</span>
-                <span class="lead-id">L-2094</span>
+                <span class="kicker">Report opened</span>
+                <span class="rep-id">R-0471</span>
               </div>
-              <h2 class="card-title">Khun Napat Srisuwan</h2>
-              <p class="fact" style="margin:0 0 5px">
+              <h2 class="card-title">Signage light out</h2>
+              <p class="fact">
                 <svg width="12" height="12" viewBox="0 0 16 16" aria-hidden="true">
                   <path d="M8 14.5S3 9.9 3 6.5a5 5 0 0 1 10 0c0 3.4-5 8-5 8Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
                   <circle cx="8" cy="6.5" r="1.7" fill="none" stroke="currentColor" stroke-width="1.5"/>
                 </svg>
                 <span>Kiosk K-12 · Zone B2, west atrium</span>
               </p>
-              <p class="fact" style="margin:0">
+              <p class="fact">
                 <svg width="12" height="12" viewBox="0 0 16 16" aria-hidden="true">
-                  <path d="M8.6 1.8 14 7.2a1.6 1.6 0 0 1 0 2.3L9.5 14a1.6 1.6 0 0 1-2.3 0L1.8 8.6V1.8Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-                  <circle cx="5" cy="5" r="1.1" fill="currentColor"/>
+                  <rect x="2.3" y="2.3" width="11.4" height="11.4" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M5 9.2 7 11l4-4.4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
-                <span>12 m² · ฿38,000/mo · Aug move-in</span>
+                <span>Maintenance · Electrical · photo attached</span>
               </p>
-              <div class="silence" aria-label="Silent 3 of 5 service-level days, last contact Wednesday 15 July">
-                <svg width="12" height="12" viewBox="0 0 16 16" aria-hidden="true" style="color:#8b96a2">
-                  <circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="1.5"/>
-                  <path d="M8 4.8V8l2.1 1.4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                </svg>
-                <span class="ticks" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span>
-                <span class="silence-label">Silent 3d of 5d SLA</span>
+              <div class="status" aria-label="Status: logged and assigned to Facilities">
+                <span class="dot" aria-hidden="true">
+                  <svg viewBox="0 0 16 16" fill="none"><path d="M3 8.4l3.2 3.1L13 4.7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+                <span class="status-label">Logged · <b>assigned to Facilities</b></span>
               </div>
             </div>
             <div class="card-actions">
               <button type="button">
                 <svg width="12" height="12" viewBox="0 0 16 16" aria-hidden="true">
-                  <rect x="2.2" y="3.2" width="11.6" height="10.3" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.5"/>
-                  <path d="M2.2 6.6h11.6M5.4 1.8v2.6m5.2-2.6v2.6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  <path d="M2.5 5A1.3 1.3 0 0 1 3.8 3.7h1.3l.9-1.4h4l.9 1.4h1.3A1.3 1.3 0 0 1 13.5 5v7A1.3 1.3 0 0 1 12.2 13.3H3.8A1.3 1.3 0 0 1 2.5 12Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                  <circle cx="8" cy="8.4" r="2.3" fill="none" stroke="currentColor" stroke-width="1.5"/>
                 </svg>
-                Book viewing
+                Add photo
               </button>
               <button type="button">
                 <svg width="12" height="12" viewBox="0 0 16 16" aria-hidden="true">
-                  <circle cx="6.4" cy="5.4" r="2.6" fill="none" stroke="currentColor" stroke-width="1.5"/>
-                  <path d="M1.8 13.6c.5-2.6 2.4-4 4.6-4s4.1 1.4 4.6 4M12 4.6v4m2-2h-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  <path d="M8 1.6v12.8M8 1.6 3.5 4.4 8 7.2l4.5-2.8Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
                 </svg>
-                Assign to me
+                Set priority
               </button>
             </div>
           </article>
-          <span class="time">09:12</span>
-        </li>
-
-        <li class="msg sent">
-          <span class="sent-meta"><span>อ่านแล้ว</span><span>09:14</span></span>
-          <div class="bubble">Booked viewing Tue 21 Jul, 10:30</div>
-        </li>
-
-        <li class="msg received">
-          <div class="avatar" aria-hidden="true">
-            <svg width="30" height="30" viewBox="0 0 30 30">
-              <path d="M8.5 13.5h13V23h-13z" fill="none" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/>
-              <path d="M7 9h16l-1.2 4.5H8.2Z" fill="none" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/>
-              <path d="M12.5 23v-5h5v5" fill="none" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/>
-            </svg>
-          </div>
-          <div class="bubble">Noted — viewing logged on L-2094 and the pipeline stage moved to &lsquo;Viewing booked&rsquo;. Reminder set for Mon 20 Jul, 17:00.</div>
-          <span class="time">09:14</span>
+          <span class="time">18:42</span>
         </li>
       </ol>
     </section>
 
     <nav class="quick" aria-label="Quick replies">
-      <button class="chip" type="button">Snooze 1 day</button>
-      <button class="chip" type="button">Log a call</button>
-      <button class="chip" type="button">Open pipeline</button>
+      <button class="chip" type="button">Add another photo</button>
+      <button class="chip" type="button">Mark urgent</button>
+      <button class="chip" type="button">Open report</button>
     </nav>
 
     <footer class="composer" aria-label="Message composer">
@@ -513,16 +515,10 @@
         </svg>
       </button>
       <input class="field" type="text" placeholder="Message" aria-label="Message">
-      <button class="icon-btn" aria-label="Camera">
+      <button class="icon-btn cam" aria-label="Camera">
         <svg width="19" height="19" viewBox="0 0 20 20" aria-hidden="true">
           <path d="M2.5 6.5A1.5 1.5 0 0 1 4 5h2l1.3-1.8h5.4L14 5h2a1.5 1.5 0 0 1 1.5 1.5v8A1.5 1.5 0 0 1 16 16H4a1.5 1.5 0 0 1-1.5-1.5Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
           <circle cx="10" cy="10.2" r="2.8" fill="none" stroke="currentColor" stroke-width="1.5"/>
-        </svg>
-      </button>
-      <button class="icon-btn" aria-label="Voice message">
-        <svg width="19" height="19" viewBox="0 0 20 20" aria-hidden="true">
-          <rect x="7.2" y="2.5" width="5.6" height="9" rx="2.8" fill="none" stroke="currentColor" stroke-width="1.5"/>
-          <path d="M4.5 9.5a5.5 5.5 0 0 0 11 0M10 15v2.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
         </svg>
       </button>
     </footer>

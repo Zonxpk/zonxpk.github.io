@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#071b37">
+  <title>Liveness check | Nara Bank (web)</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --navy-950: #071b37;
+      --navy-900: #0b2447;
+      --navy-800: #12345d;
+      --mint-100: #d9f5ee;
+      --mint-300: #7fddca;
+      --teal-500: #19a98d;
+      --ink-hi: #f2f8f6;
+      --ink-mid: #c3d2dc;
+      --ink-low: #8299ac;
+      --cam-900: #0c141b;
+      --cam-950: #080e14;
+      --cam-800: #18242e;
+      --line: rgba(255, 255, 255, 0.11);
+      --radius-stage: 16px;
+      --radius-pill: 12px;
+      --radius-chip: 9px;
+      --radius-hud: 8px;
+      --shadow-pill: 0 6px 16px rgba(3, 9, 16, 0.45), 0 1px 3px rgba(3, 9, 16, 0.4);
+      --shadow-button: 0 8px 18px rgba(127, 221, 202, 0.14), 0 2px 5px rgba(3, 9, 16, 0.5);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body { height: 100%; }
+
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #050c18;
+      color: var(--ink-hi);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 13.5px;
+      line-height: 1.4;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button { font: inherit; }
+
+    /* ---- browser window chrome ---- */
+    .win {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--navy-950);
+    }
+
+    .win-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      height: 40px;
+      padding: 0 14px;
+      background: var(--cam-900);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .dots { display: flex; gap: 7px; flex: 0 0 auto; }
+    .dots span { width: 11px; height: 11px; border-radius: 50%; background: rgba(255, 255, 255, 0.22); }
+
+    .address {
+      flex: 1;
+      min-width: 0;
+      height: 24px;
+      padding: 0 10px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--ink-mid);
+      font-size: 11px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .address svg { width: 11px; height: 11px; flex: 0 0 11px; color: var(--mint-300); }
+    .address b { color: var(--ink-hi); font-weight: 600; }
+    .address span { color: var(--ink-low); }
+
+    /* ---- app ---- */
+    .app {
+      flex: 1;
+      min-height: 0;
+      padding: 16px 18px 18px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .app-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .brand { display: flex; align-items: center; gap: 9px; }
+
+    .brand-mark {
+      width: 26px;
+      height: 26px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      background: var(--teal-500);
+      color: var(--navy-950);
+      font-weight: 800;
+      font-size: 13px;
+    }
+
+    .brand-name { font-size: 14px; font-weight: 650; letter-spacing: -0.01em; }
+    .brand-name span { color: var(--ink-low); font-weight: 500; }
+
+    .secure-chip {
+      height: 24px;
+      padding: 0 9px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--ink-mid);
+      font-size: 10.5px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .secure-chip svg { width: 11px; height: 11px; }
+
+    .stepper {
+      margin: 0 0 14px;
+      padding: 0;
+      list-style: none;
+      display: flex;
+      align-items: center;
+    }
+
+    .stepper li {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 10.5px;
+      font-weight: 500;
+      color: var(--ink-low);
+    }
+
+    .stepper li + li { flex: 1; }
+
+    .stepper li + li::before {
+      content: "";
+      flex: 1;
+      min-width: 14px;
+      height: 2px;
+      margin: 0 9px;
+      border-radius: 1px;
+      background: rgba(255, 255, 255, 0.14);
+    }
+
+    .stepper li.active::before { background: var(--mint-300); }
+
+    .step-dot {
+      width: 18px;
+      height: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 18px;
+      border-radius: 50%;
+    }
+
+    .stepper li.done .step-dot { background: rgba(127, 221, 202, 0.15); color: var(--mint-300); }
+    .stepper li.done .step-dot svg { width: 10px; height: 10px; }
+    .stepper li.done { color: var(--ink-mid); }
+    .stepper li.active .step-dot { background: var(--teal-500); box-shadow: 0 0 0 3px rgba(25, 169, 141, 0.22); }
+    .stepper li.active .step-dot::after { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #fff; }
+    .stepper li.active { color: var(--mint-100); font-weight: 600; }
+    .stepper li.todo .step-dot { border: 1.5px solid rgba(255, 255, 255, 0.28); }
+
+    .body-grid {
+      flex: 1;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    /* ---- camera stage ---- */
+    .stage {
+      position: relative;
+      min-height: 300px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: var(--radius-stage);
+      background: radial-gradient(120% 90% at 50% 36%, var(--cam-800) 0%, var(--cam-900) 55%, var(--cam-950) 100%);
+    }
+
+    .scene { position: absolute; inset: 0; }
+    .scene svg { width: 100%; height: 100%; display: block; }
+
+    .corner { position: absolute; width: 20px; height: 20px; border: 2px solid rgba(223, 236, 231, 0.42); }
+    .corner.tl { top: 10px; left: 10px; border-right: 0; border-bottom: 0; border-top-left-radius: 8px; }
+    .corner.tr { top: 10px; right: 10px; border-left: 0; border-bottom: 0; border-top-right-radius: 8px; }
+    .corner.bl { bottom: 10px; left: 10px; border-right: 0; border-top: 0; border-bottom-left-radius: 8px; }
+    .corner.br { bottom: 10px; right: 10px; border-left: 0; border-top: 0; border-bottom-right-radius: 8px; }
+
+    .hud-chip {
+      position: absolute;
+      top: 12px;
+      height: 24px;
+      padding: 0 9px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-hud);
+      background: rgba(6, 13, 20, 0.72);
+      color: var(--ink-mid);
+      font-size: 10.5px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .hud-chip.timer { left: 12px; }
+    .hud-chip.cam-label { right: 12px; font-weight: 500; }
+
+    .rec-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--mint-100); }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .rec-dot { animation: rec-pulse 2s ease-in-out infinite; }
+      @keyframes rec-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+    }
+
+    .instruction {
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+      margin: 0;
+      padding: 9px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-pill);
+      background: rgba(6, 13, 20, 0.82);
+      box-shadow: var(--shadow-pill);
+    }
+
+    .instruction svg { width: 20px; height: 20px; flex: 0 0 20px; color: var(--mint-100); }
+    .instruction-main { display: block; font-size: 12.5px; font-weight: 600; color: var(--ink-hi); line-height: 1.25; }
+    .instruction-sub { display: block; margin-top: 2px; font-size: 10.5px; font-weight: 500; color: var(--ink-mid); }
+
+    /* ---- side panel ---- */
+    .side { display: flex; flex-direction: column; }
+
+    .side-title { margin: 2px 0 4px; font-size: 16px; font-weight: 650; letter-spacing: -0.01em; }
+    .side-lede { margin: 0 0 14px; font-size: 12px; color: var(--ink-mid); }
+
+    .checks { margin: 0 0 auto; padding: 0; list-style: none; display: grid; gap: 8px; }
+
+    .checks li {
+      min-width: 0;
+      height: 38px;
+      padding: 0 11px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: var(--radius-chip);
+      background: rgba(255, 255, 255, 0.05);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--ink-mid);
+    }
+
+    .checks li svg { width: 15px; height: 15px; flex: 0 0 15px; color: var(--mint-300); }
+
+    .primary-button {
+      width: 100%;
+      height: 46px;
+      margin-top: 16px;
+      padding: 0 20px;
+      border: 0;
+      border-radius: var(--radius-pill);
+      background: var(--mint-300);
+      color: var(--navy-950);
+      box-shadow: var(--shadow-button);
+      font-size: 14px;
+      font-weight: 650;
+      letter-spacing: -0.005em;
+      cursor: pointer;
+      transition: background-color 120ms ease, transform 120ms ease;
+    }
+
+    .primary-button:focus-visible { outline: 3px solid var(--mint-100); outline-offset: 2px; }
+    .primary-button:active { background: #6fcfbb; transform: translateY(1px); }
+
+    .trust-line {
+      margin: 10px 0 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      color: var(--ink-low);
+      font-size: 10.5px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .trust-line svg { width: 12px; height: 12px; }
+
+    @media (hover: hover) and (pointer: fine) {
+      .primary-button:hover { background: #93e4d4; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .primary-button:active { transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="win">
+    <div class="win-bar">
+      <div class="dots" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div class="address">
+        <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <rect x="3.25" y="7" width="9.5" height="6.5" rx="2" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M5.5 7V5.25a2.5 2.5 0 015 0V7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <b>app.narabank.co.th</b><span>/verify/liveness</span>
+      </div>
+      <span class="secure-chip">
+        <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <rect x="3.25" y="7" width="9.5" height="6.5" rx="2" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M5.5 7V5.25a2.5 2.5 0 015 0V7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        Secure
+      </span>
+    </div>
+
+    <div class="app">
+      <div class="app-head">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">N</span>
+          <span class="brand-name">Nara Bank <span>&middot; eKYC</span></span>
+        </div>
+        <ol class="stepper" aria-label="Verification steps" style="flex:0 0 auto; width:230px;">
+          <li class="done">
+            <span class="step-dot">
+              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M3 8.4l3.2 3.1L13 4.7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            ID scan
+          </li>
+          <li class="active" aria-current="step"><span class="step-dot"></span>Face</li>
+          <li class="todo"><span class="step-dot"></span>Review</li>
+        </ol>
+      </div>
+
+      <div class="body-grid">
+        <div class="stage">
+          <div class="scene" role="img" aria-label="Live webcam preview. Your face is centred inside the oval guide. 8 of 24 movement ticks complete on the yaw ring.">
+            <svg viewBox="0 0 340 374" preserveAspectRatio="xMidYMid meet" fill="none">
+              <defs>
+                <linearGradient id="headFill" x1="170" y1="100" x2="170" y2="310" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#2b3a46"/>
+                  <stop offset="1" stop-color="#141e27"/>
+                </linearGradient>
+                <radialGradient id="faceLight" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(184 140) rotate(90) scale(70 56)">
+                  <stop stop-color="#3c4e5c" stop-opacity=".55"/>
+                  <stop offset="1" stop-color="#3c4e5c" stop-opacity="0"/>
+                </radialGradient>
+              </defs>
+
+              <!-- subject: head-and-shoulders silhouette, scaled up to fill the oval guide -->
+              <g transform="translate(170 170) scale(1.55) translate(-170 -158)">
+                <path d="M90 340c8-64 42-92 80-92s72 28 80 92" fill="url(#headFill)"/>
+                <path d="M154 214h32v34c0 10-7 16-16 16s-16-6-16-16v-34z" fill="url(#headFill)"/>
+                <ellipse cx="170" cy="152" rx="42" ry="51" fill="url(#headFill)"/>
+                <ellipse cx="170" cy="152" rx="42" ry="51" fill="url(#faceLight)"/>
+              </g>
+
+              <!-- oval face guide -->
+              <ellipse cx="170" cy="170" rx="90" ry="118" stroke="#19a98d" stroke-width="2"/>
+
+              <!-- yaw ring: 24 tick beads, base -->
+              <ellipse cx="170" cy="170" rx="102" ry="130" pathLength="96"
+                stroke="rgba(255,255,255,0.24)" stroke-width="5" stroke-linecap="round"
+                stroke-dasharray="1 3" stroke-dashoffset="-72"/>
+              <!-- yaw ring: 8 of 24 beads lit, from top sweeping right -->
+              <ellipse cx="170" cy="170" rx="102" ry="130" pathLength="96"
+                stroke="#7fddca" stroke-width="5" stroke-linecap="round"
+                stroke-dasharray="1 3 1 3 1 3 1 3 1 3 1 3 1 3 1 3 64" stroke-dashoffset="-72"/>
+            </svg>
+          </div>
+
+          <span class="corner tl" aria-hidden="true"></span>
+          <span class="corner tr" aria-hidden="true"></span>
+          <span class="corner bl" aria-hidden="true"></span>
+          <span class="corner br" aria-hidden="true"></span>
+
+          <span class="hud-chip timer" aria-label="Capture running, 12 seconds">
+            <span class="rec-dot" aria-hidden="true"></span>
+            00:12
+          </span>
+          <span class="hud-chip cam-label">Webcam</span>
+
+          <p class="instruction">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M19 13a7 7 0 1 1-2.05-4.95" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              <path d="M19 4v4.2h-4.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>
+              <span class="instruction-main">Turn your head slowly to the right</span>
+              <span class="instruction-sub">Movement 2 of 3 &middot; keep your face inside the oval</span>
+            </span>
+          </p>
+        </div>
+
+        <div class="side">
+          <h1 class="side-title">Liveness check</h1>
+          <p class="side-lede">Allow camera access and follow the on-screen movement so we can confirm you are a live person.</p>
+          <ul class="checks" aria-label="Passive checks, all passed">
+            <li aria-label="Lighting is good">
+              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <circle cx="8" cy="8" r="6.2" stroke="currentColor" stroke-width="1.8"/>
+                <path d="M5.2 8.3l1.9 1.9 3.7-3.9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span>Lighting good</span>
+            </li>
+            <li aria-label="Single face detected">
+              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <circle cx="8" cy="8" r="6.2" stroke="currentColor" stroke-width="1.8"/>
+                <path d="M5.2 8.3l1.9 1.9 3.7-3.9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span>One face</span>
+            </li>
+            <li aria-label="Camera is steady">
+              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <circle cx="8" cy="8" r="6.2" stroke="currentColor" stroke-width="1.8"/>
+                <path d="M5.2 8.3l1.9 1.9 3.7-3.9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span>Camera steady</span>
+            </li>
+          </ul>
+          <button class="primary-button" type="button">Begin head turn</button>
+          <p class="trust-line">
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <rect x="3.25" y="7" width="9.5" height="7" rx="2" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M5.5 7V5.25a2.5 2.5 0 015 0V7M8 10v1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            Encrypted end to end &middot; PDPA compliant
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -37,17 +37,17 @@
 
     html,
     body {
-      width: 100%;
+      height: 100%;
+      margin: 0;
       overflow: hidden;
     }
 
     body {
-      margin: 0;
       min-width: 700px;
       background: var(--gray-50);
       color: var(--blue-900);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      font-size: 13px;
+      font-size: 12.5px;
       -webkit-font-smoothing: antialiased;
     }
 
@@ -56,13 +56,14 @@
 
     .app {
       display: grid;
-      grid-template-rows: 56px 374px;
+      grid-template-rows: 56px minmax(0, 1fr);
       width: clamp(700px, 100vw, 1100px);
-      height: 430px;
+      height: 100vh;
       overflow: hidden;
       background: var(--gray-50);
     }
 
+    /* ---- topbar (shared shell) ---- */
     .topbar {
       position: relative;
       z-index: 2;
@@ -73,7 +74,6 @@
       padding: 0 18px 0 16px;
       background: rgba(255, 255, 255, 0.98);
       border-bottom: 1px solid var(--gray-200);
-      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.85);
     }
 
     .brand {
@@ -85,11 +85,7 @@
       text-decoration: none;
     }
 
-    .brand-mark {
-      width: 29px;
-      height: 29px;
-      filter: drop-shadow(0 4px 7px rgba(255, 107, 26, 0.2));
-    }
+    .brand-mark { width: 29px; height: 29px; }
 
     .wordmark {
       font-size: 17px;
@@ -158,8 +154,9 @@
 
     .user-copy { line-height: 1.05; }
     .user-name { display: block; font-size: 11px; font-weight: 700; }
-    .user-company { display: block; margin-top: 3px; color: var(--gray-400); font-size: 9px; }
+    .user-company { display: block; margin-top: 3px; color: var(--gray-500); font-size: 9px; }
 
+    /* ---- shell ---- */
     .shell {
       display: grid;
       grid-template-columns: 76px minmax(0, 1fr);
@@ -173,7 +170,6 @@
       padding: 13px 9px 11px;
       background: #f8fafc;
       border-right: 1px solid var(--gray-200);
-      overscroll-behavior: contain;
     }
 
     .nav-list {
@@ -199,11 +195,7 @@
       font-weight: 620;
     }
 
-    .nav-item svg {
-      width: 18px;
-      height: 18px;
-      stroke-width: 1.8;
-    }
+    .nav-item svg { width: 18px; height: 18px; stroke-width: 1.8; }
 
     .nav-item.active {
       background: var(--orange-50);
@@ -219,14 +211,13 @@
       height: 31px;
       border-radius: 0 4px 4px 0;
       background: var(--orange-500);
-      box-shadow: 0 0 0 3px rgba(255, 107, 26, 0.08);
     }
 
     .sidebar-help {
       display: grid;
       justify-items: center;
       gap: 4px;
-      color: var(--gray-400);
+      color: var(--gray-500);
       font-size: 9px;
     }
 
@@ -243,16 +234,17 @@
       box-shadow: 0 2px 5px rgba(31, 53, 79, 0.05);
     }
 
+    /* ---- page ---- */
     main {
       min-width: 0;
       min-height: 0;
-      padding: 13px 18px 15px;
+      padding: 12px 18px 14px;
       overflow: hidden;
     }
 
     .page-grid {
       display: grid;
-      grid-template-rows: 44px 58px minmax(0, 1fr);
+      grid-template-rows: 40px minmax(0, 1fr);
       gap: 10px;
       height: 100%;
     }
@@ -267,7 +259,7 @@
     .page-title h1 {
       margin: 0;
       color: var(--blue-900);
-      font-size: 20px;
+      font-size: 18px;
       line-height: 1.08;
       letter-spacing: -0.025em;
     }
@@ -275,39 +267,26 @@
     .page-title p {
       margin: 4px 0 0;
       color: var(--gray-500);
-      font-size: 10.5px;
+      font-size: 10px;
     }
 
-    .head-actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+    .head-actions { display: flex; align-items: center; gap: 8px; }
 
     .button {
-      position: relative;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 6px;
-      height: 32px;
+      height: 31px;
       padding: 0 12px;
       border-radius: 6px;
       font-size: 11px;
       font-weight: 650;
       white-space: nowrap;
+      cursor: pointer;
     }
 
-    .button svg {
-      width: 14px;
-      height: 14px;
-    }
-
-    .button::before {
-      content: "";
-      position: absolute;
-      inset: -6px -2px;
-    }
+    .button svg { width: 13px; height: 13px; }
 
     .button-secondary {
       border: 1px solid var(--gray-200);
@@ -325,243 +304,63 @@
 
     .button:focus-visible,
     .brand:focus-visible,
-    .nav-item:focus-visible {
-      outline: 2px solid var(--blue-600);
+    .nav-item:focus-visible,
+    .switch:focus-visible {
+      outline: 2px solid var(--orange-600);
       outline-offset: 2px;
     }
 
-    .sync-strip {
+    .content {
       display: grid;
-      grid-template-columns: minmax(220px, 1.28fr) repeat(3, minmax(88px, 0.64fr)) minmax(125px, 0.8fr);
-      align-items: center;
-      min-width: 0;
-      overflow: hidden;
-      border: 1px solid rgba(214, 223, 233, 0.92);
-      border-radius: 8px;
-      background: #fff;
-      box-shadow: var(--shadow-card);
-    }
-
-    .sync-destination {
-      display: flex;
-      align-items: center;
+      grid-template-columns: minmax(0, 1fr) 218px;
       gap: 10px;
-      min-width: 0;
-      height: 100%;
-      padding: 0 14px;
-      background: linear-gradient(110deg, #fff7f1 0%, #fff 88%);
-      border-right: 1px solid var(--gray-100);
+      min-height: 0;
     }
 
-    .sync-icon {
-      display: grid;
-      place-items: center;
-      width: 34px;
-      height: 34px;
-      flex: 0 0 auto;
-      border-radius: 10px;
-      background: var(--orange-100);
-      color: var(--orange-600);
-    }
-
-    .sync-icon svg { width: 17px; height: 17px; }
-
-    .sync-name {
-      overflow: hidden;
-      color: var(--blue-900);
-      font-size: 11.5px;
-      font-weight: 700;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .sync-detail {
-      margin-top: 3px;
-      color: var(--gray-400);
-      font-size: 9px;
-      white-space: nowrap;
-    }
-
-    .sync-stat {
-      min-width: 0;
-      padding: 0 10px;
-      border-right: 1px solid var(--gray-100);
-    }
-
-    .sync-stat-value {
-      color: var(--blue-900);
-      font-size: 15px;
-      font-weight: 750;
-      line-height: 1;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .sync-stat-value.success { color: var(--green-600); }
-    .sync-stat-value.warning { color: var(--amber-700); }
-
-    .sync-stat-label {
-      margin-top: 5px;
-      color: var(--gray-400);
-      font-size: 8.5px;
-      white-space: nowrap;
-    }
-
-    .last-sync {
-      min-width: 0;
-      padding: 0 13px;
-    }
-
-    .last-sync-label {
-      color: var(--gray-400);
-      font-size: 8.5px;
-    }
-
-    .last-sync-time {
-      margin-top: 5px;
-      color: var(--blue-700);
-      font-size: 10px;
-      font-weight: 680;
-      white-space: nowrap;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .panel {
+    .card {
       min-width: 0;
       min-height: 0;
       overflow: hidden;
       border: 1px solid rgba(214, 223, 233, 0.94);
-      border-radius: 9px;
+      border-radius: 10px;
       background: #fff;
       box-shadow: var(--shadow-card);
     }
 
-    .panel-head {
+    /* ---- rules panel ---- */
+    .rules-head {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      height: 44px;
-      padding: 0 14px;
+      height: 36px;
+      padding: 0 12px 0 14px;
       border-bottom: 1px solid var(--gray-100);
     }
 
-    .panel-title h2 {
+    .rules-head h2 {
       margin: 0;
-      color: var(--blue-900);
-      font-size: 13px;
-      line-height: 1.15;
+      font-size: 12.5px;
       letter-spacing: -0.01em;
-    }
-
-    .panel-title p {
-      margin: 3px 0 0;
-      color: var(--gray-400);
-      font-size: 9px;
-    }
-
-    .queue-count {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      color: var(--gray-500);
-      font-size: 9.5px;
-      font-weight: 650;
-      white-space: nowrap;
-    }
-
-    .queue-count::before {
-      content: "";
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--orange-500);
-      box-shadow: 0 0 0 3px var(--orange-50);
-    }
-
-    .table-wrap { height: calc(100% - 44px); }
-
-    table {
-      width: 100%;
-      height: 100%;
-      border-collapse: collapse;
-      table-layout: fixed;
-    }
-
-    caption {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border: 0;
-    }
-
-    thead { height: 27px; }
-
-    th {
-      padding: 0 12px;
-      background: var(--gray-25);
-      color: var(--gray-500);
-      font-size: 9px;
-      font-weight: 650;
-      text-align: left;
-      white-space: nowrap;
-    }
-
-    td {
-      padding: 4px 12px;
-      border-top: 1px solid var(--gray-100);
-      color: var(--gray-700);
-      font-size: 10px;
-      vertical-align: middle;
-    }
-
-    th:nth-child(1) { width: 32%; }
-    th:nth-child(2) { width: 17%; }
-    th:nth-child(3) { width: 32%; }
-    th:nth-child(4) { width: 19%; text-align: center; }
-    td:nth-child(4) { text-align: center; }
-
-    .lead-name {
-      overflow: hidden;
       color: var(--blue-900);
-      font-size: 10.4px;
-      font-weight: 680;
-      line-height: 1.15;
-      text-overflow: ellipsis;
-      white-space: nowrap;
     }
 
-    .lead-time {
-      margin-top: 2px;
-      overflow: hidden;
-      color: var(--gray-400);
-      font-size: 8px;
-      line-height: 1;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .source-badge,
-    .status {
+    .pending-chip {
       display: inline-flex;
       align-items: center;
-      justify-content: center;
       gap: 5px;
-      height: 20px;
-      padding: 0 7px;
+      height: 19px;
+      padding: 0 8px;
       border-radius: 999px;
+      background: var(--amber-50);
+      color: var(--amber-700);
       font-size: 8.6px;
       font-weight: 700;
       white-space: nowrap;
     }
 
-    .source-badge::before,
-    .status::before {
+    .pending-chip::before,
+    .sync-chip::before {
       content: "";
       width: 5px;
       height: 5px;
@@ -570,52 +369,302 @@
       background: currentColor;
     }
 
-    .source-web { background: var(--blue-50); color: var(--blue-600); }
-    .source-line { background: var(--green-50); color: var(--green-600); }
-    .source-import { background: var(--slate-50); color: var(--slate-600); }
+    .rule-row {
+      display: grid;
+      grid-template-columns: 30px minmax(0, 1fr) auto 32px;
+      gap: 9px;
+      align-items: center;
+      height: 60px;
+      padding: 0 12px 0 8px;
+    }
 
-    .rule {
+    .rule-row + .rule-row,
+    .fallback { border-top: 1px solid var(--gray-100); }
+
+    /* priority spine: evaluation-order rail */
+    .spine {
+      position: relative;
+      display: grid;
+      place-items: center;
+      height: 100%;
+    }
+
+    .spine::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      margin-left: -0.5px;
+      background: var(--gray-200);
+    }
+
+    .rule-row:first-of-type .spine::before { top: 50%; }
+
+    .p-node {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      place-items: center;
+      width: 19px;
+      height: 19px;
+      border: 1px solid var(--gray-200);
+      border-radius: 50%;
+      background: #fff;
+      color: var(--blue-700);
+      font-size: 9px;
+      font-weight: 750;
+      font-variant-numeric: tabular-nums;
+      box-shadow: 0 1px 2px rgba(31, 53, 79, 0.06);
+    }
+
+    .cond { min-width: 0; }
+
+    .cond-line {
+      overflow: hidden;
+      color: var(--blue-900);
+      font-size: 10.6px;
+      font-weight: 680;
+      line-height: 1.2;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .cond-meta {
       display: flex;
       align-items: center;
-      min-width: 0;
+      gap: 5px;
+      margin-top: 3px;
+      overflow: hidden;
+      color: var(--gray-500);
+      font-size: 8.6px;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .sync-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      height: 14px;
+      padding: 0 6px;
+      border-radius: 999px;
+      font-size: 8.5px;
+      font-weight: 700;
+      flex: 0 0 auto;
+    }
+
+    .sync-chip.syncing { background: var(--blue-50); color: var(--blue-600); }
+    .sync-chip.pending { background: var(--amber-50); color: var(--amber-700); }
+
+    .assignee {
+      display: flex;
+      align-items: center;
       gap: 6px;
       white-space: nowrap;
     }
 
-    .rule-name {
+    .assignee-arrow { color: var(--gray-400); font-size: 10px; }
+
+    .mini-avatar {
+      display: grid;
+      place-items: center;
+      width: 19px;
+      height: 19px;
+      border-radius: 50%;
+      background: var(--blue-900);
+      color: #fff;
+      font-size: 8.5px;
+      font-weight: 750;
+    }
+
+    .assignee-copy { line-height: 1.1; }
+    .assignee-name { display: block; color: var(--gray-700); font-size: 10px; font-weight: 680; }
+    .assignee-team { display: block; margin-top: 2px; color: var(--gray-500); font-size: 8.5px; }
+
+    .switch {
+      position: relative;
+      width: 30px;
+      height: 17px;
+      padding: 0;
+      border: 1px solid var(--gray-200);
+      border-radius: 999px;
+      background: var(--gray-200);
+      cursor: pointer;
+    }
+
+    .switch::after {
+      content: "";
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 1px 2px rgba(31, 53, 79, 0.3);
+    }
+
+    .switch[aria-checked="true"] {
+      background: var(--blue-900);
+      border-color: var(--blue-900);
+    }
+
+    .switch[aria-checked="true"]::after { left: auto; right: 2px; }
+
+    .rule-row.off .cond-line,
+    .rule-row.off .assignee-name { color: var(--gray-500); }
+    .rule-row.off .p-node { color: var(--gray-500); background: var(--gray-25); }
+    .rule-row.off .mini-avatar { background: var(--gray-400); }
+
+    /* catch-all fallback strip */
+    .fallback {
+      display: grid;
+      grid-template-columns: 30px minmax(0, 1fr) auto;
+      gap: 9px;
+      align-items: center;
+      height: 30px;
+      padding: 0 12px 0 8px;
+      background: var(--gray-25);
+    }
+
+    .fallback .spine::before {
+      bottom: 50%;
+      width: 0;
+      background: none;
+      border-left: 1px dashed var(--gray-200);
+    }
+
+    .fb-node {
+      position: relative;
+      z-index: 1;
+      width: 13px;
+      height: 13px;
+      border: 1px dashed var(--gray-400);
+      border-radius: 50%;
+      background: #fff;
+    }
+
+    .fb-copy {
       overflow: hidden;
-      color: var(--blue-700);
+      color: var(--gray-500);
       font-size: 9.4px;
-      font-weight: 700;
+      font-weight: 620;
       text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
-    .rule-arrow {
-      flex: 0 0 auto;
-      color: var(--gray-400);
-      font-size: 10px;
+    .fb-copy strong { color: var(--gray-700); font-weight: 700; }
+
+    .fb-count {
+      color: var(--gray-500);
+      font-size: 8.6px;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
     }
 
-    .rule-owner {
+    /* ---- right rail ---- */
+    .rail {
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) 122px;
+      gap: 10px;
+      min-height: 0;
+    }
+
+    .rail-card { padding: 11px 12px; }
+
+    .rail-label {
+      margin: 0;
+      color: var(--gray-500);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .rail-sub {
+      margin: 2px 0 0;
+      color: var(--gray-500);
+      font-size: 8.6px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .dist { margin-top: 9px; }
+
+    .dist-row + .dist-row { margin-top: 6px; }
+
+    .dist-top {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .dist-name {
       overflow: hidden;
       color: var(--gray-700);
       font-size: 9.5px;
-      font-weight: 620;
+      font-weight: 650;
       text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
-    .status {
-      min-width: 61px;
+    .dist-val {
+      color: var(--blue-900);
+      font-size: 9.5px;
+      font-weight: 720;
+      font-variant-numeric: tabular-nums;
     }
 
-    .synced { background: var(--green-50); color: var(--green-600); }
-    .retry { background: var(--amber-50); color: var(--amber-700); }
+    .dist-track {
+      height: 5px;
+      margin-top: 3px;
+      border-radius: 3px;
+      background: var(--gray-100);
+      overflow: hidden;
+    }
+
+    .dist-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: var(--blue-700);
+    }
+
+    .dist-row.rr .dist-fill { background: var(--gray-400); }
+    .dist-row.rr .dist-name { color: var(--gray-500); }
+
+    .sync-list {
+      margin: 9px 0 0;
+      display: grid;
+      gap: 7px;
+    }
+
+    .sync-item {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .sync-item dt { color: var(--gray-500); font-size: 9.4px; }
+
+    .sync-item dd {
+      margin: 0;
+      color: var(--blue-900);
+      font-size: 9.8px;
+      font-weight: 700;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .sync-item dd.warn { color: var(--amber-700); }
 
     @media (hover: hover) and (pointer: fine) {
       .button-secondary:hover { border-color: #cfd8e4; background: var(--gray-25); }
       .button-primary:hover { background: var(--orange-600); border-color: var(--orange-600); }
       .nav-item:hover { color: var(--blue-700); }
-      tbody tr:hover { background: var(--gray-25); }
+      .rule-row:hover { background: var(--gray-25); }
     }
 
     @media (max-width: 760px) {
@@ -625,14 +674,9 @@
       .nav-item.active::before { left: -6px; }
       main { padding-inline: 13px; }
       .connection-chip { display: none; }
-      .sync-strip { grid-template-columns: minmax(190px, 1.1fr) repeat(3, minmax(72px, 0.55fr)) minmax(105px, 0.7fr); }
-      .sync-destination { padding-inline: 11px; }
-      .sync-stat { padding-inline: 8px; }
-      .last-sync { padding-inline: 9px; }
-      th,
-      td { padding-inline: 8px; }
-      .source-badge,
-      .status { padding-inline: 6px; font-size: 8.2px; }
+      .content { grid-template-columns: minmax(0, 1fr) 190px; }
+      .assignee-team { display: none; }
+      .rule-row { gap: 7px; padding-right: 10px; }
     }
   </style>
 </head>
@@ -704,12 +748,12 @@
           <div class="page-head">
             <div class="page-title">
               <h1>Lead routing</h1>
-              <p>Inbound leads → Pipedrive</p>
+              <p>Rules run top to bottom — first match assigns the lead in Pipedrive</p>
             </div>
             <div class="head-actions">
               <button class="button button-secondary" type="button">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.8-4.2L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8 8 0 0 0 14.8 4.2L21 14"/><path d="M21 20v-6h-6"/></svg>
-                Re-sync
+                Sync now
               </button>
               <button class="button button-primary" type="button">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
@@ -718,88 +762,126 @@
             </div>
           </div>
 
-          <section class="sync-strip" aria-label="Routing sync summary">
-            <div class="sync-destination">
-              <div class="sync-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h7a4 4 0 0 1 4 4v6"/><path d="m13 14 3 3 3-3"/><circle cx="5" cy="7" r="2"/></svg>
+          <div class="content">
+            <section class="card" aria-labelledby="rules-title">
+              <div class="rules-head">
+                <h2 id="rules-title">Assignment rules</h2>
+                <span class="pending-chip">1 unsynced change</span>
               </div>
-              <div>
-                <div class="sync-name">Pipedrive sync</div>
-                <div class="sync-detail">Rules run before each lead is created</div>
-              </div>
-            </div>
-            <div class="sync-stat">
-              <div class="sync-stat-value">5</div>
-              <div class="sync-stat-label">In queue</div>
-            </div>
-            <div class="sync-stat">
-              <div class="sync-stat-value success">4</div>
-              <div class="sync-stat-label">Synced</div>
-            </div>
-            <div class="sync-stat">
-              <div class="sync-stat-value warning">1</div>
-              <div class="sync-stat-label">Needs retry</div>
-            </div>
-            <div class="last-sync">
-              <div class="last-sync-label">Last sync</div>
-              <div class="last-sync-time">Today, 10:42</div>
-            </div>
-          </section>
 
-          <section class="panel" aria-labelledby="leads-title">
-            <div class="panel-head">
-              <div class="panel-title">
-                <h2 id="leads-title">Inbound leads</h2>
-                <p>Queue applies the matching rule before sync</p>
+              <div class="rule-row">
+                <div class="spine"><span class="p-node" aria-label="Priority 1">1</span></div>
+                <div class="cond">
+                  <div class="cond-line">Source is LINE OA and province is Bangkok</div>
+                  <div class="cond-meta">Matched 128 in Jul · synced today, 14:32</div>
+                </div>
+                <div class="assignee">
+                  <span class="assignee-arrow" aria-hidden="true">&rarr;</span>
+                  <span class="mini-avatar" aria-hidden="true">PW</span>
+                  <span class="assignee-copy">
+                    <span class="assignee-name">Pimchanok W.</span>
+                    <span class="assignee-team">LINE team</span>
+                  </span>
+                </div>
+                <button class="switch" type="button" role="switch" aria-checked="true" aria-label="Rule 1, LINE OA Bangkok, enabled"></button>
               </div>
-              <div class="queue-count">5 leads</div>
+
+              <div class="rule-row">
+                <div class="spine"><span class="p-node" aria-label="Priority 2">2</span></div>
+                <div class="cond">
+                  <div class="cond-line">Campaign contains &ldquo;Mid-year sale&rdquo;</div>
+                  <div class="cond-meta">Matched 96 in Jul · <span class="sync-chip syncing">syncing now</span></div>
+                </div>
+                <div class="assignee">
+                  <span class="assignee-arrow" aria-hidden="true">&rarr;</span>
+                  <span class="mini-avatar" aria-hidden="true">NK</span>
+                  <span class="assignee-copy">
+                    <span class="assignee-name">Nattapong K.</span>
+                    <span class="assignee-team">Retail team</span>
+                  </span>
+                </div>
+                <button class="switch" type="button" role="switch" aria-checked="true" aria-label="Rule 2, mid-year sale campaign, enabled"></button>
+              </div>
+
+              <div class="rule-row">
+                <div class="spine"><span class="p-node" aria-label="Priority 3">3</span></div>
+                <div class="cond">
+                  <div class="cond-line">Company size is 50 employees or more</div>
+                  <div class="cond-meta">Edited 17 Jul, 16:05 · <span class="sync-chip pending">1 edit pending</span></div>
+                </div>
+                <div class="assignee">
+                  <span class="assignee-arrow" aria-hidden="true">&rarr;</span>
+                  <span class="mini-avatar" aria-hidden="true">TP</span>
+                  <span class="assignee-copy">
+                    <span class="assignee-name">Thanawat P.</span>
+                    <span class="assignee-team">Enterprise</span>
+                  </span>
+                </div>
+                <button class="switch" type="button" role="switch" aria-checked="true" aria-label="Rule 3, company size 50 or more, enabled"></button>
+              </div>
+
+              <div class="rule-row off">
+                <div class="spine"><span class="p-node" aria-label="Priority 4">4</span></div>
+                <div class="cond">
+                  <div class="cond-line">Province is in the northern region</div>
+                  <div class="cond-meta">Off since 12 Jul · last matched 38 leads</div>
+                </div>
+                <div class="assignee">
+                  <span class="assignee-arrow" aria-hidden="true">&rarr;</span>
+                  <span class="mini-avatar" aria-hidden="true">SC</span>
+                  <span class="assignee-copy">
+                    <span class="assignee-name">Siriporn C.</span>
+                    <span class="assignee-team">North team</span>
+                  </span>
+                </div>
+                <button class="switch" type="button" role="switch" aria-checked="false" aria-label="Rule 4, northern region, disabled"></button>
+              </div>
+
+              <div class="fallback">
+                <div class="spine"><span class="fb-node" aria-hidden="true"></span></div>
+                <div class="fb-copy">No match &rarr; <strong>round-robin</strong> across SME team (3 reps)</div>
+                <div class="fb-count">24 leads in Jul</div>
+              </div>
+            </section>
+
+            <div class="rail">
+              <section class="card rail-card" aria-labelledby="dist-title">
+                <h2 class="rail-label" id="dist-title">Assignments</h2>
+                <p class="rail-sub">1&ndash;18 Jul 2026 · 347 leads</p>
+                <div class="dist" role="img" aria-label="Leads assigned 1 to 18 July 2026: Pimchanok W. 128, Nattapong K. 96, Thanawat P. 61, Siriporn C. 38, round-robin 24">
+                  <div class="dist-row">
+                    <div class="dist-top"><span class="dist-name">Pimchanok W.</span><span class="dist-val">128</span></div>
+                    <div class="dist-track"><div class="dist-fill" style="width: 100%"></div></div>
+                  </div>
+                  <div class="dist-row">
+                    <div class="dist-top"><span class="dist-name">Nattapong K.</span><span class="dist-val">96</span></div>
+                    <div class="dist-track"><div class="dist-fill" style="width: 75%"></div></div>
+                  </div>
+                  <div class="dist-row">
+                    <div class="dist-top"><span class="dist-name">Thanawat P.</span><span class="dist-val">61</span></div>
+                    <div class="dist-track"><div class="dist-fill" style="width: 48%"></div></div>
+                  </div>
+                  <div class="dist-row">
+                    <div class="dist-top"><span class="dist-name">Siriporn C.</span><span class="dist-val">38</span></div>
+                    <div class="dist-track"><div class="dist-fill" style="width: 30%"></div></div>
+                  </div>
+                  <div class="dist-row rr">
+                    <div class="dist-top"><span class="dist-name">Round-robin</span><span class="dist-val">24</span></div>
+                    <div class="dist-track"><div class="dist-fill" style="width: 19%"></div></div>
+                  </div>
+                </div>
+              </section>
+
+              <section class="card rail-card" aria-labelledby="sync-title">
+                <h2 class="rail-label" id="sync-title">Pipedrive sync</h2>
+                <dl class="sync-list">
+                  <div class="sync-item"><dt>Last full sync</dt><dd>Today, 14:32</dd></div>
+                  <div class="sync-item"><dt>Pending changes</dt><dd class="warn">1 rule</dd></div>
+                  <div class="sync-item"><dt>Next auto-sync</dt><dd>14:47 (every 15 min)</dd></div>
+                </dl>
+              </section>
             </div>
-            <div class="table-wrap">
-              <table>
-                <caption>Inbound leads, sources, routing rules and Pipedrive sync statuses</caption>
-                <thead>
-                  <tr>
-                    <th scope="col">Lead</th>
-                    <th scope="col">Source</th>
-                    <th scope="col">Rule → owner</th>
-                    <th scope="col">Sync</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td><div class="lead-name">Siam Retail Co.</div><div class="lead-time">Received 2 min ago</div></td>
-                    <td><span class="source-badge source-web">web form</span></td>
-                    <td><div class="rule"><span class="rule-name">SME</span><span class="rule-arrow">→</span><span class="rule-owner">Nattapong</span></div></td>
-                    <td><span class="status synced">Synced</span></td>
-                  </tr>
-                  <tr>
-                    <td><div class="lead-name">Chao Phraya Foods</div><div class="lead-time">Received 8 min ago</div></td>
-                    <td><span class="source-badge source-line">LINE</span></td>
-                    <td><div class="rule"><span class="rule-name">F&amp;B</span><span class="rule-arrow">→</span><span class="rule-owner">Pimchanok</span></div></td>
-                    <td><span class="status synced">Synced</span></td>
-                  </tr>
-                  <tr>
-                    <td><div class="lead-name">Krung Siam Clinic</div><div class="lead-time">Received 14 min ago</div></td>
-                    <td><span class="source-badge source-import">import</span></td>
-                    <td><div class="rule"><span class="rule-name">health</span><span class="rule-arrow">→</span><span class="rule-owner">Kittisak</span></div></td>
-                    <td><span class="status retry">Retry</span></td>
-                  </tr>
-                  <tr>
-                    <td><div class="lead-name">Lanna Homeware</div><div class="lead-time">Received 21 min ago</div></td>
-                    <td><span class="source-badge source-web">web form</span></td>
-                    <td><div class="rule"><span class="rule-name">north</span><span class="rule-arrow">→</span><span class="rule-owner">Siriporn</span></div></td>
-                    <td><span class="status synced">Synced</span></td>
-                  </tr>
-                  <tr>
-                    <td><div class="lead-name">Andaman Logistics</div><div class="lead-time">Received 34 min ago</div></td>
-                    <td><span class="source-badge source-line">LINE</span></td>
-                    <td><div class="rule"><span class="rule-name">enterprise</span><span class="rule-arrow">→</span><span class="rule-owner">Thanawat</span></div></td>
-                    <td><span class="status synced">Synced</span></td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </section>
+          </div>
         </div>
       </main>
     </div>

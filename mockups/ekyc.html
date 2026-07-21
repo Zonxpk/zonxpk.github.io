@@ -3,357 +3,411 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#0b2447">
-  <title>Verify identity | Nara Bank</title>
+  <meta name="theme-color" content="#071b37">
+  <title>Liveness check | Nara Bank</title>
   <style>
     :root {
-      color-scheme: light;
+      color-scheme: dark;
       --navy-950: #071b37;
       --navy-900: #0b2447;
       --navy-800: #12345d;
-      --navy-700: #1a456f;
       --mint-50: #eefbf8;
       --mint-100: #d9f5ee;
       --mint-300: #7fddca;
       --teal-500: #19a98d;
       --teal-600: #108d77;
       --teal-700: #0b725f;
-      --slate-900: #15243a;
-      --slate-700: #41536a;
-      --slate-500: #718096;
-      --slate-300: #cbd6df;
-      --slate-200: #dde5eb;
-      --canvas: #f1f6f6;
-      --surface: #fbfdfd;
-      --white: #ffffff;
-      --space-1: 4px;
-      --space-2: 8px;
-      --space-3: 12px;
-      --space-4: 16px;
-      --radius-control: 10px;
-      --radius-card: 16px;
-      --radius-viewfinder: 12px;
-      --shadow-card:
-        0 8px 22px rgba(7, 34, 64, 0.07),
-        0 1px 3px rgba(7, 34, 64, 0.05);
-      --shadow-button:
-        0 7px 14px rgba(16, 141, 119, 0.20),
-        0 2px 4px rgba(7, 34, 64, 0.10);
+      --ink-hi: #f2f8f6;
+      --ink-mid: #c3d2dc;
+      --ink-low: #8299ac;
+      --cam-950: #080e14;
+      --cam-900: #0c141b;
+      --cam-800: #18242e;
+      --line: rgba(255, 255, 255, 0.11);
+      --radius-stage: 20px;
+      --radius-pill: 12px;
+      --radius-button: 12px;
+      --radius-chip: 9px;
+      --radius-hud: 8px;
+      --shadow-pill: 0 6px 16px rgba(3, 9, 16, 0.45), 0 1px 3px rgba(3, 9, 16, 0.4);
+      --shadow-button: 0 8px 18px rgba(127, 221, 202, 0.14), 0 2px 5px rgba(3, 9, 16, 0.5);
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     html,
     body {
       width: 100%;
       height: 100%;
+      margin: 0;
       overflow: hidden;
     }
 
     body {
-      margin: 0;
-      background: var(--canvas);
-      color: var(--slate-900);
+      background: var(--navy-950);
+      color: var(--ink-hi);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      font-size: 14px;
+      font-size: 13.5px;
       line-height: 1.4;
       -webkit-font-smoothing: antialiased;
       text-rendering: optimizeLegibility;
     }
 
-    button {
-      font: inherit;
-    }
+    button { font: inherit; }
 
     .screen {
-      width: 100%;
-      height: 100%;
-      background: var(--canvas);
-      overflow: hidden;
+      height: 100vh;
+      display: grid;
+      grid-template-rows: 92px minmax(0, 1fr) 56px 102px;
     }
 
+    main { display: contents; }
+
+    /* ---- header: 10 pad + 40 bar + 6 gap + 32 stepper + 4 pad = 92 ---- */
     .app-header {
-      height: 108px;
-      padding: 8px 16px 16px;
-      color: var(--white);
-      background:
-        linear-gradient(132deg, rgba(127, 221, 202, 0.08), transparent 42%),
-        var(--navy-900);
-      box-shadow: 0 3px 12px rgba(7, 27, 55, 0.16);
+      padding: 10px 16px 4px;
+      background: var(--navy-950);
     }
 
     .app-bar {
-      height: 52px;
+      height: 40px;
       display: flex;
       align-items: center;
-      gap: var(--space-1);
+      gap: 8px;
     }
 
     .back-button {
-      width: 44px;
-      height: 44px;
-      margin-left: -10px;
+      width: 40px;
+      height: 40px;
+      margin-left: -8px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      flex: 0 0 44px;
+      flex: 0 0 40px;
       border: 0;
-      border-radius: var(--radius-control);
-      color: var(--white);
+      border-radius: 10px;
+      color: var(--ink-hi);
       background: transparent;
       touch-action: manipulation;
     }
 
-    .back-button:focus-visible,
-    .primary-button:focus-visible {
+    .back-button:focus-visible {
       outline: 3px solid var(--mint-300);
       outline-offset: 2px;
     }
 
-    .back-button:active {
-      background: rgba(255, 255, 255, 0.10);
-    }
+    .back-button:active { background: rgba(255, 255, 255, 0.09); }
 
-    .back-button svg {
-      width: 22px;
-      height: 22px;
-      transform: translateX(-1px);
-    }
+    .back-button svg { width: 21px; height: 21px; }
 
     .bar-title {
       min-width: 0;
       margin: 0;
       flex: 1;
-      color: var(--white);
-      font-size: 20px;
+      font-size: 17px;
       font-weight: 600;
+      letter-spacing: -0.01em;
       line-height: 1.2;
-      letter-spacing: -0.012em;
-      text-wrap: balance;
     }
 
-    .step-count {
-      min-width: 52px;
-      height: 28px;
-      padding: 0 10px;
+    .secure-chip {
+      height: 24px;
+      padding: 0 9px;
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      border: 1px solid rgba(217, 245, 238, 0.20);
+      gap: 5px;
+      border: 1px solid var(--line);
       border-radius: 999px;
-      background: rgba(217, 245, 238, 0.10);
-      color: var(--mint-100);
-      font-size: 11px;
+      color: var(--ink-mid);
+      font-size: 10.5px;
       font-weight: 600;
-      font-variant-numeric: tabular-nums;
-      letter-spacing: 0.01em;
       white-space: nowrap;
     }
 
-    .progress-track {
-      height: 5px;
-      margin-top: 11px;
-      overflow: hidden;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.18);
-    }
+    .secure-chip svg { width: 11px; height: 11px; }
 
-    .progress-value {
-      width: 66.666%;
-      height: 100%;
-      border-radius: inherit;
-      background: var(--mint-300);
-      box-shadow: 0 0 0 1px rgba(217, 245, 238, 0.12);
-    }
-
-    main {
-      height: calc(100% - 108px);
-      padding: 12px 16px 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .capture-card {
-      height: 268px;
-      padding: 12px;
-      flex: 0 0 268px;
-      overflow: hidden;
-      border: 1px solid rgba(11, 36, 71, 0.055);
-      border-radius: var(--radius-card);
-      background: var(--surface);
-      box-shadow: var(--shadow-card);
-    }
-
-    .viewfinder {
-      position: relative;
-      width: 100%;
-      height: 206px;
-      overflow: hidden;
-      border: 1px solid rgba(11, 36, 71, 0.12);
-      border-radius: var(--radius-viewfinder);
-      background:
-        radial-gradient(circle at 50% 44%, rgba(127, 221, 202, 0.16), transparent 45%),
-        linear-gradient(150deg, #e9f5f2 0%, #dce9ea 100%);
-      box-shadow:
-        inset 0 2px 7px rgba(7, 34, 64, 0.08),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.55);
-    }
-
-    .viewfinder::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.18), transparent 32%);
-    }
-
-    .face-guide {
-      position: absolute;
-      inset: 0;
-      z-index: 1;
-      width: 100%;
-      height: 100%;
-    }
-
-    .capture-hint {
-      min-height: 36px;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      gap: 7px;
-      color: var(--slate-700);
-      font-size: 14px;
-      font-weight: 500;
-      text-align: center;
-    }
-
-    .capture-hint svg {
-      width: 17px;
-      height: 17px;
-      flex: 0 0 17px;
-      color: var(--teal-600);
-    }
-
-    .checklist-card {
-      height: 128px;
-      padding: 7px 14px;
-      flex: 0 0 128px;
-      border: 1px solid rgba(11, 36, 71, 0.055);
-      border-radius: 14px;
-      background: var(--surface);
-      box-shadow: var(--shadow-card);
-    }
-
-    .checklist {
-      height: 100%;
-      margin: 0;
+    .stepper {
+      height: 32px;
+      margin: 6px 0 0;
       padding: 0;
       list-style: none;
       display: flex;
-      flex-direction: column;
-      justify-content: center;
+      align-items: center;
     }
 
-    .checklist li {
-      min-height: 37px;
+    .stepper li {
       display: flex;
       align-items: center;
-      gap: 11px;
-      color: var(--slate-700);
-      font-size: 14px;
+      gap: 7px;
+      font-size: 10.5px;
       font-weight: 500;
+      color: var(--ink-low);
     }
 
-    .checklist li + li {
-      border-top: 1px solid rgba(11, 36, 71, 0.065);
+    .stepper li + li { flex: 1; }
+
+    .stepper li + li::before {
+      content: "";
+      flex: 1;
+      min-width: 14px;
+      height: 2px;
+      margin: 0 9px;
+      border-radius: 1px;
+      background: rgba(255, 255, 255, 0.14);
     }
 
-    .status-icon {
-      width: 22px;
-      height: 22px;
+    .stepper li.active::before { background: var(--mint-300); }
+
+    .step-dot {
+      width: 18px;
+      height: 18px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      flex: 0 0 22px;
+      flex: 0 0 18px;
       border-radius: 50%;
     }
 
-    .status-icon.complete {
-      color: var(--white);
+    .stepper li.done .step-dot {
+      background: rgba(127, 221, 202, 0.15);
+      color: var(--mint-300);
+    }
+
+    .stepper li.done .step-dot svg { width: 10px; height: 10px; }
+
+    .stepper li.done { color: var(--ink-mid); }
+
+    .stepper li.active .step-dot {
       background: var(--teal-500);
-      box-shadow: 0 2px 5px rgba(25, 169, 141, 0.18);
+      box-shadow: 0 0 0 3px rgba(25, 169, 141, 0.22);
     }
 
-    .status-icon.pending {
-      color: var(--teal-700);
+    .stepper li.active .step-dot::after {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #fff;
+    }
+
+    .stepper li.active {
+      color: var(--mint-100);
+      font-weight: 600;
+    }
+
+    .stepper li.todo .step-dot {
+      border: 1.5px solid rgba(255, 255, 255, 0.28);
+    }
+
+    /* ---- camera row: 640 - 92 - 56 - 102 = 390 ---- */
+    .camera { display: flex; min-height: 0; }
+
+    .stage {
+      position: relative;
+      flex: 1;
+      margin: 6px 14px 10px;           /* stage = 390 - 16 = 374 tall */
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: var(--radius-stage);
+      background:
+        radial-gradient(120% 90% at 50% 36%, var(--cam-800) 0%, var(--cam-900) 55%, var(--cam-950) 100%);
+    }
+
+    .scene {
+      position: absolute;
+      inset: 0;
+    }
+
+    .scene svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .corner {
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      border: 2px solid rgba(223, 236, 231, 0.42);
+    }
+
+    .corner.tl { top: 10px; left: 10px; border-right: 0; border-bottom: 0; border-top-left-radius: 8px; }
+    .corner.tr { top: 10px; right: 10px; border-left: 0; border-bottom: 0; border-top-right-radius: 8px; }
+    .corner.bl { bottom: 10px; left: 10px; border-right: 0; border-top: 0; border-bottom-left-radius: 8px; }
+    .corner.br { bottom: 10px; right: 10px; border-left: 0; border-top: 0; border-bottom-right-radius: 8px; }
+
+    .hud-chip {
+      position: absolute;
+      top: 12px;
+      height: 24px;
+      padding: 0 9px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-hud);
+      background: rgba(6, 13, 20, 0.72);
+      color: var(--ink-mid);
+      font-size: 10.5px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .hud-chip.timer { left: 12px; }
+    .hud-chip.cam-label { right: 12px; font-weight: 500; }
+
+    .rec-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
       background: var(--mint-100);
-      border: 1px solid rgba(16, 141, 119, 0.16);
     }
 
-    .status-icon svg {
+    @media (prefers-reduced-motion: no-preference) {
+      .rec-dot {
+        animation: rec-pulse 2s ease-in-out infinite;
+      }
+
+      @keyframes rec-pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.3; }
+      }
+    }
+
+    .instruction {
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+      margin: 0;
+      padding: 9px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-pill);
+      background: rgba(6, 13, 20, 0.82);
+      box-shadow: var(--shadow-pill);
+    }
+
+    .instruction svg {
+      width: 20px;
+      height: 20px;
+      flex: 0 0 20px;
+      color: var(--mint-100);
+    }
+
+    .instruction-main {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink-hi);
+      line-height: 1.25;
+    }
+
+    .instruction-sub {
+      display: block;
+      margin-top: 2px;
+      font-size: 10.5px;
+      font-weight: 500;
+      color: var(--ink-mid);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ---- passive checks: 56 = 8 pad + 40 chips + 8 slack ---- */
+    .checks {
+      margin: 0;
+      padding: 8px 14px 0;
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      align-content: start;
+    }
+
+    .checks li {
+      min-width: 0;
+      height: 40px;
+      padding: 0 10px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: var(--radius-chip);
+      background: rgba(255, 255, 255, 0.05);
+      font-size: 10.5px;
+      font-weight: 600;
+      color: var(--ink-mid);
+    }
+
+    .checks li svg {
       width: 14px;
       height: 14px;
+      flex: 0 0 14px;
+      color: var(--mint-300);
+    }
+
+    .checks li span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* ---- action bar: 102 = 12 pad + 52 button + 9 gap + 16 trust + 13 pad ---- */
+    .actions {
+      padding: 12px 16px 0;
+      background: var(--navy-950);
     }
 
     .primary-button {
       width: 100%;
       height: 52px;
-      min-height: 52px;
-      padding: 0 22px;
-      flex: 0 0 52px;
-      border: 1px solid rgba(7, 34, 64, 0.06);
-      border-radius: var(--radius-control);
-      background: var(--teal-600);
-      color: var(--white);
+      padding: 0 20px;
+      border: 0;
+      border-radius: var(--radius-button);
+      background: var(--mint-300);
+      color: var(--navy-950);
       box-shadow: var(--shadow-button);
-      font-size: 14px;
-      font-weight: 600;
+      font-size: 14.5px;
+      font-weight: 650;
       letter-spacing: -0.005em;
       touch-action: manipulation;
+      transition: background-color 120ms ease, transform 120ms ease;
+    }
+
+    .primary-button:focus-visible {
+      outline: 3px solid var(--mint-100);
+      outline-offset: 2px;
     }
 
     .primary-button:active {
-      background: var(--teal-700);
-      transform: scale(0.98);
+      background: #6fcfbb;
+      transform: translateY(1px);
     }
 
-    .trust-footer {
-      height: 24px;
-      min-height: 24px;
+    .trust-line {
+      height: 16px;
+      margin-top: 9px;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 6px;
-      color: var(--slate-500);
-      font-size: 11px;
+      color: var(--ink-low);
+      font-size: 10.5px;
       font-weight: 500;
-      letter-spacing: 0.01em;
       white-space: nowrap;
     }
 
-    .trust-footer svg {
-      width: 13px;
-      height: 13px;
-      color: var(--teal-700);
-    }
+    .trust-line svg { width: 12px; height: 12px; }
 
     @media (hover: hover) and (pointer: fine) {
-      .back-button:hover {
-        background: rgba(255, 255, 255, 0.09);
-      }
-
-      .primary-button:hover {
-        background: var(--teal-700);
-      }
+      .back-button:hover { background: rgba(255, 255, 255, 0.08); }
+      .primary-button:hover { background: #93e4d4; }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .primary-button {
-        transform: none;
-      }
+      .primary-button:active { transform: none; }
     }
   </style>
 </head>
@@ -363,93 +417,135 @@
       <div class="app-bar">
         <button class="back-button" type="button" aria-label="Go back">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </button>
-        <h1 class="bar-title">Verify identity</h1>
-        <span class="step-count">2 of 3</span>
+        <h1 class="bar-title">Liveness check</h1>
+        <span class="secure-chip">
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <rect x="3.25" y="7" width="9.5" height="6.5" rx="2" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M5.5 7V5.25a2.5 2.5 0 015 0V7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          Secure
+        </span>
       </div>
-      <div class="progress-track" role="progressbar" aria-label="Identity verification progress" aria-valuemin="1" aria-valuemax="3" aria-valuenow="2">
-        <div class="progress-value"></div>
-      </div>
+      <ol class="stepper" aria-label="Verification steps">
+        <li class="done">
+          <span class="step-dot">
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M3 8.4l3.2 3.1L13 4.7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          ID scan
+        </li>
+        <li class="active" aria-current="step">
+          <span class="step-dot"></span>
+          Face
+        </li>
+        <li class="todo">
+          <span class="step-dot"></span>
+          Review
+        </li>
+      </ol>
     </header>
 
     <main>
-      <section class="capture-card" aria-label="Face capture">
-        <div class="viewfinder">
-          <svg class="face-guide" viewBox="0 0 264 210" fill="none" aria-hidden="true">
-            <defs>
-              <linearGradient id="portraitFill" x1="132" y1="52" x2="132" y2="181" gradientUnits="userSpaceOnUse">
-                <stop stop-color="#9BB2BC" stop-opacity=".20"/>
-                <stop offset="1" stop-color="#5D7886" stop-opacity=".08"/>
-              </linearGradient>
-              <filter id="softShadow" x="46" y="28" width="172" height="174" filterUnits="userSpaceOnUse">
-                <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0B2447" flood-opacity=".08"/>
-              </filter>
-            </defs>
+      <section class="camera" aria-label="Face capture">
+        <div class="stage">
+          <div class="scene" role="img" aria-label="Live front-camera preview. Your face is centred inside the oval guide. 8 of 24 movement ticks complete on the yaw ring.">
+            <svg viewBox="0 0 340 374" preserveAspectRatio="xMidYMid meet" fill="none">
+              <defs>
+                <linearGradient id="headFill" x1="170" y1="100" x2="170" y2="310" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#2b3a46"/>
+                  <stop offset="1" stop-color="#141e27"/>
+                </linearGradient>
+                <radialGradient id="faceLight" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(184 140) rotate(90) scale(70 56)">
+                  <stop stop-color="#3c4e5c" stop-opacity=".55"/>
+                  <stop offset="1" stop-color="#3c4e5c" stop-opacity="0"/>
+                </radialGradient>
+              </defs>
 
-            <path d="M88 182c5-35 22-52 44-52s39 17 44 52" fill="url(#portraitFill)"/>
-            <circle cx="132" cy="96" r="35" fill="url(#portraitFill)"/>
+              <!-- subject: head-and-shoulders silhouette, scaled up to fill the oval guide -->
+              <g transform="translate(170 170) scale(1.55) translate(-170 -158)">
+                <path d="M90 340c8-64 42-92 80-92s72 28 80 92" fill="url(#headFill)"/>
+                <path d="M154 214h32v34c0 10-7 16-16 16s-16-6-16-16v-34z" fill="url(#headFill)"/>
+                <ellipse cx="170" cy="152" rx="42" ry="51" fill="url(#headFill)"/>
+                <ellipse cx="170" cy="152" rx="42" ry="51" fill="url(#faceLight)"/>
+              </g>
 
-            <ellipse cx="132" cy="105" rx="67" ry="84" stroke="#108D77" stroke-width="2" stroke-dasharray="5 6" opacity=".88" filter="url(#softShadow)"/>
+              <!-- oval face guide -->
+              <ellipse cx="170" cy="170" rx="90" ry="118" stroke="#19a98d" stroke-width="2"/>
 
-            <path d="M54 66V45c0-6 5-11 11-11h21M210 66V45c0-6-5-11-11-11h-21M54 144v21c0 6 5 11 11 11h21M210 144v21c0 6-5 11-11 11h-21"
-              stroke="#0B725F" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              <!-- yaw ring: 24 tick beads, base -->
+              <ellipse cx="170" cy="170" rx="102" ry="130" pathLength="96"
+                stroke="rgba(255,255,255,0.24)" stroke-width="5" stroke-linecap="round"
+                stroke-dasharray="1 3" stroke-dashoffset="-72"/>
+              <!-- yaw ring: 8 of 24 beads lit, from top sweeping right -->
+              <ellipse cx="170" cy="170" rx="102" ry="130" pathLength="96"
+                stroke="#7fddca" stroke-width="5" stroke-linecap="round"
+                stroke-dasharray="1 3 1 3 1 3 1 3 1 3 1 3 1 3 1 3 64" stroke-dashoffset="-72"/>
+            </svg>
+          </div>
 
-            <circle cx="132" cy="105" r="3" fill="#108D77"/>
-            <path d="M124 115c2.2 2 4.8 3 8 3s5.8-1 8-3" stroke="#108D77" stroke-width="1.5" stroke-linecap="round" opacity=".55"/>
-          </svg>
-        </div>
-        <div class="capture-hint">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M8 6.5l1.2-2h5.6l1.2 2h2.5A2.5 2.5 0 0121 9v7.5a2.5 2.5 0 01-2.5 2.5h-13A2.5 2.5 0 013 16.5V9a2.5 2.5 0 012.5-2.5H8z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
-            <circle cx="12" cy="12.5" r="3.3" stroke="currentColor" stroke-width="1.8"/>
-          </svg>
-          <span>Position your face in the frame</span>
+          <span class="corner tl" aria-hidden="true"></span>
+          <span class="corner tr" aria-hidden="true"></span>
+          <span class="corner bl" aria-hidden="true"></span>
+          <span class="corner br" aria-hidden="true"></span>
+
+          <span class="hud-chip timer" aria-label="Capture running, 12 seconds">
+            <span class="rec-dot" aria-hidden="true"></span>
+            00:12
+          </span>
+          <span class="hud-chip cam-label">Front camera</span>
+
+          <p class="instruction">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M19 13a7 7 0 1 1-2.05-4.95" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              <path d="M19 4v4.2h-4.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>
+              <span class="instruction-main">Turn your head slowly to the right</span>
+              <span class="instruction-sub">Movement 2 of 3 &middot; keep your face inside the oval</span>
+            </span>
+          </p>
         </div>
       </section>
 
-      <section class="checklist-card" aria-label="Before you begin">
-        <ul class="checklist">
-          <li>
-            <span class="status-icon complete">
-              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                <path d="M3.5 8.2l2.7 2.7 6.3-6.2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </span>
-            <span>Good lighting</span>
-          </li>
-          <li>
-            <span class="status-icon complete">
-              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                <path d="M3.5 8.2l2.7 2.7 6.3-6.2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </span>
-            <span>Remove glasses</span>
-          </li>
-          <li>
-            <span class="status-icon pending">
-              <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-                <circle cx="3" cy="8" r="1.25"/>
-                <circle cx="8" cy="8" r="1.25"/>
-                <circle cx="13" cy="8" r="1.25"/>
-              </svg>
-            </span>
-            <span>Hold still</span>
-          </li>
-        </ul>
-      </section>
+      <ul class="checks" aria-label="Passive checks, all passed">
+        <li aria-label="Lighting is good">
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <circle cx="8" cy="8" r="6.2" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M5.2 8.3l1.9 1.9 3.7-3.9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Lighting good</span>
+        </li>
+        <li aria-label="Single face detected">
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <circle cx="8" cy="8" r="6.2" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M5.2 8.3l1.9 1.9 3.7-3.9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>One face</span>
+        </li>
+        <li aria-label="Device is steady">
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <circle cx="8" cy="8" r="6.2" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M5.2 8.3l1.9 1.9 3.7-3.9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Device steady</span>
+        </li>
+      </ul>
+    </main>
 
-      <button class="primary-button" type="button">Start liveness check</button>
-
-      <footer class="trust-footer">
+    <footer class="actions">
+      <button class="primary-button" type="button">Begin head turn</button>
+      <p class="trust-line">
         <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
           <rect x="3.25" y="7" width="9.5" height="7" rx="2" stroke="currentColor" stroke-width="1.5"/>
           <path d="M5.5 7V5.25a2.5 2.5 0 015 0V7M8 10v1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
         </svg>
-        <span>Encrypted · PDPA compliant</span>
-      </footer>
-    </main>
+        Encrypted end to end &middot; PDPA compliant
+      </p>
+    </footer>
   </div>
 </body>
 </html>

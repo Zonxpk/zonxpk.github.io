@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f4f7fb">
-  <title>SMS Campaign Dashboard</title>
+  <title>BulkSMS — campaign dashboard</title>
   <style>
     :root {
       color-scheme: light;
@@ -30,7 +30,6 @@
       --slate-50: #f0f3f7;
       --slate-600: #66758a;
       --shadow-card: 0 8px 22px rgba(31, 53, 79, 0.055), 0 1px 3px rgba(31, 53, 79, 0.06);
-      --shadow-float: 0 7px 18px rgba(255, 107, 26, 0.18), 0 2px 5px rgba(31, 53, 79, 0.08);
     }
 
     * { box-sizing: border-box; }
@@ -48,11 +47,18 @@
       background: var(--gray-50);
       color: var(--blue-900);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      font-size: 13px;
+      font-size: 12.5px;
+      font-variant-numeric: tabular-nums;
       -webkit-font-smoothing: antialiased;
     }
 
     svg { display: block; }
+
+    a:focus-visible,
+    button:focus-visible {
+      outline: 2px solid var(--orange-600);
+      outline-offset: 2px;
+    }
 
     .app {
       display: grid;
@@ -61,15 +67,16 @@
       background: var(--gray-50);
     }
 
+    /* ---------- topbar ---------- */
+
     .topbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 20px;
       padding: 0 18px 0 16px;
-      background: rgba(255, 255, 255, 0.98);
+      background: #fff;
       border-bottom: 1px solid var(--gray-200);
-      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.85);
       position: relative;
       z-index: 2;
     }
@@ -83,11 +90,7 @@
       color: var(--blue-900);
     }
 
-    .brand-mark {
-      width: 29px;
-      height: 29px;
-      filter: drop-shadow(0 4px 7px rgba(255, 107, 26, 0.2));
-    }
+    .brand-mark { width: 29px; height: 29px; }
 
     .wordmark {
       font-size: 17px;
@@ -110,14 +113,15 @@
       gap: 6px;
       min-height: 32px;
       padding: 0 11px;
-      border: 1px solid var(--orange-100);
+      border: 1px solid var(--gray-200);
       border-radius: 6px;
-      background: var(--orange-50);
-      color: var(--orange-600);
+      background: #fff;
+      color: var(--gray-700);
       font: inherit;
       font-size: 11.5px;
-      font-weight: 700;
+      font-weight: 650;
       white-space: nowrap;
+      box-shadow: 0 1px 2px rgba(31, 53, 79, 0.04);
     }
 
     .topup svg { width: 14px; height: 14px; }
@@ -129,7 +133,7 @@
       height: 34px;
       padding: 3px 7px 3px 4px;
       border: 1px solid var(--gray-200);
-      border-radius: 18px;
+      border-radius: 999px;
       background: #fff;
       color: var(--gray-700);
       box-shadow: 0 1px 2px rgba(31, 53, 79, 0.04);
@@ -150,7 +154,9 @@
 
     .user-copy { line-height: 1.05; }
     .user-name { font-size: 11px; font-weight: 700; }
-    .user-company { margin-top: 3px; color: var(--gray-400); font-size: 9px; }
+    .user-company { margin-top: 3px; color: var(--gray-500); font-size: 9px; }
+
+    /* ---------- shell ---------- */
 
     .shell {
       display: grid;
@@ -165,7 +171,6 @@
       padding: 15px 9px 12px;
       background: #f8fafc;
       border-right: 1px solid var(--gray-200);
-      overscroll-behavior: contain;
     }
 
     .nav-list {
@@ -211,14 +216,13 @@
       height: 32px;
       border-radius: 0 4px 4px 0;
       background: var(--orange-500);
-      box-shadow: 0 0 0 3px rgba(255, 107, 26, 0.08);
     }
 
     .sidebar-help {
       display: grid;
       justify-items: center;
       gap: 5px;
-      color: var(--gray-400);
+      color: var(--gray-500);
       font-size: 9px;
     }
 
@@ -235,17 +239,19 @@
       box-shadow: 0 2px 5px rgba(31, 53, 79, 0.05);
     }
 
+    /* ---------- page ---------- */
+
     main {
       min-width: 0;
       min-height: 0;
-      padding: 16px 18px 17px;
+      padding: 13px 18px 14px;
       overflow: hidden;
     }
 
     .page-grid {
       display: grid;
-      grid-template-rows: 42px 100px minmax(0, 1fr);
-      gap: 13px;
+      grid-template-rows: 38px 98px minmax(0, 1fr);
+      gap: 12px;
       height: 100%;
     }
 
@@ -259,13 +265,13 @@
     .page-title h1 {
       margin: 0;
       color: var(--blue-900);
-      font-size: 20px;
-      line-height: 1.08;
-      letter-spacing: -0.025em;
+      font-size: 17px;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
     }
 
     .page-title p {
-      margin: 4px 0 0;
+      margin: 3px 0 0;
       color: var(--gray-500);
       font-size: 10.5px;
     }
@@ -278,7 +284,7 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
-      height: 32px;
+      height: 31px;
       border-radius: 6px;
       font: inherit;
       font-size: 11px;
@@ -299,84 +305,97 @@
 
     .campaign-button {
       padding: 0 12px;
-      border: 1px solid var(--orange-500);
+      border: 1px solid var(--orange-600);
       background: var(--orange-500);
       color: #fff;
-      box-shadow: var(--shadow-float);
+      box-shadow: 0 4px 10px rgba(31, 53, 79, 0.1), 0 1px 2px rgba(31, 53, 79, 0.08);
     }
+
+    /* ---------- KPI row ---------- */
 
     .kpi-grid {
       display: grid;
-      grid-template-columns: 1.16fr 1fr 1fr;
+      grid-template-columns: 1.18fr 1fr 1fr;
       gap: 12px;
       min-width: 0;
     }
 
     .kpi-card {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 58px;
-      align-items: center;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: end;
       min-width: 0;
-      padding: 13px 14px;
+      padding: 12px 14px 11px;
       border: 1px solid rgba(214, 223, 233, 0.92);
-      border-radius: 8px;
+      border-radius: 10px;
       background: #fff;
       box-shadow: var(--shadow-card);
     }
 
-    .kpi-card.primary {
-      border-color: #ffdac4;
-      background: linear-gradient(110deg, #fff7f1 0%, #fff 74%);
+    .kpi-card.hero {
+      grid-template-columns: minmax(0, 1fr);
+      border-color: #ffd6bd;
+      background: #fff7f1;
     }
 
     .kpi-label {
-      margin-bottom: 6px;
       color: var(--gray-500);
       font-size: 10.5px;
       font-weight: 650;
     }
 
     .kpi-value {
+      margin-top: 5px;
       color: var(--blue-900);
-      font-size: clamp(21px, 2.65vw, 27px);
+      font-size: 25px;
       font-weight: 760;
       line-height: 1;
-      letter-spacing: -0.035em;
-      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.03em;
       white-space: nowrap;
     }
 
-    .primary .kpi-value { color: var(--orange-600); }
+    .hero .kpi-value { color: var(--orange-600); }
+    .kpi-value small { font-size: 13px; font-weight: 700; letter-spacing: 0; }
 
     .kpi-note {
       margin-top: 7px;
-      color: var(--gray-400);
+      color: var(--gray-500);
       font-size: 9.5px;
       white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    .kpi-icon {
-      display: grid;
-      place-items: center;
-      justify-self: end;
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
-      background: var(--blue-50);
-      color: var(--blue-600);
-    }
-
-    .primary .kpi-icon {
+    /* signature detail: credit runway meter */
+    .runway-track {
+      margin-top: 9px;
+      height: 4px;
+      border-radius: 999px;
       background: var(--orange-100);
-      color: var(--orange-600);
+      overflow: hidden;
     }
 
-    .kpi-icon svg { width: 18px; height: 18px; }
+    .runway-fill {
+      width: 32%;
+      height: 100%;
+      border-radius: 999px;
+      background: var(--orange-500);
+    }
+
+    .hero .kpi-note { margin-top: 5px; }
+
+    .spark {
+      align-self: end;
+      margin-bottom: 15px;
+      color: var(--blue-700);
+    }
+
+    /* ---------- content ---------- */
 
     .content-grid {
       display: grid;
-      grid-template-columns: minmax(0, 1.62fr) minmax(205px, 0.9fr);
-      gap: 13px;
+      grid-template-columns: minmax(0, 1.62fr) minmax(215px, 0.9fr);
+      gap: 12px;
       min-height: 0;
     }
 
@@ -385,7 +404,7 @@
       min-height: 0;
       overflow: hidden;
       border: 1px solid rgba(214, 223, 233, 0.94);
-      border-radius: 9px;
+      border-radius: 10px;
       background: #fff;
       box-shadow: var(--shadow-card);
     }
@@ -395,7 +414,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      height: 48px;
+      height: 40px;
       padding: 0 14px;
       border-bottom: 1px solid var(--gray-100);
     }
@@ -403,26 +422,28 @@
     .panel-title h2 {
       margin: 0;
       color: var(--blue-900);
-      font-size: 13px;
+      font-size: 12.5px;
       line-height: 1.15;
       letter-spacing: -0.01em;
     }
 
     .panel-title p {
-      margin: 4px 0 0;
-      color: var(--gray-400);
-      font-size: 9.5px;
+      margin: 2px 0 0;
+      color: var(--gray-500);
+      font-size: 9px;
     }
 
     .view-all {
-      color: var(--orange-600);
+      color: var(--gray-700);
       font-size: 10px;
       font-weight: 700;
       text-decoration: none;
       white-space: nowrap;
     }
 
-    .table-wrap { height: calc(100% - 48px); }
+    /* ---------- table ---------- */
+
+    .table-wrap { height: calc(100% - 40px); }
 
     table {
       width: 100%;
@@ -431,31 +452,33 @@
       table-layout: fixed;
     }
 
-    thead { height: 31px; }
+    thead { height: 26px; }
 
     th {
       padding: 0 9px;
       background: var(--gray-25);
       color: var(--gray-500);
-      font-size: 9px;
-      font-weight: 650;
+      font-size: 8.5px;
+      font-weight: 680;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
       text-align: left;
       white-space: nowrap;
     }
 
     td {
-      padding: 6px 9px;
+      padding: 5px 9px;
       border-top: 1px solid var(--gray-100);
       color: var(--gray-700);
       font-size: 10.2px;
       vertical-align: middle;
     }
 
-    th:nth-child(1) { width: 41%; }
-    th:nth-child(2) { width: 18%; }
-    th:nth-child(3) { width: 20%; text-align: right; }
+    th:nth-child(1) { width: 42%; }
+    th:nth-child(2) { width: 19%; }
+    th:nth-child(3) { width: 18%; text-align: right; }
     th:nth-child(4) { width: 21%; text-align: center; }
-    td:nth-child(3) { text-align: right; font-variant-numeric: tabular-nums; }
+    td:nth-child(3) { text-align: right; }
     td:nth-child(4) { text-align: center; }
 
     .campaign-name {
@@ -471,12 +494,11 @@
     .campaign-list {
       margin-top: 3px;
       overflow: hidden;
-      color: var(--gray-400);
+      color: var(--gray-500);
       font-size: 8.6px;
       line-height: 1;
       text-overflow: ellipsis;
       white-space: nowrap;
-      font-variant-numeric: tabular-nums;
     }
 
     .sender {
@@ -494,7 +516,7 @@
       justify-content: center;
       gap: 5px;
       min-width: 63px;
-      height: 21px;
+      height: 20px;
       padding: 0 7px;
       border-radius: 999px;
       font-size: 8.8px;
@@ -516,90 +538,108 @@
     .scheduled { background: var(--amber-50); color: var(--amber-700); }
     .draft { background: var(--slate-50); color: var(--slate-600); }
 
+    /* ---------- volume chart ---------- */
+
     .chart-panel {
       display: grid;
-      grid-template-rows: 48px minmax(0, 1fr);
+      grid-template-rows: 40px minmax(0, 1fr);
     }
 
     .chart-total {
       color: var(--blue-900);
-      font-size: 11px;
+      font-size: 11.5px;
       font-weight: 750;
-      font-variant-numeric: tabular-nums;
       white-space: nowrap;
+      text-align: right;
     }
 
     .chart-total span {
       display: block;
       margin-top: 2px;
-      color: var(--gray-400);
-      font-size: 8px;
+      color: var(--gray-500);
+      font-size: 8.5px;
       font-weight: 550;
-      text-align: right;
     }
 
     .chart-body {
       display: grid;
-      grid-template-rows: 1fr 21px;
+      grid-template-rows: minmax(0, 1fr) 14px;
+      gap: 5px;
       min-height: 0;
       padding: 12px 12px 8px;
     }
 
     .plot {
       position: relative;
-      display: flex;
-      align-items: end;
-      justify-content: space-between;
-      gap: 7px;
       min-height: 0;
-      padding: 7px 3px 0;
       border-bottom: 1px solid var(--gray-200);
-      background-image: linear-gradient(to bottom, transparent calc(50% - .5px), var(--gray-100) 50%, transparent calc(50% + .5px));
     }
 
-    .bar-wrap {
-      display: flex;
-      align-items: end;
-      justify-content: center;
+    .plot > svg {
       width: 100%;
       height: 100%;
     }
 
-    .bar {
-      position: relative;
-      width: min(17px, 68%);
-      height: var(--h);
-      min-height: 8px;
-      border-radius: 4px 4px 2px 2px;
-      background: #ffb488;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.34);
+    .dot {
+      position: absolute;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
     }
 
-    .bar.highlight {
-      background: var(--orange-500);
-      box-shadow: 0 4px 9px rgba(255, 107, 26, 0.19), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+    .dot.peak {
+      left: 82%;
+      top: 12.7%;
+      background: var(--blue-700);
+      border: 1.5px solid #fff;
+      box-shadow: 0 1px 3px rgba(31, 53, 79, 0.3);
     }
+
+    .dot.today {
+      left: 98%;
+      top: 29.5%;
+      background: var(--orange-500);
+      border: 1.5px solid #fff;
+      box-shadow: 0 1px 3px rgba(31, 53, 79, 0.3);
+    }
+
+    .peak-label {
+      position: absolute;
+      left: 82%;
+      top: 12.7%;
+      transform: translate(-108%, -50%);
+      color: var(--blue-900);
+      font-size: 8.5px;
+      font-weight: 750;
+      white-space: nowrap;
+    }
+
+    .peak-label span { color: var(--gray-500); font-weight: 600; }
 
     .chart-days {
       display: flex;
       align-items: end;
       justify-content: space-between;
-      gap: 7px;
-      padding: 0 3px;
-      color: var(--gray-400);
-      font-size: 8px;
+      color: var(--gray-500);
+      font-size: 8.5px;
       font-weight: 600;
     }
 
     .chart-days span { width: 100%; text-align: center; }
-    .chart-days .today { color: var(--orange-600); font-weight: 750; }
+    .chart-days span:first-child { text-align: left; }
+    .chart-days span:last-child { text-align: right; }
+    .chart-days .today-day { color: var(--orange-600); font-weight: 750; }
 
-    .chart-foot {
-      position: absolute;
-      right: 13px;
-      bottom: 8px;
-      color: var(--gray-400);
-      font-size: 8px;
+    /* ---------- interaction ---------- */
+
+    @media (hover: hover) and (pointer: fine) {
+      .campaign-button:hover { border-color: var(--orange-600); background: var(--orange-600); }
+      .date-chip:hover,
+      .topup:hover { border-color: #cfd8e4; background: var(--gray-25); }
+      .nav-item:hover { color: var(--blue-700); }
+      tbody tr:hover { background: var(--gray-25); }
+      .view-all:hover { text-decoration: underline; text-underline-offset: 2px; }
     }
 
     @media (max-width: 760px) {
@@ -609,14 +649,14 @@
       .nav-item.active::before { left: -6px; }
       main { padding-inline: 13px; }
       .page-grid { gap: 11px; }
-      .content-grid { gap: 10px; grid-template-columns: minmax(0, 1.55fr) minmax(196px, .9fr); }
+      .content-grid { gap: 10px; grid-template-columns: minmax(0, 1.5fr) minmax(200px, 0.9fr); }
       .kpi-grid { gap: 9px; }
-      .kpi-card { grid-template-columns: minmax(0, 1fr) 32px; padding-inline: 11px; }
-      .kpi-icon { width: 30px; height: 30px; border-radius: 8px; }
-      .kpi-icon svg { width: 15px; height: 15px; }
+      .kpi-card { padding-inline: 11px; }
+      .kpi-value { font-size: 22px; }
       .kpi-note { font-size: 8.6px; }
+      .spark svg { width: 54px; }
       th, td { padding-inline: 7px; }
-      .status { min-width: 57px; padding-inline: 6px; font-size: 8.3px; }
+      .status { min-width: 57px; padding-inline: 6px; font-size: 8.5px; }
       .topup { display: none; }
     }
   </style>
@@ -637,7 +677,7 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <rect x="3" y="6" width="18" height="13" rx="2"/><path d="M16 11h5v4h-5a2 2 0 0 1 0-4Z"/><path d="M7 6V4h10v2"/>
           </svg>
-          Top up ฿2,000
+          Top up credits
         </button>
         <div class="user-chip" aria-label="Signed in as Narin, Siam Retail">
           <span class="avatar">NR</span>
@@ -690,8 +730,8 @@
         <div class="page-grid">
           <div class="page-head">
             <div class="page-title">
-              <h1>SMS Campaign Dashboard</h1>
-              <p>Monitor sends, delivery, and account credits.</p>
+              <h1>Campaign dashboard</h1>
+              <p>Credits, delivery, and send volume for Siam Retail.</p>
             </div>
             <div class="head-actions">
               <button class="date-chip" type="button">
@@ -705,15 +745,15 @@
             </div>
           </div>
 
-          <section class="kpi-grid" aria-label="Campaign key performance indicators">
-            <article class="kpi-card primary">
+          <section class="kpi-grid" aria-label="Key metrics">
+            <article class="kpi-card hero">
               <div>
                 <div class="kpi-label">Credits remaining</div>
-                <div class="kpi-value">128,540</div>
-                <div class="kpi-note">Enough for ~3 campaigns</div>
-              </div>
-              <div class="kpi-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="14" rx="2"/><path d="M16 11h5v4h-5a2 2 0 0 1 0-4Z"/><path d="M7 6V4h10v2"/></svg>
+                <div class="kpi-value">128,540 <small>credits</small></div>
+                <div class="runway-track" role="img" aria-label="Credit runway: 32 percent of balance left since last top-up, about 3 sending days at current pace">
+                  <div class="runway-fill"></div>
+                </div>
+                <div class="kpi-note">≈ 3 sending days at current pace · last top-up ฿25,000 on 11 Jul</div>
               </div>
             </article>
 
@@ -721,10 +761,13 @@
               <div>
                 <div class="kpi-label">Delivered today</div>
                 <div class="kpi-value">42,318</div>
-                <div class="kpi-note">4 campaigns sent</div>
+                <div class="kpi-note">+8.4% vs last Saturday</div>
               </div>
-              <div class="kpi-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 3 9.5 14.5"/><path d="m21 3-7.3 18-4.2-6.5L3 10.3 21 3Z"/></svg>
+              <div class="spark">
+                <svg width="64" height="30" viewBox="0 0 64 30" role="img" aria-label="Hourly deliveries today, climbing through the afternoon to 42,318 total">
+                  <path d="M1 25 L10 21 L19 23 L28 16 L37 18 L46 10 L55 12 L63 5 L63 30 L1 30 Z" fill="rgba(29,66,104,0.09)"/>
+                  <path d="M1 25 L10 21 L19 23 L28 16 L37 18 L46 10 L55 12 L63 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
               </div>
             </article>
 
@@ -732,10 +775,13 @@
               <div>
                 <div class="kpi-label">Delivery rate</div>
                 <div class="kpi-value">98.2%</div>
-                <div class="kpi-note">Last 7 days: 97.8%</div>
+                <div class="kpi-note">+0.4 pt vs last week</div>
               </div>
-              <div class="kpi-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m4 12 5 5L20 6"/><path d="M20 12a8 8 0 1 1-5.2-7.5"/></svg>
+              <div class="spark">
+                <svg width="64" height="30" viewBox="0 0 64 30" role="img" aria-label="Delivery rate over the last 7 days, holding between 97.5 and 98.4 percent">
+                  <path d="M1 15 L11 13 L21 17 L31 11 L41 13 L51 8 L63 9 L63 30 L1 30 Z" fill="rgba(29,66,104,0.09)"/>
+                  <path d="M1 15 L11 13 L21 17 L31 11 L41 13 L51 8 L63 9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
               </div>
             </article>
           </section>
@@ -745,7 +791,7 @@
               <div class="panel-head">
                 <div class="panel-title">
                   <h2 id="campaigns-title">Recent campaigns</h2>
-                  <p>Latest audience sends</p>
+                  <p>Latest audience sends · 5 of 32 this month</p>
                 </div>
                 <a class="view-all" href="#">View history</a>
               </div>
@@ -754,34 +800,40 @@
                   <thead>
                     <tr>
                       <th scope="col">Campaign</th>
-                      <th scope="col">Sender</th>
+                      <th scope="col">Sender ID</th>
                       <th scope="col">Recipients</th>
                       <th scope="col">Status</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
-                      <td><div class="campaign-name">Weekend member sale</div><div class="campaign-list">VIP list · +66 ••• 4188</div></td>
-                      <td><span class="sender">SND-01</span></td>
+                      <td><div class="campaign-name">Payday flash sale</div><div class="campaign-list">VIP tier · test to +66 81-•••-4188</div></td>
+                      <td><span class="sender">SIAMRETAIL</span></td>
+                      <td><span class="recipients">24,618</span></td>
+                      <td><span class="status sending">Sending</span></td>
+                    </tr>
+                    <tr>
+                      <td><div class="campaign-name">Weekend member sale</div><div class="campaign-list">Loyalty list · test to +66 89-•••-2071</div></td>
+                      <td><span class="sender">SIAMRETAIL</span></td>
                       <td><span class="recipients">18,420</span></td>
                       <td><span class="status sent">Sent</span></td>
                     </tr>
                     <tr>
-                      <td><div class="campaign-name">PromptPay receipt alert</div><div class="campaign-list">Store ops · +66 ••• 9024</div></td>
-                      <td><span class="sender">SND-01</span></td>
+                      <td><div class="campaign-name">PromptPay receipt alerts</div><div class="campaign-list">Store ops · test to +66 92-•••-9024</div></td>
+                      <td><span class="sender">SIAMPAY</span></td>
                       <td><span class="recipients">9,856</span></td>
-                      <td><span class="status sending">Sending</span></td>
+                      <td><span class="status sent">Sent</span></td>
                     </tr>
                     <tr>
-                      <td><div class="campaign-name">Mid-month flash deal</div><div class="campaign-list">Bangkok · +66 ••• 7731</div></td>
-                      <td><span class="sender">SND-01</span></td>
-                      <td><span class="recipients">24,600</span></td>
+                      <td><div class="campaign-name">Mid-month billing reminder</div><div class="campaign-list">Accounts · 20 Jul 08:00 · +66 62-•••-1165</div></td>
+                      <td><span class="sender">SIAMPAY</span></td>
+                      <td><span class="recipients">6,240</span></td>
                       <td><span class="status scheduled">Scheduled</span></td>
                     </tr>
                     <tr>
-                      <td><div class="campaign-name">July billing reminder</div><div class="campaign-list">Accounts · +66 ••• 1165</div></td>
-                      <td><span class="sender">SND-01</span></td>
-                      <td><span class="recipients">6,240</span></td>
+                      <td><div class="campaign-name">Rama IX branch opening</div><div class="campaign-list">Bangkok metro · +66 84-•••-7731</div></td>
+                      <td><span class="sender">SIAMRETAIL</span></td>
+                      <td><span class="recipients">12,300</span></td>
                       <td><span class="status draft">Draft</span></td>
                     </tr>
                   </tbody>
@@ -793,22 +845,30 @@
               <div class="panel-head">
                 <div class="panel-title">
                   <h2 id="volume-title">7-day volume</h2>
-                  <p>Messages processed</p>
+                  <p>Messages sent · Jul 12–18</p>
                 </div>
-                <div class="chart-total">248.6k<span>total SMS</span></div>
+                <div class="chart-total">249.6k<span>total sent</span></div>
               </div>
               <div class="chart-body">
-                <div class="plot" role="img" aria-label="SMS volume by day: Saturday 22 thousand, Sunday 31 thousand, Monday 28 thousand, Tuesday 39 thousand, Wednesday 34 thousand, Thursday 52 thousand, Friday 42 thousand">
-                  <div class="bar-wrap"><span class="bar" style="--h:42%"></span></div>
-                  <div class="bar-wrap"><span class="bar" style="--h:59%"></span></div>
-                  <div class="bar-wrap"><span class="bar" style="--h:53%"></span></div>
-                  <div class="bar-wrap"><span class="bar" style="--h:74%"></span></div>
-                  <div class="bar-wrap"><span class="bar" style="--h:65%"></span></div>
-                  <div class="bar-wrap"><span class="bar" style="--h:100%"></span></div>
-                  <div class="bar-wrap"><span class="bar highlight" style="--h:81%"></span></div>
+                <div class="plot">
+                  <svg viewBox="0 0 100 100" preserveAspectRatio="none" role="img" aria-label="Messages sent per day, July 12 to 18: Sunday 22.4 thousand, Monday 31.2 thousand, Tuesday 28.1 thousand, Wednesday 39.0 thousand, Thursday 34.2 thousand, Friday 52.4 thousand which was the weekly peak, Saturday 42.3 thousand so far today">
+                    <defs>
+                      <linearGradient id="vol-fill" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0" stop-color="#1d4268" stop-opacity="0.16"/>
+                        <stop offset="1" stop-color="#1d4268" stop-opacity="0"/>
+                      </linearGradient>
+                    </defs>
+                    <line x1="0" y1="33.3" x2="100" y2="33.3" stroke="#edf1f6" stroke-width="1" vector-effect="non-scaling-stroke"/>
+                    <line x1="0" y1="66.7" x2="100" y2="66.7" stroke="#edf1f6" stroke-width="1" vector-effect="non-scaling-stroke"/>
+                    <path d="M2 62.7 L18 48 L34 53.2 L50 35 L66 43 L82 12.7 L98 29.5 L98 100 L2 100 Z" fill="url(#vol-fill)"/>
+                    <path d="M2 62.7 L18 48 L34 53.2 L50 35 L66 43 L82 12.7 L98 29.5" fill="none" stroke="#1d4268" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+                  </svg>
+                  <span class="dot peak" aria-hidden="true"></span>
+                  <span class="dot today" aria-hidden="true"></span>
+                  <div class="peak-label" aria-hidden="true">52.4k <span>· Fri peak</span></div>
                 </div>
                 <div class="chart-days" aria-hidden="true">
-                  <span>Sat</span><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span class="today">Fri</span>
+                  <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span class="today-day">Sat</span>
                 </div>
               </div>
             </section>
