@@ -488,9 +488,10 @@
         flex: 0 1 288px;
         margin-inline: 0;
       }
-      /* browser-window screens sit on the same row as a phone, wrapping when narrow */
+      /* browser-window screens share a row with a phone and grow to fill the
+         rest of it, wrapping to their own row when the column gets narrow */
       .proj-screens > .screen--web {
-        flex: 0 1 560px;
+        flex: 1 1 460px;
       }
       .screen-top .plat {
         font-family: var(--mono);
@@ -540,6 +541,22 @@
         display: block;
         width: 100%;
         border: 0;
+      }
+      /* zoom-out: render the embed larger than its frame, then scale it down so
+         wider breakpoints show and content reads smaller. --zoom 0.6 = 40% out. */
+      .screen-body--zoom {
+        position: relative;
+        overflow: hidden;
+        height: var(--zoom-h, 560px);
+      }
+      .screen-body--zoom iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: calc(100% / var(--zoom));
+        height: calc(100% / var(--zoom));
+        transform: scale(var(--zoom));
+        transform-origin: top left;
       }
 
       /* ============ 02 LAB ============ */
@@ -1199,10 +1216,6 @@
                       <dt>Scope</dt>
                       <dd>eKYC · onboarding · integrations</dd>
                     </div>
-                    <div>
-                      <dt>Stack</dt>
-                      <dd>React · banking APIs</dd>
-                    </div>
                   </dl>
                 </div>
                 <div class="proj-screens">
@@ -1353,15 +1366,14 @@
                       ><span class="led" aria-hidden="true"></span>
                     </div>
                     <div
-                      class="screen-body screen-body--frame"
+                      class="screen-body screen-body--frame screen-body--zoom"
+                      style="--zoom: 0.85; --zoom-h: 580px"
                       aria-hidden="true"
                     >
                       <iframe
-                        class="fit"
                         src="mockups/lineoa-bot.html"
                         title="line oa lead follow-up assistant"
                         loading="lazy"
-                        height="580"
                       ></iframe>
                     </div>
                     <figcaption class="mono">
@@ -1374,15 +1386,14 @@
                       ><span class="led" aria-hidden="true"></span>
                     </div>
                     <div
-                      class="screen-body screen-body--frame"
+                      class="screen-body screen-body--frame screen-body--zoom"
+                      style="--zoom: 0.85; --zoom-h: 580px"
                       aria-hidden="true"
                     >
                       <iframe
-                        class="fit"
                         src="mockups/lineoa-report.html"
                         title="line oa photo capture into a branch report"
                         loading="lazy"
-                        height="580"
                       ></iframe>
                     </div>
                     <figcaption class="mono">
@@ -1448,12 +1459,14 @@
                       <span class="mono">EMPEO · RESULTS REPORT</span
                       ><span class="led" aria-hidden="true"></span>
                     </div>
-                    <div class="screen-body screen-body--frame">
+                    <div
+                      class="screen-body screen-body--frame screen-body--zoom"
+                      style="--zoom: 0.85"
+                    >
                       <iframe
                         src="performance-management/index.html"
                         title="Performance Results prototype — weighted scores, gaps, and merit suggestions"
                         loading="lazy"
-                        height="560"
                       ></iframe>
                     </div>
                     <figcaption class="mono">
@@ -1604,12 +1617,14 @@
                       <span class="mono">EDUSIGHT · REPLAY</span
                       ><span class="led" aria-hidden="true"></span>
                     </div>
-                    <div class="screen-body screen-body--frame">
+                    <div
+                      class="screen-body screen-body--frame screen-body--zoom"
+                      style="--zoom: 0.6"
+                    >
                       <iframe
                         src="edusight/index.html"
                         title="Cognitive Replay prototype — learning signals and support detection"
                         loading="lazy"
-                        height="560"
                       ></iframe>
                     </div>
                     <figcaption class="mono">
