@@ -367,12 +367,54 @@
         stroke-width: 1.5;
         stroke-dasharray: 600;
         stroke-dashoffset: 600;
-        animation: draw 1.4s steps(14) 0.2s forwards;
+        animation: draw 1.4s steps(14) 0.9s forwards;
       }
       @keyframes draw {
         to {
           stroke-dashoffset: 0;
         }
+      }
+
+      /* flat-lay cards: start stacked, jump out, then idle wiggle */
+      .signal .fl {
+        transform-box: fill-box;
+        transform-origin: center;
+        transform: translate(0, 0) rotate(var(--r));
+        animation:
+          fl-pop 0.55s cubic-bezier(0.3, 1.4, 0.4, 1) var(--d, 0s) both,
+          fl-wiggle var(--wd, 4s) ease-in-out calc(0.9s + var(--d, 0s))
+            infinite;
+      }
+      .signal .fl-1 { --r: -2deg;   --dx: 111px;  --dy: 60px;  --d: 0s;    --wd: 5.2s; }
+      .signal .fl-2 { --r: 1.8deg;  --dx: -110px; --dy: 64px;  --d: 0.07s; --wd: 4.1s; }
+      .signal .fl-3 { --r: -1.5deg; --dx: 30px;   --dy: -86px; --d: 0.14s; --wd: 4.7s; }
+      .signal .fl-4 { --r: 2.4deg;  --dx: -142px; --dy: -80px; --d: 0.21s; --wd: 3.5s; }
+      @keyframes fl-pop {
+        from {
+          transform: translate(var(--dx), var(--dy)) rotate(0deg) scale(0.92);
+        }
+        to {
+          transform: translate(0, 0) rotate(var(--r)) scale(1);
+        }
+      }
+      @keyframes fl-wiggle {
+        0%, 100% { transform: rotate(var(--r)); }
+        25% { transform: rotate(calc(var(--r) - 0.6deg)); }
+        75% { transform: rotate(calc(var(--r) + 0.6deg)); }
+      }
+      .signal .fl-cap {
+        opacity: 0;
+        animation: fl-cap 0.4s ease-out 0.9s forwards;
+      }
+      @keyframes fl-cap {
+        to { opacity: 1; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .signal .fl, .signal .wire, .signal .fl-cap {
+          animation: none;
+        }
+        .signal .wire { stroke-dashoffset: 0; }
+        .signal .fl-cap { opacity: 1; }
       }
 
       .stats {
@@ -1052,122 +1094,66 @@
             </div>
           </div>
           <div class="hero-art" aria-hidden="true">
-            <svg class="signal" viewBox="0 0 460 300">
-              <rect
-                x="20"
-                y="24"
-                width="120"
-                height="44"
-                fill="none"
-                stroke="#111"
-                stroke-width="1.5"
-              />
-              <text
-                x="34"
-                y="50"
-                font-family="ui-monospace,monospace"
-                font-size="11"
-                letter-spacing="1"
-                fill="#111"
-              >
-                FLOORPLAN
-              </text>
-              <rect
-                x="20"
-                y="92"
-                width="120"
-                height="44"
-                fill="none"
-                stroke="#111"
-                stroke-width="1.5"
-              />
-              <text
-                x="34"
-                y="118"
-                font-family="ui-monospace,monospace"
-                font-size="11"
-                letter-spacing="1"
-                fill="#111"
-              >
-                REPORTS
-              </text>
-              <rect
-                x="20"
-                y="160"
-                width="120"
-                height="44"
-                fill="none"
-                stroke="#111"
-                stroke-width="1.5"
-              />
-              <text
-                x="34"
-                y="186"
-                font-family="ui-monospace,monospace"
-                font-size="11"
-                letter-spacing="1"
-                fill="#111"
-              >
-                WORKFLOWS
-              </text>
-              <rect
-                x="20"
-                y="228"
-                width="120"
-                height="44"
-                fill="none"
-                stroke="#111"
-                stroke-width="1.5"
-              />
-              <text
-                x="34"
-                y="254"
-                font-family="ui-monospace,monospace"
-                font-size="11"
-                letter-spacing="1"
-                fill="#111"
-              >
-                FIELD TEAMS
-              </text>
-              <path class="wire" d="M140 46 H210 V128 H260" />
-              <path class="wire" d="M140 114 H190 V138 H260" />
-              <path class="wire" d="M140 182 H190 V158 H260" />
-              <path class="wire" d="M140 250 H210 V168 H260" />
-              <rect
-                x="260"
-                y="112"
-                width="150"
-                height="74"
-                fill="none"
-                stroke="#111"
-                stroke-width="1.5"
-              />
-              <text
-                x="278"
-                y="145"
-                font-family="ui-monospace,monospace"
-                font-size="11"
-                letter-spacing="1"
-                fill="#111"
-              >
-                ONE PRODUCT
-              </text>
-              <text
-                x="278"
-                y="163"
-                font-family="ui-monospace,monospace"
-                font-size="11"
-                letter-spacing="1"
-                fill="#767672"
-              >
-                OUT ▸
-              </text>
-              <circle cx="140" cy="46" r="4" fill="#ff4d00" />
-              <circle cx="140" cy="114" r="4" fill="#00a4c8" />
-              <circle cx="140" cy="182" r="4" fill="#f5c400" />
-              <circle cx="140" cy="250" r="4" fill="#3fa435" />
-              <path class="wire" d="M410 149 H436" />
-              <circle cx="440" cy="149" r="4" fill="#e03616" />
+            <svg class="signal" viewBox="0 0 460 330">
+              <!-- floorplan card -->
+              <g class="fl fl-1">
+                <rect x="27" y="31" width="190" height="145" fill="#111" />
+                <rect x="24" y="28" width="190" height="145" fill="#fff" stroke="#111" stroke-width="1.5" />
+                <text x="36" y="48" font-family="ui-monospace,monospace" font-size="9" letter-spacing="1" fill="#111">FLOORPLAN · F2</text>
+                <g stroke="#111" stroke-width="1">
+                  <rect x="36" y="58" width="24" height="18" fill="#e2e2de" />
+                  <rect x="66" y="58" width="24" height="18" fill="#fff" />
+                  <rect x="96" y="58" width="24" height="18" fill="#e2e2de" />
+                  <rect x="126" y="58" width="24" height="18" fill="#fff" />
+                  <rect x="156" y="58" width="24" height="18" fill="#e2e2de" />
+                  <rect x="36" y="82" width="24" height="18" fill="#fff" />
+                  <rect x="66" y="82" width="24" height="18" fill="#e2e2de" />
+                  <rect x="96" y="82" width="24" height="18" fill="#ff4d00" />
+                  <rect x="126" y="82" width="24" height="18" fill="#e2e2de" />
+                  <rect x="156" y="82" width="24" height="18" fill="#fff" />
+                  <rect x="36" y="106" width="84" height="48" fill="#fff" />
+                  <rect x="126" y="106" width="24" height="18" fill="#e2e2de" />
+                  <rect x="156" y="106" width="24" height="18" fill="#fff" />
+                  <rect x="126" y="130" width="24" height="18" fill="#fff" />
+                  <rect x="156" y="130" width="24" height="18" fill="#e2e2de" />
+                </g>
+                <text x="56" y="133" font-family="ui-monospace,monospace" font-size="8" letter-spacing="1" fill="#767672">ATRIUM</text>
+              </g>
+              <!-- report card -->
+              <g class="fl fl-2">
+                <rect x="253" y="43" width="180" height="112" fill="#111" />
+                <rect x="250" y="40" width="180" height="112" fill="#fff" stroke="#111" stroke-width="1.5" />
+                <text x="262" y="60" font-family="ui-monospace,monospace" font-size="9" letter-spacing="1" fill="#111">REPORT.XLSX</text>
+                <path d="M262 96 H418 M262 116 H418" stroke="#e5e5e1" stroke-width="1" />
+                <path d="M262 136 H418" stroke="#cfcfcb" stroke-width="1" />
+                <path class="wire" d="M262 128 L282 112 L302 120 L322 96 L342 104 L362 84 L382 92 L402 76" />
+              </g>
+              <!-- field tasks card -->
+              <g class="fl fl-3">
+                <rect x="118" y="195" width="170" height="108" fill="#111" />
+                <rect x="115" y="192" width="170" height="108" fill="#fff" stroke="#111" stroke-width="1.5" />
+                <text x="127" y="212" font-family="ui-monospace,monospace" font-size="9" letter-spacing="1" fill="#111">FIELD TASKS</text>
+                <rect x="127" y="222" width="10" height="10" fill="#fff" stroke="#111" stroke-width="1" />
+                <path d="M129.5 227 l2.5 3 5 -6" fill="none" stroke="#111" stroke-width="1.5" />
+                <text x="145" y="231" font-family="ui-monospace,monospace" font-size="9" fill="#111">inspect · b-07</text>
+                <rect x="127" y="246" width="10" height="10" fill="#fff" stroke="#111" stroke-width="1" />
+                <path d="M129.5 251 l2.5 3 5 -6" fill="none" stroke="#111" stroke-width="1.5" />
+                <text x="145" y="255" font-family="ui-monospace,monospace" font-size="9" fill="#111">photo record</text>
+                <rect x="127" y="270" width="10" height="10" fill="#fff" stroke="#111" stroke-width="1" />
+                <text x="145" y="279" font-family="ui-monospace,monospace" font-size="9" fill="#767672">sla follow-up</text>
+              </g>
+              <!-- line oa card -->
+              <g class="fl fl-4">
+                <rect x="313" y="199" width="124" height="88" fill="#111" />
+                <rect x="310" y="196" width="124" height="88" fill="#fff" stroke="#111" stroke-width="1.5" />
+                <text x="322" y="216" font-family="ui-monospace,monospace" font-size="9" letter-spacing="1" fill="#111">LINE OA</text>
+                <circle cx="418" cy="212" r="3.5" fill="#3fa435" />
+                <rect x="322" y="224" width="100" height="32" rx="6" fill="#f4f4f2" stroke="#111" stroke-width="1" />
+                <path d="M334 256 l-6 9 13 -3 z" fill="#f4f4f2" stroke="#111" stroke-width="1" />
+                <text x="330" y="238" font-family="ui-monospace,monospace" font-size="8" fill="#111">sla due · b-07</text>
+                <text x="330" y="250" font-family="ui-monospace,monospace" font-size="8" fill="#767672">reminder sent</text>
+              </g>
+              <text class="fl-cap" x="24" y="324" font-family="ui-monospace,monospace" font-size="9" letter-spacing="1" fill="#767672">DMMS · ARTIFACTS FROM ONE SYSTEM</text>
             </svg>
           </div>
         </section>
