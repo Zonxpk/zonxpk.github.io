@@ -1,950 +1,1980 @@
 <!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pakawat Smutkun — operations, made legible</title>
-<meta name="description" content="Pakawat Smutkun — full-stack product engineer. 5+ years building systems where floorplans, reports, workflows, and field teams operate as one reliable product.">
-<meta name="theme-color" content="#f4f4f2">
-<meta property="og:title" content="Pakawat Smutkun — operations, made legible">
-<meta property="og:description" content="Full-stack product engineer. 5+ years building systems where floorplans, reports, workflows, and field teams operate as one reliable product.">
-<meta property="og:image" content="/preview.webp">
-<meta property="og:image:type" content="image/webp">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23f4f4f2'/%3E%3Crect x='3' y='3' width='10' height='10' fill='%23ff4d00'/%3E%3C/svg%3E">
-<style>
-/* ============ tokens ============ */
-:root {
-  --chassis: #f4f4f2;
-  --panel: #e8e8e6;
-  --ink: #111111;
-  --ink-soft: #444444;
-  --rule-soft: #cfcfcb;
-  --c-orange: #ff4d00;
-  --c-cyan: #00a4c8;
-  --c-yellow: #f5c400;
-  --c-green: #3fa435;
-  --c-led: #e03616;
-  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  --sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --rail: 88px;
-}
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pakawat Smutkun — operations, made legible</title>
+    <meta
+      name="description"
+      content="Pakawat Smutkun — full-stack product engineer. 5+ years building systems where floorplans, reports, workflows, and field teams operate as one reliable product."
+    />
+    <meta name="theme-color" content="#f4f4f2" />
+    <meta
+      property="og:title"
+      content="Pakawat Smutkun — operations, made legible"
+    />
+    <meta
+      property="og:description"
+      content="Full-stack product engineer. 5+ years building systems where floorplans, reports, workflows, and field teams operate as one reliable product."
+    />
+    <meta property="og:image" content="/preview.webp" />
+    <meta property="og:image:type" content="image/webp" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23f4f4f2'/%3E%3Crect x='3' y='3' width='10' height='10' fill='%23ff4d00'/%3E%3C/svg%3E"
+    />
+    <style>
+      /* ============ tokens ============ */
+      :root {
+        --chassis: #f4f4f2;
+        --panel: #e8e8e6;
+        --ink: #111111;
+        --ink-soft: #444444;
+        --rule-soft: #cfcfcb;
+        --c-orange: #ff4d00;
+        --c-cyan: #00a4c8;
+        --c-yellow: #f5c400;
+        --c-green: #3fa435;
+        --c-led: #e03616;
+        --mono:
+          "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+        --sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        --rail: 88px;
+      }
 
-/* ============ base ============ */
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-body {
-  background: var(--panel);
-  color: var(--ink);
-  font-family: var(--sans);
-  font-size: 16px;
-  line-height: 1.55;
-  -webkit-font-smoothing: antialiased;
-}
-::selection { background: var(--c-orange); color: #fff; }
-svg { display: block; }
-a { color: inherit; }
+      /* ============ base ============ */
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--panel);
+        color: var(--ink);
+        font-family: var(--sans);
+        font-size: 16px;
+        line-height: 1.55;
+        -webkit-font-smoothing: antialiased;
+      }
+      ::selection {
+        background: var(--c-orange);
+        color: #fff;
+      }
+      svg {
+        display: block;
+      }
+      a {
+        color: inherit;
+      }
 
-.mono {
-  font-family: var(--mono);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-size: 12px;
-  font-variant-numeric: tabular-nums;
-}
+      .mono {
+        font-family: var(--mono);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-size: 12px;
+        font-variant-numeric: tabular-nums;
+      }
 
-.chassis {
-  max-width: 1440px;
-  margin: 0 auto;
-  background: var(--chassis);
-  border-left: 1px solid var(--ink);
-  border-right: 1px solid var(--ink);
-}
+      .chassis {
+        max-width: 1440px;
+        margin: 0 auto;
+        background: var(--chassis);
+        border-left: 1px solid var(--ink);
+        border-right: 1px solid var(--ink);
+      }
 
-.skip {
-  position: absolute;
-  left: -9999px;
-  top: 0;
-  z-index: 20;
-  padding: 10px 16px;
-  background: var(--ink);
-  color: #fff;
-  font-family: var(--mono);
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  text-decoration: none;
-}
-.skip:focus { left: 8px; top: 8px; }
+      .skip {
+        position: absolute;
+        left: -9999px;
+        top: 0;
+        z-index: 20;
+        padding: 10px 16px;
+        background: var(--ink);
+        color: #fff;
+        font-family: var(--mono);
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        text-decoration: none;
+      }
+      .skip:focus {
+        left: 8px;
+        top: 8px;
+      }
 
-:focus-visible { outline: 2px solid var(--c-orange); outline-offset: 2px; }
+      :focus-visible {
+        outline: 2px solid var(--c-orange);
+        outline-offset: 2px;
+      }
 
-/* ============ mechanical key ============ */
-.key {
-  display: inline-block;
-  font-family: var(--mono);
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  text-decoration: none;
-  color: var(--ink);
-  background: var(--chassis);
-  border: 1px solid var(--ink);
-  border-radius: 2px;
-  padding: 9px 14px 8px;
-  box-shadow: 2px 2px 0 var(--ink);
-  cursor: pointer;
-  user-select: none;
-}
-.key:active { transform: translate(2px, 2px); box-shadow: none; }
-.key:hover { background: #fff; }
-.key svg { display: inline-block; width: 13px; height: 13px; vertical-align: -2px; margin-right: 7px; fill: currentColor; }
-.key--accent { background: var(--c-orange); color: #fff; }
-.key--accent:hover { background: #e64500; }
+      /* ============ mechanical key ============ */
+      .key {
+        display: inline-block;
+        font-family: var(--mono);
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        text-decoration: none;
+        color: var(--ink);
+        background: var(--chassis);
+        border: 1px solid var(--ink);
+        border-radius: 2px;
+        padding: 9px 14px 8px;
+        box-shadow: 2px 2px 0 var(--ink);
+        cursor: pointer;
+        user-select: none;
+      }
+      .key:active {
+        transform: translate(2px, 2px);
+        box-shadow: none;
+      }
+      .key:hover {
+        background: #fff;
+      }
+      .key svg {
+        display: inline-block;
+        width: 13px;
+        height: 13px;
+        vertical-align: -2px;
+        margin-right: 7px;
+        fill: currentColor;
+      }
+      .key--accent {
+        background: var(--c-orange);
+        color: #fff;
+      }
+      .key--accent:hover {
+        background: #e64500;
+      }
 
-/* ============ header ============ */
-.head {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  display: flex;
-  align-items: stretch;
-  border-bottom: 1px solid var(--ink);
-  background: var(--chassis);
-}
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 16px;
-  border-right: 1px solid var(--ink);
-  text-decoration: none;
-  font-weight: 700;
-  white-space: nowrap;
-}
-.brand-chip { width: 12px; height: 12px; background: var(--c-orange); }
-.readout {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 16px;
-  border-right: 1px solid var(--ink);
-  white-space: nowrap;
-}
-.rec {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--c-led);
-  animation: blink 1.2s steps(2, start) infinite;
-}
-@keyframes blink { 50% { opacity: 0.15; } }
-.head nav { flex: 1; display: flex; overflow-x: auto; min-width: 0; }
-.head nav a {
-  display: flex;
-  align-items: center;
-  padding: 12px 14px;
-  text-decoration: none;
-  border-right: 1px solid var(--ink);
-  white-space: nowrap;
-}
-.head nav a:hover { background: #fff; }
-.head nav a b { font-weight: 400; color: var(--ink-soft); margin-right: 6px; }
-.snd {
-  margin-left: auto;
-  border: 0;
-  border-left: 1px solid var(--ink);
-  background: var(--chassis);
-  padding: 12px 16px;
-  font-family: var(--mono);
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  cursor: pointer;
-  white-space: nowrap;
-}
-.snd:hover { background: #fff; }
-.snd[aria-pressed="true"] { background: var(--ink); color: #fff; }
+      /* ============ header ============ */
+      .head {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        display: flex;
+        align-items: stretch;
+        border-bottom: 1px solid var(--ink);
+        background: var(--chassis);
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 16px;
+        border-right: 1px solid var(--ink);
+        text-decoration: none;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+      .brand-chip {
+        width: 12px;
+        height: 12px;
+        background: var(--c-orange);
+      }
+      .readout {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 16px;
+        border-right: 1px solid var(--ink);
+        white-space: nowrap;
+      }
+      .rec {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--c-led);
+        animation: blink 1.2s steps(2, start) infinite;
+      }
+      @keyframes blink {
+        50% {
+          opacity: 0.15;
+        }
+      }
+      .head nav {
+        flex: 1;
+        display: flex;
+        overflow-x: auto;
+        min-width: 0;
+      }
+      .head nav a {
+        display: flex;
+        align-items: center;
+        padding: 12px 14px;
+        text-decoration: none;
+        border-right: 1px solid var(--ink);
+        white-space: nowrap;
+      }
+      .head nav a:hover {
+        background: #fff;
+      }
+      .head nav a b {
+        font-weight: 400;
+        color: var(--ink-soft);
+        margin-right: 6px;
+      }
+      .snd {
+        margin-left: auto;
+        border: 0;
+        border-left: 1px solid var(--ink);
+        background: var(--chassis);
+        padding: 12px 16px;
+        font-family: var(--mono);
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      .snd:hover {
+        background: #fff;
+      }
+      .snd[aria-pressed="true"] {
+        background: var(--ink);
+        color: #fff;
+      }
 
-/* ============ modules ============ */
-.module { border-bottom: 1px solid var(--ink); display: grid; grid-template-columns: var(--rail) 1fr; }
-.rail {
-  border-right: 1px solid var(--ink);
-  padding: 20px 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-}
-.rail .chip { width: 14px; height: 14px; border: 1px solid var(--ink); }
-.module-body { padding: 40px 40px 48px; min-width: 0; }
-.module-head h2 {
-  font-family: var(--mono);
-  font-size: 13px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  font-weight: 600;
-  margin-bottom: 8px;
-}
-.module-lede {
-  font-size: 26px;
-  line-height: 1.25;
-  letter-spacing: -0.02em;
-  font-weight: 700;
-  max-width: 26ch;
-  text-wrap: balance;
-  margin-bottom: 12px;
-}
-.module-note { color: var(--ink-soft); max-width: 62ch; margin-bottom: 32px; }
+      /* ============ modules ============ */
+      .module {
+        border-bottom: 1px solid var(--ink);
+        display: grid;
+        grid-template-columns: var(--rail) 1fr;
+      }
+      .rail {
+        border-right: 1px solid var(--ink);
+        padding: 20px 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+      }
+      .rail .chip {
+        width: 14px;
+        height: 14px;
+        border: 1px solid var(--ink);
+      }
+      .module-body {
+        padding: 40px 40px 48px;
+        min-width: 0;
+      }
+      .module-head h2 {
+        font-family: var(--mono);
+        font-size: 13px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+      .module-lede {
+        font-size: 26px;
+        line-height: 1.25;
+        letter-spacing: -0.02em;
+        font-weight: 700;
+        max-width: 26ch;
+        text-wrap: balance;
+        margin-bottom: 12px;
+      }
+      .module-note {
+        color: var(--ink-soft);
+        max-width: 62ch;
+        margin-bottom: 32px;
+      }
 
-.m-work .chip { background: var(--c-orange); }
-.m-lab .chip { background: var(--c-cyan); }
-.m-log .chip { background: var(--c-yellow); }
-.m-spec .chip { background: var(--c-green); }
+      .m-work .chip {
+        background: var(--c-orange);
+      }
+      .m-lab .chip {
+        background: var(--c-cyan);
+      }
+      .m-log .chip {
+        background: var(--c-yellow);
+      }
+      .m-spec .chip {
+        background: var(--c-green);
+      }
 
-/* ============ hero ============ */
-.hero { display: grid; grid-template-columns: 1.1fr 1fr; border-bottom: 1px solid var(--ink); }
-.hero-copy { padding: 56px 40px 48px; border-right: 1px solid var(--ink); }
-.status {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  border: 1px solid var(--ink);
-  padding: 6px 10px 5px;
-  margin-bottom: 28px;
-}
-.status .dot { width: 8px; height: 8px; background: var(--c-green); border-radius: 50%; }
-.hero h1 {
-  font-size: clamp(40px, 6vw, 64px);
-  line-height: 0.98;
-  letter-spacing: -0.03em;
-  font-weight: 750;
-  margin-bottom: 20px;
-}
-.thesis { font-size: 18px; max-width: 44ch; color: var(--ink-soft); margin-bottom: 32px; }
-.thesis strong { color: var(--ink); font-weight: 600; }
-.hero-keys { display: flex; flex-wrap: wrap; gap: 12px; }
-.hero-art { padding: 32px; display: flex; align-items: center; justify-content: center; }
-.hero-art svg { width: 100%; max-width: 460px; min-width: 0; height: auto; }
+      /* ============ hero ============ */
+      .hero {
+        display: grid;
+        grid-template-columns: 1.1fr 1fr;
+        border-bottom: 1px solid var(--ink);
+      }
+      .hero-copy {
+        padding: 56px 40px 48px;
+        border-right: 1px solid var(--ink);
+      }
+      .status {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid var(--ink);
+        padding: 6px 10px 5px;
+        margin-bottom: 28px;
+      }
+      .status .dot {
+        width: 8px;
+        height: 8px;
+        background: var(--c-green);
+        border-radius: 50%;
+      }
+      .hero h1 {
+        font-size: clamp(40px, 6vw, 64px);
+        line-height: 0.98;
+        letter-spacing: -0.03em;
+        font-weight: 750;
+        margin-bottom: 20px;
+      }
+      .thesis {
+        font-size: 18px;
+        max-width: 44ch;
+        color: var(--ink-soft);
+        margin-bottom: 32px;
+      }
+      .thesis strong {
+        color: var(--ink);
+        font-weight: 600;
+      }
+      .hero-keys {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .hero-art {
+        padding: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .hero-art svg {
+        width: 100%;
+        max-width: 460px;
+        min-width: 0;
+        height: auto;
+      }
 
-.signal .wire {
-  fill: none;
-  stroke: var(--ink);
-  stroke-width: 1.5;
-  stroke-dasharray: 600;
-  stroke-dashoffset: 600;
-  animation: draw 1.4s steps(14) 0.2s forwards;
-}
-@keyframes draw { to { stroke-dashoffset: 0; } }
+      .signal .wire {
+        fill: none;
+        stroke: var(--ink);
+        stroke-width: 1.5;
+        stroke-dasharray: 600;
+        stroke-dashoffset: 600;
+        animation: draw 1.4s steps(14) 0.2s forwards;
+      }
+      @keyframes draw {
+        to {
+          stroke-dashoffset: 0;
+        }
+      }
 
-.stats { display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 1px solid var(--ink); }
-.stat { padding: 20px 24px; border-right: 1px solid var(--ink); }
-.stat:last-child { border-right: 0; }
-.stat b {
-  display: block;
-  font-family: var(--mono);
-  font-size: 28px;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.01em;
-}
-.stat span { color: var(--ink-soft); font-size: 13px; }
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        border-bottom: 1px solid var(--ink);
+      }
+      .stat {
+        padding: 20px 24px;
+        border-right: 1px solid var(--ink);
+      }
+      .stat:last-child {
+        border-right: 0;
+      }
+      .stat b {
+        display: block;
+        font-family: var(--mono);
+        font-size: 28px;
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: -0.01em;
+      }
+      .stat span {
+        color: var(--ink-soft);
+        font-size: 13px;
+      }
 
-/* ============ 01 WORK — projects ============ */
-.projects { display: grid; gap: 64px; }
-.proj { display: grid; grid-template-columns: minmax(240px, 300px) 1fr; gap: 40px; align-items: start; }
-.proj-meta { position: sticky; top: 64px; }
-.proj-meta .period { display: block; color: var(--ink-soft); margin-bottom: 10px; }
-.proj-meta h3 { font-size: 20px; letter-spacing: -0.02em; margin-bottom: 8px; }
-.proj-meta .story { font-size: 14px; color: var(--ink-soft); margin-bottom: 18px; }
-.proj-dl { border-top: 1px solid var(--ink); }
-.proj-dl > div { display: grid; grid-template-columns: 92px 1fr; gap: 12px; padding: 9px 0 8px; border-bottom: 1px solid var(--rule-soft); }
-.proj-dl dt { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); padding-top: 2px; }
-.proj-dl dd { font-size: 13px; }
-.proj-screens { display: flex; flex-wrap: wrap; gap: 28px; min-width: 0; align-items: flex-start; justify-content: flex-start; }
-.proj-screens > .screen { flex: 1 1 100%; }
-.proj-keys { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
-.proj-keys .key { padding: 6px 10px 5px; font-size: 11px; box-shadow: 1.5px 1.5px 0 var(--ink); }
-.proj-keys .key:active { transform: translate(1.5px, 1.5px); box-shadow: none; }
+      /* ============ 01 WORK — projects ============ */
+      .projects {
+        display: grid;
+        gap: 64px;
+      }
+      .proj {
+        display: grid;
+        grid-template-columns: minmax(240px, 300px) 1fr;
+        gap: 40px;
+        align-items: start;
+      }
+      .proj-meta {
+        position: sticky;
+        top: 64px;
+      }
+      .proj-meta .period {
+        display: block;
+        color: var(--ink-soft);
+        margin-bottom: 10px;
+      }
+      .proj-meta h3 {
+        font-size: 20px;
+        letter-spacing: -0.02em;
+        margin-bottom: 8px;
+      }
+      .proj-meta .story {
+        font-size: 14px;
+        color: var(--ink-soft);
+        margin-bottom: 18px;
+      }
+      .proj-dl {
+        border-top: 1px solid var(--ink);
+      }
+      .proj-dl > div {
+        display: grid;
+        grid-template-columns: 92px 1fr;
+        gap: 12px;
+        padding: 9px 0 8px;
+        border-bottom: 1px solid var(--rule-soft);
+      }
+      .proj-dl dt {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+        padding-top: 2px;
+      }
+      .proj-dl dd {
+        font-size: 13px;
+      }
+      .proj-screens {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 28px;
+        min-width: 0;
+        align-items: flex-start;
+        justify-content: flex-start;
+      }
+      .proj-screens > .screen {
+        flex: 1 1 100%;
+      }
+      .proj-keys {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 18px;
+      }
+      .proj-keys .key {
+        padding: 6px 10px 5px;
+        font-size: 11px;
+        box-shadow: 1.5px 1.5px 0 var(--ink);
+      }
+      .proj-keys .key:active {
+        transform: translate(1.5px, 1.5px);
+        box-shadow: none;
+      }
 
-/* mockup screens */
-.screen { border: 1px solid var(--ink); background: #fff; box-shadow: 2px 2px 0 var(--ink); }
-.screen--phone { width: min(320px, 100%); margin-inline: auto; }
-/* phones pack multiple per row instead of one full-width row each */
-.proj-screens > .screen--phone { flex: 0 1 288px; margin-inline: 0; }
-/* browser-window screens sit on the same row as a phone, wrapping when narrow */
-.proj-screens > .screen--web { flex: 0 1 560px; }
-.screen-top .plat { font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); border: 1px solid var(--rule-soft); padding: 2px 6px; }
-.screen-top .led { margin-left: auto; }
-.screen-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 12px; border-bottom: 1px solid var(--ink); background: var(--chassis); }
-.screen-top .led { width: 8px; height: 8px; border-radius: 50%; background: var(--c-green); }
-.screen-body { padding: 16px; }
-.screen figcaption { border-top: 1px solid var(--rule-soft); padding: 8px 12px; color: var(--ink-soft); }
-/* uniform caption block so phones sharing a row bottom-align despite 1- vs 2-line captions */
-.screen--phone figcaption { display: flex; align-items: center; min-height: 54px; }
-.screen-body--frame { padding: 0; }
-.screen-body--frame iframe { display: block; width: 100%; border: 0; }
+      /* mockup screens */
+      .screen {
+        border: 1px solid var(--ink);
+        background: #fff;
+        box-shadow: 2px 2px 0 var(--ink);
+      }
+      .screen--phone {
+        width: min(320px, 100%);
+        margin-inline: auto;
+      }
+      /* phones pack multiple per row instead of one full-width row each */
+      .proj-screens > .screen--phone {
+        flex: 0 1 288px;
+        margin-inline: 0;
+      }
+      /* browser-window screens sit on the same row as a phone, wrapping when narrow */
+      .proj-screens > .screen--web {
+        flex: 0 1 560px;
+      }
+      .screen-top .plat {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+        border: 1px solid var(--rule-soft);
+        padding: 2px 6px;
+      }
+      .screen-top .led {
+        margin-left: auto;
+      }
+      .screen-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 8px 12px;
+        border-bottom: 1px solid var(--ink);
+        background: var(--chassis);
+      }
+      .screen-top .led {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--c-green);
+      }
+      .screen-body {
+        padding: 16px;
+      }
+      .screen figcaption {
+        border-top: 1px solid var(--rule-soft);
+        padding: 8px 12px;
+        color: var(--ink-soft);
+      }
+      /* uniform caption block so phones sharing a row bottom-align despite 1- vs 2-line captions */
+      .screen--phone figcaption {
+        display: flex;
+        align-items: center;
+        min-height: 54px;
+      }
+      .screen-body--frame {
+        padding: 0;
+      }
+      .screen-body--frame iframe {
+        display: block;
+        width: 100%;
+        border: 0;
+      }
 
-/* ============ 02 LAB ============ */
-.carts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-.cart { border: 1px solid var(--ink); display: flex; flex-direction: column; }
-.cart-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--ink);
-}
-.cart .led { width: 10px; height: 10px; border: 1px solid var(--ink); border-radius: 50%; }
-.cart:hover .led, .cart:focus-within .led { background: var(--c-cyan); }
-.cart-glyph { padding: 20px 16px 0; }
-.cart-glyph svg { width: 72px; height: 48px; stroke: var(--ink); fill: none; stroke-width: 1.5; }
-.cart h3 { font-size: 17px; letter-spacing: -0.01em; padding: 12px 16px 4px; }
-.cart > p { font-size: 14px; color: var(--ink-soft); padding: 0 16px 16px; flex: 1; }
-.cart-keys { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 16px 16px; }
-.cart-keys .key { padding: 6px 10px 5px; font-size: 11px; box-shadow: 1.5px 1.5px 0 var(--ink); }
-.cart-keys .key:active { transform: translate(1.5px, 1.5px); box-shadow: none; }
+      /* ============ 02 LAB ============ */
+      .carts {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+      }
+      .cart {
+        border: 1px solid var(--ink);
+        display: flex;
+        flex-direction: column;
+      }
+      .cart-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--ink);
+      }
+      .cart .led {
+        width: 10px;
+        height: 10px;
+        border: 1px solid var(--ink);
+        border-radius: 50%;
+      }
+      .cart:hover .led,
+      .cart:focus-within .led {
+        background: var(--c-cyan);
+      }
+      .cart-glyph {
+        padding: 20px 16px 0;
+      }
+      .cart-glyph svg {
+        width: 72px;
+        height: 48px;
+        stroke: var(--ink);
+        fill: none;
+        stroke-width: 1.5;
+      }
+      .cart h3 {
+        font-size: 17px;
+        letter-spacing: -0.01em;
+        padding: 12px 16px 4px;
+      }
+      .cart > p {
+        font-size: 14px;
+        color: var(--ink-soft);
+        padding: 0 16px 16px;
+        flex: 1;
+      }
+      .cart-keys {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 0 16px 16px;
+      }
+      .cart-keys .key {
+        padding: 6px 10px 5px;
+        font-size: 11px;
+        box-shadow: 1.5px 1.5px 0 var(--ink);
+      }
+      .cart-keys .key:active {
+        transform: translate(1.5px, 1.5px);
+        box-shadow: none;
+      }
 
-/* ============ 03 LOG ============ */
-.log { width: 100%; border-collapse: collapse; border: 1px solid var(--ink); }
-.log th, .log td { text-align: left; vertical-align: top; padding: 12px 16px; border-top: 1px solid var(--rule-soft); }
-.log thead th {
-  border-top: 0;
-  border-bottom: 1px solid var(--ink);
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  font-weight: 600;
-}
-.log .yr { font-family: var(--mono); font-size: 12px; letter-spacing: 0.04em; white-space: nowrap; font-variant-numeric: tabular-nums; }
-.log .role { font-weight: 600; white-space: nowrap; }
-.log .unit { font-family: var(--mono); font-size: 12px; letter-spacing: 0.04em; white-space: nowrap; }
-.log .note { color: var(--ink-soft); font-size: 14px; }
+      /* ============ 03 LOG ============ */
+      .log {
+        width: 100%;
+        border-collapse: collapse;
+        border: 1px solid var(--ink);
+      }
+      .log th,
+      .log td {
+        text-align: left;
+        vertical-align: top;
+        padding: 12px 16px;
+        border-top: 1px solid var(--rule-soft);
+      }
+      .log thead th {
+        border-top: 0;
+        border-bottom: 1px solid var(--ink);
+        font-family: var(--mono);
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        font-weight: 600;
+      }
+      .log .yr {
+        font-family: var(--mono);
+        font-size: 12px;
+        letter-spacing: 0.04em;
+        white-space: nowrap;
+        font-variant-numeric: tabular-nums;
+      }
+      .log .role {
+        font-weight: 600;
+        white-space: nowrap;
+      }
+      .log .unit {
+        font-family: var(--mono);
+        font-size: 12px;
+        letter-spacing: 0.04em;
+        white-space: nowrap;
+      }
+      .log .note {
+        color: var(--ink-soft);
+        font-size: 14px;
+      }
 
-/* ============ 04 SPEC ============ */
-.spec { width: 100%; border-collapse: collapse; border: 1px solid var(--ink); }
-.spec th, .spec td { text-align: left; vertical-align: top; padding: 12px 16px; border-top: 1px solid var(--rule-soft); }
-.spec tr:first-child th, .spec tr:first-child td { border-top: 0; }
-.spec th {
-  width: 220px;
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  font-weight: 600;
-}
-.spec th::before { content: "▪ "; color: var(--c-green); }
-.spec td { font-size: 14px; color: var(--ink-soft); }
-/* stack clusters — icon cards */
-.stack-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1px;
-  border: 1px solid var(--ink);
-  background: var(--ink);
-  margin-bottom: 24px;
-}
-.stack-cell { background: var(--chassis); padding: 22px; }
-.stack-icon {
-  width: 34px; height: 34px;
-  display: grid; place-items: center;
-  border: 1px solid var(--ink);
-  background: #fff;
-  box-shadow: 1.5px 1.5px 0 var(--ink);
-  margin-bottom: 14px;
-}
-.stack-icon img { width: 20px; height: 20px; object-fit: contain; }
-.stack-cell h3 {
-  font-family: var(--mono);
-  font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
-  margin-bottom: 8px;
-}
-.stack-cell p { font-size: 13px; color: var(--ink-soft); line-height: 1.6; }
+      /* ============ 04 SPEC ============ */
+      .spec {
+        width: 100%;
+        border-collapse: collapse;
+        border: 1px solid var(--ink);
+      }
+      .spec th,
+      .spec td {
+        text-align: left;
+        vertical-align: top;
+        padding: 12px 16px;
+        border-top: 1px solid var(--rule-soft);
+      }
+      .spec tr:first-child th,
+      .spec tr:first-child td {
+        border-top: 0;
+      }
+      .spec th {
+        width: 220px;
+        font-family: var(--mono);
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        font-weight: 600;
+      }
+      .spec th::before {
+        content: "▪ ";
+        color: var(--c-green);
+      }
+      .spec td {
+        font-size: 14px;
+        color: var(--ink-soft);
+      }
+      /* stack clusters — icon cards */
+      .stack-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1px;
+        border: 1px solid var(--ink);
+        background: var(--ink);
+        margin-bottom: 24px;
+      }
+      .stack-cell {
+        background: var(--chassis);
+        padding: 22px;
+      }
+      .stack-icon {
+        width: 34px;
+        height: 34px;
+        display: grid;
+        place-items: center;
+        border: 1px solid var(--ink);
+        background: #fff;
+        box-shadow: 1.5px 1.5px 0 var(--ink);
+        margin-bottom: 14px;
+      }
+      .stack-icon img {
+        width: 20px;
+        height: 20px;
+        object-fit: contain;
+      }
+      .stack-cell h3 {
+        font-family: var(--mono);
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+      }
+      .stack-cell p {
+        font-size: 13px;
+        color: var(--ink-soft);
+        line-height: 1.6;
+      }
 
-/* ai toolchain flow */
-.ai-flow {
-  display: grid;
-  grid-template-columns: minmax(220px, 0.7fr) minmax(0, 1.3fr);
-  border: 1px solid var(--ink);
-  margin-bottom: 24px;
-}
-.ai-intro { padding: 26px; border-right: 1px solid var(--ink); background: var(--panel); }
-.ai-intro .k {
-  font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em;
-  text-transform: uppercase; color: var(--c-orange); margin-bottom: 10px;
-}
-.ai-intro h3 { font-size: 22px; letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 12px; }
-.ai-intro p { font-size: 13px; color: var(--ink-soft); line-height: 1.6; }
-.ai-tools {
-  display: grid; grid-template-columns: repeat(3, 1fr);
-  gap: 1px; background: var(--ink); border-bottom: 1px solid var(--ink);
-}
-.ai-tool { background: var(--chassis); padding: 22px; }
-.ai-tool-icon {
-  width: 38px; height: 38px; display: grid; place-items: center;
-  border: 1px solid var(--ink); background: #fff;
-  box-shadow: 1.5px 1.5px 0 var(--ink);
-  color: var(--ink); margin-bottom: 12px;
-}
-.ai-tool-icon svg { width: 22px; height: 22px; }
-.ai-tool h4 { font-size: 15px; margin-bottom: 4px; }
-.ai-tool p { font-size: 12px; color: var(--ink-soft); line-height: 1.5; }
-.ai-addon { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 16px 22px; }
-.ai-addon strong {
-  font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em;
-  text-transform: uppercase; font-weight: 600;
-}
-.ai-addon span {
-  font-family: var(--mono); font-size: 11px;
-  border: 1px solid var(--ink); padding: 4px 10px; background: #fff;
-}
+      /* ai toolchain flow */
+      .ai-flow {
+        display: grid;
+        grid-template-columns: minmax(220px, 0.7fr) minmax(0, 1.3fr);
+        border: 1px solid var(--ink);
+        margin-bottom: 24px;
+      }
+      .ai-intro {
+        padding: 26px;
+        border-right: 1px solid var(--ink);
+        background: var(--panel);
+      }
+      .ai-intro .k {
+        font-family: var(--mono);
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--c-orange);
+        margin-bottom: 10px;
+      }
+      .ai-intro h3 {
+        font-size: 22px;
+        letter-spacing: -0.02em;
+        line-height: 1.1;
+        margin-bottom: 12px;
+      }
+      .ai-intro p {
+        font-size: 13px;
+        color: var(--ink-soft);
+        line-height: 1.6;
+      }
+      .ai-tools {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1px;
+        background: var(--ink);
+        border-bottom: 1px solid var(--ink);
+      }
+      .ai-tool {
+        background: var(--chassis);
+        padding: 22px;
+      }
+      .ai-tool-icon {
+        width: 38px;
+        height: 38px;
+        display: grid;
+        place-items: center;
+        border: 1px solid var(--ink);
+        background: #fff;
+        box-shadow: 1.5px 1.5px 0 var(--ink);
+        color: var(--ink);
+        margin-bottom: 12px;
+      }
+      .ai-tool-icon svg {
+        width: 22px;
+        height: 22px;
+      }
+      .ai-tool h4 {
+        font-size: 15px;
+        margin-bottom: 4px;
+      }
+      .ai-tool p {
+        font-size: 12px;
+        color: var(--ink-soft);
+        line-height: 1.5;
+      }
+      .ai-addon {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        padding: 16px 22px;
+      }
+      .ai-addon strong {
+        font-family: var(--mono);
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        font-weight: 600;
+      }
+      .ai-addon span {
+        font-family: var(--mono);
+        font-size: 11px;
+        border: 1px solid var(--ink);
+        padding: 4px 10px;
+        background: #fff;
+      }
 
-/* ============ footer ============ */
-.foot { padding: 56px 40px 32px; }
-.foot h2 {
-  font-size: clamp(28px, 4vw, 44px);
-  letter-spacing: -0.02em;
-  line-height: 1.1;
-  max-width: 20ch;
-  text-wrap: balance;
-  margin-bottom: 8px;
-}
-.foot > p { color: var(--ink-soft); margin-bottom: 28px; }
-.foot-keys { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 48px; }
-.foot-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 24px;
-  justify-content: space-between;
-  border-top: 1px solid var(--ink);
-  padding-top: 16px;
-  color: var(--ink-soft);
-}
-kbd {
-  font-family: var(--mono);
-  font-size: 11px;
-  border: 1px solid var(--ink);
-  border-radius: 2px;
-  padding: 1px 5px;
-  background: #fff;
-  color: var(--ink);
-}
+      /* ============ footer ============ */
+      .foot {
+        padding: 56px 40px 32px;
+      }
+      .foot h2 {
+        font-size: clamp(28px, 4vw, 44px);
+        letter-spacing: -0.02em;
+        line-height: 1.1;
+        max-width: 20ch;
+        text-wrap: balance;
+        margin-bottom: 8px;
+      }
+      .foot > p {
+        color: var(--ink-soft);
+        margin-bottom: 28px;
+      }
+      .foot-keys {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 48px;
+      }
+      .foot-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 24px;
+        justify-content: space-between;
+        border-top: 1px solid var(--ink);
+        padding-top: 16px;
+        color: var(--ink-soft);
+      }
+      kbd {
+        font-family: var(--mono);
+        font-size: 11px;
+        border: 1px solid var(--ink);
+        border-radius: 2px;
+        padding: 1px 5px;
+        background: #fff;
+        color: var(--ink);
+      }
 
-/* ============ reveal ============ */
-.js .reveal { opacity: 0; translate: 0 8px; }
-.js .reveal.on { opacity: 1; translate: 0 0; transition: opacity 0.35s steps(4), translate 0.35s steps(4); }
+      /* ============ reveal ============ */
+      .js .reveal {
+        opacity: 0;
+        translate: 0 8px;
+      }
+      .js .reveal.on {
+        opacity: 1;
+        translate: 0 0;
+        transition:
+          opacity 0.35s steps(4),
+          translate 0.35s steps(4);
+      }
 
-/* ============ responsive ============ */
-@media (max-width: 900px) {
-  .hero { grid-template-columns: 1fr; }
-  .hero-copy { border-right: 0; border-bottom: 1px solid var(--ink); }
-  .stats { grid-template-columns: repeat(2, 1fr); }
-  .stat:nth-child(2) { border-right: 0; }
-  .stat:nth-child(-n+2) { border-bottom: 1px solid var(--ink); }
-  .carts { grid-template-columns: 1fr; }
-  .proj { grid-template-columns: 1fr; gap: 24px; }
-  .proj-meta { position: static; }
-  .stack-grid { grid-template-columns: repeat(2, 1fr); }
-  .ai-flow { grid-template-columns: 1fr; }
-  .ai-intro { border-right: 0; border-bottom: 1px solid var(--ink); }
-}
-@media (max-width: 720px) {
-  :root { --rail: 44px; }
-  .module-body { padding: 28px 20px 36px; }
-  .hero-copy { padding: 40px 20px 36px; }
-  .foot { padding: 40px 20px 24px; }
-  .brand span { display: none; }
-  .readout { display: none; }
-  .log thead { position: absolute; left: -9999px; }
-  .log tr { display: block; border-top: 1px solid var(--ink); padding: 8px 0; }
-  .log tbody tr:first-child { border-top: 0; }
-  .log td { display: block; border-top: 0; padding: 2px 16px; }
-  .spec th { width: auto; display: block; padding-bottom: 0; border-top: 1px solid var(--rule-soft); }
-  .spec td { display: block; border-top: 0; }
-  .spec tr:first-child th { border-top: 0; }
-}
-</style>
-</head>
-<body>
-<a class="skip" href="#main">Skip to content</a>
-<div class="chassis">
+      /* ============ responsive ============ */
+      @media (max-width: 900px) {
+        .hero {
+          grid-template-columns: 1fr;
+        }
+        .hero-copy {
+          border-right: 0;
+          border-bottom: 1px solid var(--ink);
+        }
+        .stats {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .stat:nth-child(2) {
+          border-right: 0;
+        }
+        .stat:nth-child(-n + 2) {
+          border-bottom: 1px solid var(--ink);
+        }
+        .carts {
+          grid-template-columns: 1fr;
+        }
+        .proj {
+          grid-template-columns: 1fr;
+          gap: 24px;
+        }
+        .proj-meta {
+          position: static;
+        }
+        .stack-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .ai-flow {
+          grid-template-columns: 1fr;
+        }
+        .ai-intro {
+          border-right: 0;
+          border-bottom: 1px solid var(--ink);
+        }
+      }
+      @media (max-width: 720px) {
+        :root {
+          --rail: 44px;
+        }
+        .module-body {
+          padding: 28px 20px 36px;
+        }
+        .hero-copy {
+          padding: 40px 20px 36px;
+        }
+        .foot {
+          padding: 40px 20px 24px;
+        }
+        .brand span {
+          display: none;
+        }
+        .readout {
+          display: none;
+        }
+        .log thead {
+          position: absolute;
+          left: -9999px;
+        }
+        .log tr {
+          display: block;
+          border-top: 1px solid var(--ink);
+          padding: 8px 0;
+        }
+        .log tbody tr:first-child {
+          border-top: 0;
+        }
+        .log td {
+          display: block;
+          border-top: 0;
+          padding: 2px 16px;
+        }
+        .spec th {
+          width: auto;
+          display: block;
+          padding-bottom: 0;
+          border-top: 1px solid var(--rule-soft);
+        }
+        .spec td {
+          display: block;
+          border-top: 0;
+        }
+        .spec tr:first-child th {
+          border-top: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <div class="chassis">
+      <header class="head">
+        <a class="brand mono" href="#top"
+          ><span class="brand-chip" aria-hidden="true"></span>Pakawat
+          <span>&nbsp;Smutkun</span></a
+        >
+        <p class="readout mono">
+          <span class="rec" aria-hidden="true"></span
+          ><span aria-hidden="true">rec</span>
+          <output id="readout">00 ready</output>
+        </p>
+        <nav class="mono" aria-label="Sections">
+          <a href="#work"><b>01</b>work</a>
+          <a href="#lab"><b>02</b>lab</a>
+          <a href="#log"><b>03</b>log</a>
+          <a href="#spec"><b>04</b>spec</a>
+          <a href="#contact"><b>--</b>contact</a>
+        </nav>
+        <button
+          class="snd"
+          id="snd"
+          aria-pressed="false"
+          aria-label="Toggle click sounds"
+        >
+          snd ○
+        </button>
+      </header>
 
-  <header class="head">
-    <a class="brand mono" href="#top"><span class="brand-chip" aria-hidden="true"></span>Pakawat <span>&nbsp;Smutkun</span></a>
-    <p class="readout mono"><span class="rec" aria-hidden="true"></span><span aria-hidden="true">rec</span> <output id="readout">00 ready</output></p>
-    <nav class="mono" aria-label="Sections">
-      <a href="#work"><b>01</b>work</a>
-      <a href="#lab"><b>02</b>lab</a>
-      <a href="#log"><b>03</b>log</a>
-      <a href="#spec"><b>04</b>spec</a>
-      <a href="#contact"><b>--</b>contact</a>
-    </nav>
-    <button class="snd" id="snd" aria-pressed="false" aria-label="Toggle click sounds">snd ○</button>
-  </header>
+      <main id="main">
+        <!-- hero -->
+        <section
+          class="hero"
+          id="top"
+          data-code="00 ready"
+          aria-label="Introduction"
+        >
+          <div class="hero-copy">
+            <p class="status mono">
+              <span class="dot" aria-hidden="true"></span>available — ba / tpo /
+              full-stack
+            </p>
+            <h1>Operations,<br />made legible.</h1>
+            <p class="thesis">
+              Pakawat Smutkun: 5+ years engineering business systems where
+              <strong>floorplans, reports, workflows, and field teams</strong>
+              operate as one reliable product.
+            </p>
+            <div class="hero-keys">
+              <a
+                class="key key--accent"
+                href="https://drive.google.com/uc?export=download&amp;id=1B2tvM8jNeyZd6OBbq5haLpY4j3sO8lss"
+                >Download resume</a
+              >
+              <a class="key" href="https://github.com/Zonxpk"
+                ><svg viewBox="0 0 16 16" aria-hidden="true">
+                  <path
+                    d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"
+                  /></svg
+                >GitHub</a
+              >
+              <a class="key" href="https://www.linkedin.com/in/zonpk/"
+                ><svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    d="M20.45 20.45h-3.56v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 110-4.13 2.06 2.06 0 010 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"
+                  /></svg
+                >LinkedIn</a
+              >
+            </div>
+          </div>
+          <div class="hero-art" aria-hidden="true">
+            <svg class="signal" viewBox="0 0 460 300">
+              <rect
+                x="20"
+                y="24"
+                width="120"
+                height="44"
+                fill="none"
+                stroke="#111"
+                stroke-width="1.5"
+              />
+              <text
+                x="34"
+                y="50"
+                font-family="ui-monospace,monospace"
+                font-size="11"
+                letter-spacing="1"
+                fill="#111"
+              >
+                FLOORPLAN
+              </text>
+              <rect
+                x="20"
+                y="92"
+                width="120"
+                height="44"
+                fill="none"
+                stroke="#111"
+                stroke-width="1.5"
+              />
+              <text
+                x="34"
+                y="118"
+                font-family="ui-monospace,monospace"
+                font-size="11"
+                letter-spacing="1"
+                fill="#111"
+              >
+                REPORTS
+              </text>
+              <rect
+                x="20"
+                y="160"
+                width="120"
+                height="44"
+                fill="none"
+                stroke="#111"
+                stroke-width="1.5"
+              />
+              <text
+                x="34"
+                y="186"
+                font-family="ui-monospace,monospace"
+                font-size="11"
+                letter-spacing="1"
+                fill="#111"
+              >
+                WORKFLOWS
+              </text>
+              <rect
+                x="20"
+                y="228"
+                width="120"
+                height="44"
+                fill="none"
+                stroke="#111"
+                stroke-width="1.5"
+              />
+              <text
+                x="34"
+                y="254"
+                font-family="ui-monospace,monospace"
+                font-size="11"
+                letter-spacing="1"
+                fill="#111"
+              >
+                FIELD TEAMS
+              </text>
+              <path class="wire" d="M140 46 H210 V128 H260" />
+              <path class="wire" d="M140 114 H190 V138 H260" />
+              <path class="wire" d="M140 182 H190 V158 H260" />
+              <path class="wire" d="M140 250 H210 V168 H260" />
+              <rect
+                x="260"
+                y="112"
+                width="150"
+                height="74"
+                fill="none"
+                stroke="#111"
+                stroke-width="1.5"
+              />
+              <text
+                x="278"
+                y="145"
+                font-family="ui-monospace,monospace"
+                font-size="11"
+                letter-spacing="1"
+                fill="#111"
+              >
+                ONE PRODUCT
+              </text>
+              <text
+                x="278"
+                y="163"
+                font-family="ui-monospace,monospace"
+                font-size="11"
+                letter-spacing="1"
+                fill="#767672"
+              >
+                OUT ▸
+              </text>
+              <circle cx="140" cy="46" r="4" fill="#ff4d00" />
+              <circle cx="140" cy="114" r="4" fill="#00a4c8" />
+              <circle cx="140" cy="182" r="4" fill="#f5c400" />
+              <circle cx="140" cy="250" r="4" fill="#3fa435" />
+              <path class="wire" d="M410 149 H436" />
+              <circle cx="440" cy="149" r="4" fill="#e03616" />
+            </svg>
+          </div>
+        </section>
 
-  <main id="main">
-
-    <!-- hero -->
-    <section class="hero" id="top" data-code="00 ready" aria-label="Introduction">
-      <div class="hero-copy">
-        <p class="status mono"><span class="dot" aria-hidden="true"></span>available — ba / tpo / full-stack</p>
-        <h1>Operations,<br>made legible.</h1>
-        <p class="thesis">Pakawat Smutkun: 5+ years engineering business systems where <strong>floorplans, reports, workflows, and field teams</strong> operate as one reliable product.</p>
-        <div class="hero-keys">
-          <a class="key key--accent" href="https://drive.google.com/uc?export=download&amp;id=1B2tvM8jNeyZd6OBbq5haLpY4j3sO8lss">Download resume</a>
-          <a class="key" href="https://github.com/Zonxpk"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>GitHub</a>
-          <a class="key" href="https://www.linkedin.com/in/zonpk/"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 110-4.13 2.06 2.06 0 010 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/></svg>LinkedIn</a>
+        <div class="stats" aria-label="Key figures">
+          <p class="stat">
+            <b>5+</b><span>years shipping production web systems</span>
+          </p>
+          <p class="stat">
+            <b>200+</b><span>active users on ERP + LINE OA workflows</span>
+          </p>
+          <p class="stat">
+            <b>2,000+</b><span>branches through automation pipelines</span>
+          </p>
+          <p class="stat">
+            <b>10</b><span>integrated DMMS modules in one platform</span>
+          </p>
         </div>
-      </div>
-      <div class="hero-art" aria-hidden="true">
-        <svg class="signal" viewBox="0 0 460 300">
-          <rect x="20" y="24" width="120" height="44" fill="none" stroke="#111" stroke-width="1.5"/>
-          <text x="34" y="50" font-family="ui-monospace,monospace" font-size="11" letter-spacing="1" fill="#111">FLOORPLAN</text>
-          <rect x="20" y="92" width="120" height="44" fill="none" stroke="#111" stroke-width="1.5"/>
-          <text x="34" y="118" font-family="ui-monospace,monospace" font-size="11" letter-spacing="1" fill="#111">REPORTS</text>
-          <rect x="20" y="160" width="120" height="44" fill="none" stroke="#111" stroke-width="1.5"/>
-          <text x="34" y="186" font-family="ui-monospace,monospace" font-size="11" letter-spacing="1" fill="#111">WORKFLOWS</text>
-          <rect x="20" y="228" width="120" height="44" fill="none" stroke="#111" stroke-width="1.5"/>
-          <text x="34" y="254" font-family="ui-monospace,monospace" font-size="11" letter-spacing="1" fill="#111">FIELD TEAMS</text>
-          <path class="wire" d="M140 46 H210 V128 H260"/>
-          <path class="wire" d="M140 114 H190 V138 H260"/>
-          <path class="wire" d="M140 182 H190 V158 H260"/>
-          <path class="wire" d="M140 250 H210 V168 H260"/>
-          <rect x="260" y="112" width="150" height="74" fill="none" stroke="#111" stroke-width="1.5"/>
-          <text x="278" y="145" font-family="ui-monospace,monospace" font-size="11" letter-spacing="1" fill="#111">ONE PRODUCT</text>
-          <text x="278" y="163" font-family="ui-monospace,monospace" font-size="11" letter-spacing="1" fill="#767672">OUT ▸</text>
-          <circle cx="140" cy="46" r="4" fill="#ff4d00"/>
-          <circle cx="140" cy="114" r="4" fill="#00a4c8"/>
-          <circle cx="140" cy="182" r="4" fill="#f5c400"/>
-          <circle cx="140" cy="250" r="4" fill="#3fa435"/>
-          <path class="wire" d="M410 149 H436"/>
-          <circle cx="440" cy="149" r="4" fill="#e03616"/>
-        </svg>
-      </div>
-    </section>
 
-    <div class="stats" aria-label="Key figures">
-      <p class="stat"><b>5+</b><span>years shipping production web systems</span></p>
-      <p class="stat"><b>200+</b><span>active users on ERP + LINE OA workflows</span></p>
-      <p class="stat"><b>2,000+</b><span>branches through automation pipelines</span></p>
-      <p class="stat"><b>10</b><span>integrated DMMS modules in one platform</span></p>
+        <!-- 01 WORK -->
+        <section class="module m-work" id="work" data-code="01 work">
+          <div class="rail" aria-hidden="true">
+            <span class="chip"></span><span class="mono">01</span>
+          </div>
+          <div class="module-body">
+            <div class="module-head"><h2>Selected work</h2></div>
+            <p class="module-lede reveal">
+              Six years of systems, drawn as screens.
+            </p>
+            <p class="module-note reveal">
+              Every role rebuilt as its interface. These aren't screenshots:
+              internal systems stay internal, so every screen is a mockup
+              rebuilt from the work, in the product's own style.
+            </p>
+
+            <div class="projects">
+              <article class="proj">
+                <div class="proj-meta reveal">
+                  <span class="period mono">2026 · 3 mo</span>
+                  <h3>Blockfint</h3>
+                  <p class="story">
+                    eKYC onboarding prototypes and integration support for
+                    banking and lending scenarios.
+                  </p>
+                  <dl class="proj-dl">
+                    <div>
+                      <dt>Role</dt>
+                      <dd>Software Engineer</dd>
+                    </div>
+                    <div>
+                      <dt>Scope</dt>
+                      <dd>eKYC · onboarding · integrations</dd>
+                    </div>
+                    <div>
+                      <dt>Stack</dt>
+                      <dd>React · banking APIs</dd>
+                    </div>
+                  </dl>
+                </div>
+                <div class="proj-screens">
+                  <figure class="screen screen--phone reveal">
+                    <div class="screen-top">
+                      <span class="mono">EKYC · ONBOARD</span
+                      ><span class="plat">Android · iOS</span
+                      ><span class="led" aria-hidden="true"></span>
+                    </div>
+                    <div
+                      class="screen-body screen-body--frame"
+                      aria-hidden="true"
+                    >
+                      <iframe
+                        class="fit"
+                        src="mockups/ekyc.html"
+                        title="mobile liveness capture checkpoint"
+                        loading="lazy"
+                        height="640"
+                      ></iframe>
+                    </div>
+                    <figcaption class="mono">
+                      mobile liveness capture checkpoint
+                    </figcaption>
+                  </figure>
+                  <figure class="screen screen--web reveal">
+                    <div class="screen-top">
+                      <span class="mono">EKYC · ONBOARD</span
+                      ><span class="plat">Web</span
+                      ><span class="led" aria-hidden="true"></span>
+                    </div>
+                    <div
+                      class="screen-body screen-body--frame"
+                      aria-hidden="true"
+                    >
+                      <iframe
+                        class="fit"
+                        src="mockups/ekyc-web.html"
+                        title="browser liveness capture checkpoint"
+                        loading="lazy"
+                        height="640"
+                      ></iframe>
+                    </div>
+                    <figcaption class="mono">
+                      same liveness step, browser onboarding
+                    </figcaption>
+                  </figure>
+                  <figure class="screen reveal">
+                    <div class="screen-top">
+                      <span class="mono">EKYC · REVIEW CONSOLE</span
+                      ><span class="led" aria-hidden="true"></span>
+                    </div>
+                    <div
+                      class="screen-body screen-body--frame"
+                      aria-hidden="true"
+                    >
+                      <iframe
+                        class="fit"
+                        src="mockups/ekyc-review.html"
+                        title="analyst queue for document and liveness review"
+                        loading="lazy"
+                        height="560"
+                      ></iframe>
+                    </div>
+                    <figcaption class="mono">
+                      analyst queue for document and liveness review
+                    </figcaption>
+                  </figure>
+                </div>
+              </article>
+
+              <article class="proj">
+                <div class="proj-meta reveal">
+                  <span class="period mono" style="color: var(--c-orange)"
+                    >2021–2026 · flagship</span
+                  >
+                  <h3>CP ORIGIN / DMMS</h3>
+                  <p class="story">
+                    Ten modules unifying floorplan analytics, reporting
+                    automation, field work, and lead pipeline for 200+ users
+                    across 2,000+ branches.
+                  </p>
+                  <dl class="proj-dl">
+                    <div>
+                      <dt>Role</dt>
+                      <dd>Frontend Developer</dd>
+                    </div>
+                    <div>
+                      <dt>Scope</dt>
+                      <dd>Spatial · automation · field · pipeline</dd>
+                    </div>
+                    <div>
+                      <dt>Stack</dt>
+                      <dd>React · Node.js · GCP · LINE OA</dd>
+                    </div>
+                    <div>
+                      <dt>Side</dt>
+                      <dd>Affiliate referral · market rental · meal order</dd>
+                    </div>
+                  </dl>
+                </div>
+                <div class="proj-screens">
+                  <figure class="screen reveal">
+                    <div class="screen-top">
+                      <span class="mono">MALL OPS · FLOORPLAN</span
+                      ><span class="led" aria-hidden="true"></span>
+                    </div>
+                    <div
+                      class="screen-body screen-body--frame"
+                      aria-hidden="true"
+                    >
+                      <iframe
+                        class="fit"
+                        src="mockups/dmms.html"
+                        title="live floorplan occupancy and revenue overlay"
+                        loading="lazy"
+                        height="560"
+                      ></iframe>
+                    </div>
+                    <figcaption class="mono">
+                      live floorplan occupancy and revenue overlay
+                    </figcaption>
+                  </figure>
+                  <figure class="screen screen--phone reveal">
+                    <div class="screen-top">
+                      <span class="mono">MALL OPS · FIELD OPS</span
+                      ><span class="led" aria-hidden="true"></span>
+                    </div>
+                    <div
+                      class="screen-body screen-body--frame"
+                      aria-hidden="true"
+                    >
+                      <iframe
+                        class="fit"
+                        src="mockups/mallops-field.html"
+                        title="field task check-in and photo record"
+                        loading="lazy"
+                        height="580"
+                      ></iframe>
+                    </div>
+                    <figcaption class="mono">
+                      field task check-in and photo record
+                    </figcaption>
+                  </figure>
+                  <figure class="screen screen--phone reveal">
+                    <div class="screen-top">
+                      <span class="mono">LINE OA · LEAD BOT</span
+                      ><span class="led" aria-hidden="true"></span>
+                    </div>
+                    <div
+                      class="screen-body screen-body--frame"
+                      aria-hidden="true"
+                    >
+                      <iframe
+                        class="fit"
+                        src="mockups/lineoa-bot.html"
+                        title="line oa lead follow-up assistant"
+                        loading="lazy"
+                        height="580"
+                      ></iframe>
+                    </div>
+                    <figcaption class="mono">
+                      line oa lead follow-up assistant
+                    </figcaption>
+                  </figure>
+                  <figure class="screen screen--phone reveal">
+                    <div class="screen-top">
+                      <span class="mono">LINE OA · PHOTO REPORT</span
+                      ><span class="led" aria-hidden="true"></span>
+                    </div>
+                    <div
+                      class="screen-body screen-body--frame"
+                      aria-hidden="true"
+                    >
+                      <iframe
+                        class="fit"
+                        src="mockups/lineoa-report.html"
+                        title="line oa photo capture into a branch report"
+                        loading="lazy"
+                        height="580"
+                      ></iframe>
+                    </div>
+                    <figcaption class="mono">
+                      capture a photo, auto-logged as a branch report
+                    </figcaption>
+                  </figure>
+                </div>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <!-- 02 LAB -->
+        <section class="module m-lab" id="lab" data-code="02 lab">
+          <div class="rail" aria-hidden="true">
+            <span class="chip"></span><span class="mono">02</span>
+          </div>
+          <div class="module-body">
+            <div class="module-head"><h2>Lab / prototypes</h2></div>
+            <p class="module-lede reveal">Product bets, made clickable.</p>
+            <p class="module-note reveal">
+              Three product explorations turned into runnable interfaces. Each
+              preview below is the live prototype — click into it, or open it
+              full-screen.
+            </p>
+
+            <div class="projects">
+              <article class="proj">
+                <div class="proj-meta reveal">
+                  <span class="period mono">empeo</span>
+                  <h3>Performance Results</h3>
+                  <p class="story">
+                    A 360° review turned into a manager decision report:
+                    weighted scores become gap flags, a trend read, and merit,
+                    bonus, and promotion suggestions.
+                  </p>
+                  <dl class="proj-dl">
+                    <div>
+                      <dt>Kind</dt>
+                      <dd>PM prototype</dd>
+                    </div>
+                    <div>
+                      <dt>Focus</dt>
+                      <dd>360° review → decision</dd>
+                    </div>
+                    <div>
+                      <dt>Output</dt>
+                      <dd>Manager decision report</dd>
+                    </div>
+                  </dl>
+                  <div class="proj-keys">
+                    <a class="key" href="performance-management/index.html"
+                      >Open full-screen</a
+                    >
+                    <a class="key" href="performance-management/handoff.html"
+                      >Engineering handoff</a
+                    >
+                  </div>
+                </div>
+                <div class="proj-screens">
+                  <figure class="screen reveal">
+                    <div class="screen-top">
+                      <span class="mono">EMPEO · RESULTS REPORT</span
+                      ><span class="led" aria-hidden="true"></span>
+                    </div>
+                    <div class="screen-body screen-body--frame">
+                      <iframe
+                        src="performance-management/index.html"
+                        title="Performance Results prototype — weighted scores, gaps, and merit suggestions"
+                        loading="lazy"
+                        height="560"
+                      ></iframe>
+                    </div>
+                    <figcaption class="mono">
+                      weighted scores · gap flags · merit and promotion
+                      suggestions
+                    </figcaption>
+                  </figure>
+                </div>
+              </article>
+
+              <article class="proj">
+                <div class="proj-meta reveal">
+                  <span class="period mono">thaimart</span>
+                  <h3>Marketplace Flywheel</h3>
+                  <p class="story">
+                    A PM-style set that starts from business leverage: demand,
+                    fulfillment, and supply, each turned into a runnable
+                    interface with flows and metrics.
+                  </p>
+                  <dl class="proj-dl">
+                    <div>
+                      <dt>Kind</dt>
+                      <dd>PM prototype set</dd>
+                    </div>
+                    <div>
+                      <dt>Focus</dt>
+                      <dd>Demand · fulfillment · supply</dd>
+                    </div>
+                    <div>
+                      <dt>Set</dt>
+                      <dd>Three runnable modules</dd>
+                    </div>
+                  </dl>
+                  <div class="proj-keys">
+                    <a class="key" href="thaimart/index.html"
+                      >Open full-screen</a
+                    >
+                    <a class="key" href="thaimart/01-smartrewards.html"
+                      >SmartRewards</a
+                    >
+                    <a class="key" href="thaimart/02-localpick.html"
+                      >LocalPick</a
+                    >
+                    <a class="key" href="thaimart/03-vendorexpress.html"
+                      >VendorExpress</a
+                    >
+                  </div>
+                </div>
+                <div class="proj-screens">
+                  <figure class="screen reveal">
+                    <div class="screen-top">
+                      <span class="mono">THAIMART · PROTOTYPE HUB</span
+                      ><span class="led" aria-hidden="true"></span>
+                    </div>
+                    <div class="screen-body screen-body--frame">
+                      <iframe
+                        src="thaimart/index.html"
+                        title="Marketplace Flywheel prototype hub — demand, fulfillment, supply"
+                        loading="lazy"
+                        height="560"
+                      ></iframe>
+                    </div>
+                    <figcaption class="mono">
+                      flywheel hub · demand, fulfillment and supply modules
+                    </figcaption>
+                  </figure>
+                </div>
+              </article>
+
+              <article class="proj">
+                <div class="proj-meta reveal">
+                  <span class="period mono">edusight</span>
+                  <h3>Cognitive Replay</h3>
+                  <p class="story">
+                    A behavior diagnostic for coding classes: capture IDE-like
+                    learning signals, detect support moments, and show progress
+                    evidence in one view.
+                  </p>
+                  <dl class="proj-dl">
+                    <div>
+                      <dt>Kind</dt>
+                      <dd>Diagnostic prototype</dd>
+                    </div>
+                    <div>
+                      <dt>Focus</dt>
+                      <dd>Learning-signal capture</dd>
+                    </div>
+                    <div>
+                      <dt>Output</dt>
+                      <dd>Support moments · progress evidence</dd>
+                    </div>
+                  </dl>
+                  <div class="proj-keys">
+                    <a class="key" href="edusight/index.html"
+                      >Open full-screen</a
+                    >
+                  </div>
+                </div>
+                <div class="proj-screens">
+                  <figure class="screen reveal">
+                    <div class="screen-top">
+                      <span class="mono">EDUSIGHT · REPLAY</span
+                      ><span class="led" aria-hidden="true"></span>
+                    </div>
+                    <div class="screen-body screen-body--frame">
+                      <iframe
+                        src="edusight/index.html"
+                        title="Cognitive Replay prototype — learning signals and support detection"
+                        loading="lazy"
+                        height="560"
+                      ></iframe>
+                    </div>
+                    <figcaption class="mono">
+                      learning signals · support detection · progress in one
+                      view
+                    </figcaption>
+                  </figure>
+                </div>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <!-- 03 LOG -->
+        <section class="module m-log" id="log" data-code="03 log">
+          <div class="rail" aria-hidden="true">
+            <span class="chip"></span><span class="mono">03</span>
+          </div>
+          <div class="module-body">
+            <div class="module-head"><h2>Log / experience</h2></div>
+            <p class="module-lede reveal">
+              Enterprise work, turned into operating rhythm.
+            </p>
+            <p class="module-note reveal">
+              The common thread is not one stack; it is taking scattered
+              business activity and making it visible, trackable, and easier to
+              act on.
+            </p>
+
+            <table class="log reveal">
+              <thead>
+                <tr>
+                  <th scope="col">Period</th>
+                  <th scope="col">Role</th>
+                  <th scope="col">Unit</th>
+                  <th scope="col">Note</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="yr">2026–now</td>
+                  <td class="role">Software Engineer</td>
+                  <td class="unit">1Moby</td>
+                  <td class="note">
+                    ThaiBulkSMS full-stack support: Pipedrive lead routing,
+                    banner management, SMS history search.
+                  </td>
+                </tr>
+                <tr>
+                  <td class="yr">2026 · 3 mo</td>
+                  <td class="role">Software Engineer</td>
+                  <td class="unit">blockfint</td>
+                  <td class="note">
+                    eKYC onboarding prototypes and integration support for
+                    banking and lending scenarios.
+                  </td>
+                </tr>
+                <tr>
+                  <td class="yr">2021–2026</td>
+                  <td class="role">Frontend Developer</td>
+                  <td class="unit">CP ORIGIN</td>
+                  <td class="note">
+                    DMMS; ERP + LINE OA for 200+ users; reporting automation
+                    across 2,000+ branches.
+                  </td>
+                </tr>
+                <tr>
+                  <td class="yr">2020–2021</td>
+                  <td class="role">Software Engineer</td>
+                  <td class="unit">Softnix</td>
+                  <td class="note">
+                    PDPA project lead as product owner; mentored trainees on
+                    full-stack delivery.
+                  </td>
+                </tr>
+                <tr>
+                  <td class="yr">2020 · 7 mo</td>
+                  <td class="role">Programmer</td>
+                  <td class="unit">Thai Nippon Seiki</td>
+                  <td class="note">
+                    Document approval system with multi-level sign-off; factory
+                    ERP pipeline maintenance.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- 04 SPEC -->
+        <section class="module m-spec" id="spec" data-code="04 spec">
+          <div class="rail" aria-hidden="true">
+            <span class="chip"></span><span class="mono">04</span>
+          </div>
+          <div class="module-body">
+            <div class="module-head"><h2>Spec / capabilities</h2></div>
+            <p class="module-lede reveal">The stack follows the workflow.</p>
+            <p class="module-note reveal">
+              Choosing the shape that makes business systems easier to operate.
+            </p>
+
+            <div class="stack-grid reveal">
+              <article class="stack-cell">
+                <span class="stack-icon" aria-hidden="true"
+                  ><img
+                    src="https://svgl.app/library/react_dark.svg"
+                    alt=""
+                    loading="lazy"
+                    width="20"
+                    height="20"
+                /></span>
+                <h3>Frontend systems</h3>
+                <p>React, Next.js, TypeScript, Vue, Angular, HTML, CSS</p>
+              </article>
+              <article class="stack-cell">
+                <span class="stack-icon" aria-hidden="true"
+                  ><img
+                    src="https://svgl.app/library/nodejs.svg"
+                    alt=""
+                    loading="lazy"
+                    width="20"
+                    height="20"
+                /></span>
+                <h3>Backend delivery</h3>
+                <p>Node.js, NestJS, Express, Go, Python, PHP, SQL</p>
+              </article>
+              <article class="stack-cell">
+                <span class="stack-icon" aria-hidden="true"
+                  ><img
+                    src="https://svgl.app/library/reactquery.svg"
+                    alt=""
+                    loading="lazy"
+                    width="20"
+                    height="20"
+                /></span>
+                <h3>State + testing</h3>
+                <p>React Query, Zustand, XState, Jest, Vitest, Agile/Scrum</p>
+              </article>
+              <article class="stack-cell">
+                <span class="stack-icon" aria-hidden="true"
+                  ><img
+                    src="https://svgl.app/library/google-cloud.svg"
+                    alt=""
+                    loading="lazy"
+                    width="20"
+                    height="20"
+                /></span>
+                <h3>Cloud + automation</h3>
+                <p>
+                  GCP, AWS, Docker, Firebase, Git, n8n, AI integration, LINE OA
+                </p>
+              </article>
+            </div>
+
+            <div class="ai-flow reveal">
+              <div class="ai-intro">
+                <p class="k">AI toolchain</p>
+                <h3>Tools route by kind of work.</h3>
+                <p>
+                  Everyday coding, interface judgment, and complex debugging
+                  stay in the same workflow, with skills layered on when the
+                  task needs stronger process.
+                </p>
+              </div>
+              <div class="ai-right">
+                <div class="ai-tools">
+                  <article class="ai-tool">
+                    <span class="ai-tool-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none">
+                        <path
+                          d="M4 3.8 20.2 12 12.8 14.2 9.4 21 4 3.8Z"
+                          stroke="currentColor"
+                          stroke-width="1.8"
+                          stroke-linejoin="round"
+                        />
+                        <path
+                          d="m12.8 14.2 4.9 4.9"
+                          stroke="currentColor"
+                          stroke-width="1.8"
+                          stroke-linecap="round"
+                        />
+                      </svg>
+                    </span>
+                    <h4>Grok Composer 4.5</h4>
+                    <p>All-around everyday code.</p>
+                  </article>
+                  <article class="ai-tool">
+                    <span class="ai-tool-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none">
+                        <path
+                          d="M12 3.5c1.1 3.2 2.3 5.1 5.7 5.8-3.4.7-4.6 2.6-5.7 5.8-1.1-3.2-2.3-5.1-5.7-5.8 3.4-.7 4.6-2.6 5.7-5.8Z"
+                          stroke="currentColor"
+                          stroke-width="1.7"
+                          stroke-linejoin="round"
+                        />
+                        <path
+                          d="M18.2 14.8c.5 1.4 1 2.2 2.5 2.6-1.5.4-2 1.2-2.5 2.6-.5-1.4-1-2.2-2.5-2.6 1.5-.4 2-1.2 2.5-2.6Z"
+                          stroke="currentColor"
+                          stroke-width="1.5"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </span>
+                    <h4>Claude Opus Fable 5</h4>
+                    <p>Designer and frontend partner.</p>
+                  </article>
+                  <article class="ai-tool">
+                    <span class="ai-tool-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none">
+                        <path
+                          d="m8.2 7.2-4.4 4.7 4.4 4.9M15.8 7.2l4.4 4.7-4.4 4.9"
+                          stroke="currentColor"
+                          stroke-width="1.8"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <path
+                          d="M13.8 5.5 10.2 18.5"
+                          stroke="currentColor"
+                          stroke-width="1.8"
+                          stroke-linecap="round"
+                        />
+                      </svg>
+                    </span>
+                    <h4>Codex GPT 5.6 Sol</h4>
+                    <p>Bug hunts and complex solving.</p>
+                  </article>
+                </div>
+                <div class="ai-addon" aria-label="AI workflow skills">
+                  <strong>Add-on skills</strong>
+                  <span>Superpowers</span>
+                  <span>Obsidian Vault</span>
+                  <span>Ponytail</span>
+                  <span>Loop Engineering</span>
+                </div>
+              </div>
+            </div>
+
+            <table class="spec reveal">
+              <tbody>
+                <tr>
+                  <th scope="row">Also</th>
+                  <td>
+                    JavaScript, Kotlin, C#, QR workflows, bot follow-ups,
+                    reporting pipelines, enterprise data collection
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">Education</th>
+                  <td>
+                    B.Sc. Software Engineering, Burapha University, 2020. GPA
+                    3.53
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">Languages</th>
+                  <td>Thai (native) · English (conversational)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- footer -->
+        <footer class="foot" id="contact">
+          <h2>Ready to make operations legible.</h2>
+          <p>
+            Open to Business Analyst &amp; Technical Product Owner roles — a
+            developer who works close to the business side. Bangkok, Thailand.
+          </p>
+          <div class="foot-keys">
+            <a class="key key--accent" href="mailto:pakawat.zon@gmail.com"
+              ><svg viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M2 5.5C2 4.67 2.67 4 3.5 4h17c.83 0 1.5.67 1.5 1.5v13c0 .83-.67 1.5-1.5 1.5h-17C2.67 20 2 19.33 2 18.5v-13zm2.2.5 7.8 5.2L19.8 6H4.2zM20 7.55l-7.45 4.97a1 1 0 01-1.1 0L4 7.55V18h16V7.55z"
+                /></svg
+              >pakawat.zon@gmail.com</a
+            >
+            <a class="key" href="tel:+66971427997"
+              ><svg viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M6.62 10.79a15.15 15.15 0 006.59 6.59l2.2-2.2a1 1 0 011.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 011 1V20a1 1 0 01-1 1C10.4 21 3 13.6 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.24.2 2.45.57 3.57a1 1 0 01-.24 1.02l-2.21 2.2z"
+                /></svg
+              >(+66) 97-142-7997</a
+            >
+            <a class="key" href="https://github.com/Zonxpk"
+              ><svg viewBox="0 0 16 16" aria-hidden="true">
+                <path
+                  d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"
+                /></svg
+              >GitHub</a
+            >
+            <a class="key" href="https://www.linkedin.com/in/zonpk/"
+              ><svg viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M20.45 20.45h-3.56v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 110-4.13 2.06 2.06 0 010 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"
+                /></svg
+              >LinkedIn</a
+            >
+          </div>
+          <div class="foot-meta mono">
+            <span>© 2026 Pakawat Smutkun</span>
+            <span
+              >shortcuts: <kbd>q</kbd> <kbd>w</kbd> <kbd>e</kbd> <kbd>r</kbd> or
+              <kbd>1</kbd>–<kbd>4</kbd> jump to modules</span
+            >
+          </div>
+        </footer>
+      </main>
     </div>
 
-    <!-- 01 WORK -->
-    <section class="module m-work" id="work" data-code="01 work">
-      <div class="rail" aria-hidden="true"><span class="chip"></span><span class="mono">01</span></div>
-      <div class="module-body">
-        <div class="module-head"><h2>Selected work</h2></div>
-        <p class="module-lede reveal">Six years of systems, drawn as screens.</p>
-        <p class="module-note reveal">Every role rebuilt as its interface. These aren't screenshots: internal systems stay internal, so every screen is a mockup rebuilt from the work, in the product's own style.</p>
+    <script>
+      document.documentElement.classList.add("js");
 
-        <div class="projects">
+      // sound: synthesized click, opt-in, no audio files
+      let audio = null;
+      const sndBtn = document.getElementById("snd");
+      let snd = localStorage.getItem("snd") === "1";
+      function paintSnd() {
+        sndBtn.setAttribute("aria-pressed", String(snd));
+        sndBtn.textContent = "snd " + (snd ? "●" : "○");
+      }
+      function click() {
+        if (!snd) return;
+        audio =
+          audio || new (window.AudioContext || window.webkitAudioContext)();
+        const o = audio.createOscillator(),
+          g = audio.createGain();
+        o.type = "square";
+        o.frequency.value = 2200;
+        g.gain.setValueAtTime(0.1, audio.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + 0.02);
+        o.connect(g).connect(audio.destination);
+        o.start();
+        o.stop(audio.currentTime + 0.03);
+      }
+      sndBtn.addEventListener("click", () => {
+        snd = !snd;
+        localStorage.setItem("snd", snd ? "1" : "0");
+        paintSnd();
+        click();
+      });
+      document.addEventListener("pointerdown", (e) => {
+        if (e.target.closest(".key, .head nav a, .brand")) click();
+      });
+      paintSnd();
 
-          <article class="proj">
-            <div class="proj-meta reveal">
-              <span class="period mono">2026 · 3 mo</span>
-              <h3>Blockfint</h3>
-              <p class="story">eKYC onboarding prototypes and integration support for banking and lending scenarios.</p>
-              <dl class="proj-dl">
-                <div><dt>Role</dt><dd>Software Engineer</dd></div>
-                <div><dt>Scope</dt><dd>eKYC · onboarding · integrations</dd></div>
-                <div><dt>Stack</dt><dd>React · banking APIs</dd></div>
-              </dl>
-            </div>
-            <div class="proj-screens">
-              <figure class="screen screen--phone reveal">
-                <div class="screen-top"><span class="mono">EKYC · ONBOARD</span><span class="plat">Android · iOS</span><span class="led" aria-hidden="true"></span></div>
-                <div class="screen-body screen-body--frame" aria-hidden="true">
-                  <iframe class="fit" src="mockups/ekyc.html" title="mobile liveness capture checkpoint" loading="lazy" height="640"></iframe>
-                </div>
-                <figcaption class="mono">mobile liveness capture checkpoint</figcaption>
-              </figure>
-              <figure class="screen screen--web reveal">
-                <div class="screen-top"><span class="mono">EKYC · ONBOARD</span><span class="plat">Web</span><span class="led" aria-hidden="true"></span></div>
-                <div class="screen-body screen-body--frame" aria-hidden="true">
-                  <iframe class="fit" src="mockups/ekyc-web.html" title="browser liveness capture checkpoint" loading="lazy" height="640"></iframe>
-                </div>
-                <figcaption class="mono">same liveness step, browser onboarding</figcaption>
-              </figure>
-              <figure class="screen reveal">
-                <div class="screen-top"><span class="mono">EKYC · REVIEW CONSOLE</span><span class="led" aria-hidden="true"></span></div>
-                <div class="screen-body screen-body--frame" aria-hidden="true">
-                  <iframe class="fit" src="mockups/ekyc-review.html" title="analyst queue for document and liveness review" loading="lazy" height="560"></iframe>
-                </div>
-                <figcaption class="mono">analyst queue for document and liveness review</figcaption>
-              </figure>
-            </div>
-          </article>
+      // readout: current section code in header
+      const readout = document.getElementById("readout");
+      const readoutIO = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((en) => {
+            if (en.isIntersecting) readout.textContent = en.target.dataset.code;
+          });
+        },
+        { rootMargin: "-40% 0px -55% 0px" },
+      );
+      document
+        .querySelectorAll("[data-code]")
+        .forEach((s) => readoutIO.observe(s));
 
-          <article class="proj">
-            <div class="proj-meta reveal">
-              <span class="period mono" style="color:var(--c-orange)">2021–2026 · flagship</span>
-              <h3>CP ORIGIN / DMMS</h3>
-              <p class="story">Ten modules unifying floorplan analytics, reporting automation, field work, and lead pipeline for 200+ users across 2,000+ branches.</p>
-              <dl class="proj-dl">
-                <div><dt>Role</dt><dd>Frontend Developer</dd></div>
-                <div><dt>Scope</dt><dd>Spatial · automation · field · pipeline</dd></div>
-                <div><dt>Stack</dt><dd>React · Node.js · GCP · LINE OA</dd></div>
-                <div><dt>Side</dt><dd>Affiliate referral · market rental · meal order</dd></div>
-              </dl>
-            </div>
-            <div class="proj-screens">
-              <figure class="screen reveal">
-                <div class="screen-top"><span class="mono">MALL OPS · FLOORPLAN</span><span class="led" aria-hidden="true"></span></div>
-                <div class="screen-body screen-body--frame" aria-hidden="true">
-                  <iframe class="fit" src="mockups/dmms.html" title="live floorplan occupancy and revenue overlay" loading="lazy" height="560"></iframe>
-                </div>
-                <figcaption class="mono">live floorplan occupancy and revenue overlay</figcaption>
-              </figure>
-              <figure class="screen screen--phone reveal">
-                <div class="screen-top"><span class="mono">MALL OPS · FIELD OPS</span><span class="led" aria-hidden="true"></span></div>
-                <div class="screen-body screen-body--frame" aria-hidden="true">
-                  <iframe class="fit" src="mockups/mallops-field.html" title="field task check-in and photo record" loading="lazy" height="580"></iframe>
-                </div>
-                <figcaption class="mono">field task check-in and photo record</figcaption>
-              </figure>
-              <figure class="screen screen--phone reveal">
-                <div class="screen-top"><span class="mono">LINE OA · LEAD BOT</span><span class="led" aria-hidden="true"></span></div>
-                <div class="screen-body screen-body--frame" aria-hidden="true">
-                  <iframe class="fit" src="mockups/lineoa-bot.html" title="line oa lead follow-up assistant" loading="lazy" height="580"></iframe>
-                </div>
-                <figcaption class="mono">line oa lead follow-up assistant</figcaption>
-              </figure>
-              <figure class="screen screen--phone reveal">
-                <div class="screen-top"><span class="mono">LINE OA · PHOTO REPORT</span><span class="led" aria-hidden="true"></span></div>
-                <div class="screen-body screen-body--frame" aria-hidden="true">
-                  <iframe class="fit" src="mockups/lineoa-report.html" title="line oa photo capture into a branch report" loading="lazy" height="580"></iframe>
-                </div>
-                <figcaption class="mono">capture a photo, auto-logged as a branch report</figcaption>
-              </figure>
-            </div>
-          </article>
+      // QWER / 1-4 jump keys (ignore typing + modifiers)
+      const modules = ["work", "lab", "log", "spec"].map((id) =>
+        document.getElementById(id),
+      );
+      const jump = { q: 0, w: 1, e: 2, r: 3, 1: 0, 2: 1, 3: 2, 4: 3 };
+      document.addEventListener("keydown", (e) => {
+        if (e.metaKey || e.ctrlKey || e.altKey) return;
+        if (e.target.matches("input, textarea, select, [contenteditable]"))
+          return;
+        const i = jump[e.key.toLowerCase()];
+        if (i !== undefined && modules[i]) {
+          modules[i].scrollIntoView({ behavior: "smooth", block: "start" });
+          click();
+        }
+      });
 
-        </div>
-      </div>
-    </section>
+      // iframe screens: match frame height to content (same-origin)
+      function fitFrame(f) {
+        try {
+          const d = f.contentDocument;
+          if (
+            d &&
+            d.readyState === "complete" &&
+            d.body &&
+            d.body.offsetHeight > 40
+          ) {
+            f.style.height = d.body.offsetHeight + "px";
+          }
+        } catch (e) {}
+      }
+      document.querySelectorAll("iframe.fit").forEach((f) => {
+        f.addEventListener("load", () => fitFrame(f));
+        fitFrame(f); // already loaded before this script ran
+      });
 
-    <!-- 02 LAB -->
-    <section class="module m-lab" id="lab" data-code="02 lab">
-      <div class="rail" aria-hidden="true"><span class="chip"></span><span class="mono">02</span></div>
-      <div class="module-body">
-        <div class="module-head"><h2>Lab / prototypes</h2></div>
-        <p class="module-lede reveal">Product bets, made clickable.</p>
-        <p class="module-note reveal">Three product explorations turned into runnable interfaces. Each preview below is the live prototype — click into it, or open it full-screen.</p>
-
-        <div class="projects">
-
-          <article class="proj">
-            <div class="proj-meta reveal">
-              <span class="period mono">empeo</span>
-              <h3>Performance Results</h3>
-              <p class="story">A 360° review turned into a manager decision report: weighted scores become gap flags, a trend read, and merit, bonus, and promotion suggestions.</p>
-              <dl class="proj-dl">
-                <div><dt>Kind</dt><dd>PM prototype</dd></div>
-                <div><dt>Focus</dt><dd>360° review → decision</dd></div>
-                <div><dt>Output</dt><dd>Manager decision report</dd></div>
-              </dl>
-              <div class="proj-keys">
-                <a class="key" href="performance-management/index.html">Open full-screen</a>
-                <a class="key" href="performance-management/handoff.html">Engineering handoff</a>
-              </div>
-            </div>
-            <div class="proj-screens">
-              <figure class="screen reveal">
-                <div class="screen-top"><span class="mono">EMPEO · RESULTS REPORT</span><span class="led" aria-hidden="true"></span></div>
-                <div class="screen-body screen-body--frame">
-                  <iframe src="performance-management/index.html" title="Performance Results prototype — weighted scores, gaps, and merit suggestions" loading="lazy" height="560"></iframe>
-                </div>
-                <figcaption class="mono">weighted scores · gap flags · merit and promotion suggestions</figcaption>
-              </figure>
-            </div>
-          </article>
-
-          <article class="proj">
-            <div class="proj-meta reveal">
-              <span class="period mono">thaimart</span>
-              <h3>Marketplace Flywheel</h3>
-              <p class="story">A PM-style set that starts from business leverage: demand, fulfillment, and supply, each turned into a runnable interface with flows and metrics.</p>
-              <dl class="proj-dl">
-                <div><dt>Kind</dt><dd>PM prototype set</dd></div>
-                <div><dt>Focus</dt><dd>Demand · fulfillment · supply</dd></div>
-                <div><dt>Set</dt><dd>Three runnable modules</dd></div>
-              </dl>
-              <div class="proj-keys">
-                <a class="key" href="thaimart/index.html">Open full-screen</a>
-                <a class="key" href="thaimart/01-smartrewards.html">SmartRewards</a>
-                <a class="key" href="thaimart/02-localpick.html">LocalPick</a>
-                <a class="key" href="thaimart/03-vendorexpress.html">VendorExpress</a>
-              </div>
-            </div>
-            <div class="proj-screens">
-              <figure class="screen reveal">
-                <div class="screen-top"><span class="mono">THAIMART · PROTOTYPE HUB</span><span class="led" aria-hidden="true"></span></div>
-                <div class="screen-body screen-body--frame">
-                  <iframe src="thaimart/index.html" title="Marketplace Flywheel prototype hub — demand, fulfillment, supply" loading="lazy" height="560"></iframe>
-                </div>
-                <figcaption class="mono">flywheel hub · demand, fulfillment and supply modules</figcaption>
-              </figure>
-            </div>
-          </article>
-
-          <article class="proj">
-            <div class="proj-meta reveal">
-              <span class="period mono">edusight</span>
-              <h3>Cognitive Replay</h3>
-              <p class="story">A behavior diagnostic for coding classes: capture IDE-like learning signals, detect support moments, and show progress evidence in one view.</p>
-              <dl class="proj-dl">
-                <div><dt>Kind</dt><dd>Diagnostic prototype</dd></div>
-                <div><dt>Focus</dt><dd>Learning-signal capture</dd></div>
-                <div><dt>Output</dt><dd>Support moments · progress evidence</dd></div>
-              </dl>
-              <div class="proj-keys">
-                <a class="key" href="edusight/index.html">Open full-screen</a>
-              </div>
-            </div>
-            <div class="proj-screens">
-              <figure class="screen reveal">
-                <div class="screen-top"><span class="mono">EDUSIGHT · REPLAY</span><span class="led" aria-hidden="true"></span></div>
-                <div class="screen-body screen-body--frame">
-                  <iframe src="edusight/index.html" title="Cognitive Replay prototype — learning signals and support detection" loading="lazy" height="560"></iframe>
-                </div>
-                <figcaption class="mono">learning signals · support detection · progress in one view</figcaption>
-              </figure>
-            </div>
-          </article>
-
-        </div>
-      </div>
-    </section>
-
-    <!-- 03 LOG -->
-    <section class="module m-log" id="log" data-code="03 log">
-      <div class="rail" aria-hidden="true"><span class="chip"></span><span class="mono">03</span></div>
-      <div class="module-body">
-        <div class="module-head"><h2>Log / experience</h2></div>
-        <p class="module-lede reveal">Enterprise work, turned into operating rhythm.</p>
-        <p class="module-note reveal">The common thread is not one stack; it is taking scattered business activity and making it visible, trackable, and easier to act on.</p>
-
-        <table class="log reveal">
-          <thead>
-            <tr><th scope="col">Period</th><th scope="col">Role</th><th scope="col">Unit</th><th scope="col">Note</th></tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="yr">2026–now</td>
-              <td class="role">Software Engineer</td>
-              <td class="unit">1Moby</td>
-              <td class="note">ThaiBulkSMS full-stack support: Pipedrive lead routing, banner management, SMS history search.</td>
-            </tr>
-            <tr>
-              <td class="yr">2026 · 3 mo</td>
-              <td class="role">Software Engineer</td>
-              <td class="unit">blockfint</td>
-              <td class="note">eKYC onboarding prototypes and integration support for banking and lending scenarios.</td>
-            </tr>
-            <tr>
-              <td class="yr">2021–2026</td>
-              <td class="role">Frontend Developer</td>
-              <td class="unit">CP ORIGIN</td>
-              <td class="note">DMMS; ERP + LINE OA for 200+ users; reporting automation across 2,000+ branches.</td>
-            </tr>
-            <tr>
-              <td class="yr">2020–2021</td>
-              <td class="role">Software Engineer</td>
-              <td class="unit">Softnix</td>
-              <td class="note">PDPA project lead as product owner; mentored trainees on full-stack delivery.</td>
-            </tr>
-            <tr>
-              <td class="yr">2020 · 7 mo</td>
-              <td class="role">Programmer</td>
-              <td class="unit">Thai Nippon Seiki</td>
-              <td class="note">Document approval system with multi-level sign-off; factory ERP pipeline maintenance.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- 04 SPEC -->
-    <section class="module m-spec" id="spec" data-code="04 spec">
-      <div class="rail" aria-hidden="true"><span class="chip"></span><span class="mono">04</span></div>
-      <div class="module-body">
-        <div class="module-head"><h2>Spec / capabilities</h2></div>
-        <p class="module-lede reveal">The stack follows the workflow.</p>
-        <p class="module-note reveal">Choosing the shape that makes business systems easier to operate.</p>
-
-        <div class="stack-grid reveal">
-          <article class="stack-cell">
-            <span class="stack-icon" aria-hidden="true"><img src="https://svgl.app/library/react_dark.svg" alt="" loading="lazy" width="20" height="20"></span>
-            <h3>Frontend systems</h3>
-            <p>React, Next.js, TypeScript, Vue, Angular, HTML, CSS</p>
-          </article>
-          <article class="stack-cell">
-            <span class="stack-icon" aria-hidden="true"><img src="https://svgl.app/library/nodejs.svg" alt="" loading="lazy" width="20" height="20"></span>
-            <h3>Backend delivery</h3>
-            <p>Node.js, NestJS, Express, Go, Python, PHP, SQL</p>
-          </article>
-          <article class="stack-cell">
-            <span class="stack-icon" aria-hidden="true"><img src="https://svgl.app/library/reactquery.svg" alt="" loading="lazy" width="20" height="20"></span>
-            <h3>State + testing</h3>
-            <p>React Query, Zustand, XState, Jest, Vitest, Agile/Scrum</p>
-          </article>
-          <article class="stack-cell">
-            <span class="stack-icon" aria-hidden="true"><img src="https://svgl.app/library/google-cloud.svg" alt="" loading="lazy" width="20" height="20"></span>
-            <h3>Cloud + automation</h3>
-            <p>GCP, AWS, Docker, Firebase, Git, n8n, AI integration, LINE OA</p>
-          </article>
-        </div>
-
-        <div class="ai-flow reveal">
-          <div class="ai-intro">
-            <p class="k">AI toolchain</p>
-            <h3>Tools route by kind of work.</h3>
-            <p>Everyday coding, interface judgment, and complex debugging stay in the same workflow, with skills layered on when the task needs stronger process.</p>
-          </div>
-          <div class="ai-right">
-            <div class="ai-tools">
-              <article class="ai-tool">
-                <span class="ai-tool-icon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none"><path d="M4 3.8 20.2 12 12.8 14.2 9.4 21 4 3.8Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="m12.8 14.2 4.9 4.9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-                </span>
-                <h4>Grok Composer 4.5</h4>
-                <p>All-around everyday code.</p>
-              </article>
-              <article class="ai-tool">
-                <span class="ai-tool-icon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none"><path d="M12 3.5c1.1 3.2 2.3 5.1 5.7 5.8-3.4.7-4.6 2.6-5.7 5.8-1.1-3.2-2.3-5.1-5.7-5.8 3.4-.7 4.6-2.6 5.7-5.8Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M18.2 14.8c.5 1.4 1 2.2 2.5 2.6-1.5.4-2 1.2-2.5 2.6-.5-1.4-1-2.2-2.5-2.6 1.5-.4 2-1.2 2.5-2.6Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
-                </span>
-                <h4>Claude Opus Fable 5</h4>
-                <p>Designer and frontend partner.</p>
-              </article>
-              <article class="ai-tool">
-                <span class="ai-tool-icon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none"><path d="m8.2 7.2-4.4 4.7 4.4 4.9M15.8 7.2l4.4 4.7-4.4 4.9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M13.8 5.5 10.2 18.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-                </span>
-                <h4>Codex GPT 5.6 Sol</h4>
-                <p>Bug hunts and complex solving.</p>
-              </article>
-            </div>
-            <div class="ai-addon" aria-label="AI workflow skills">
-              <strong>Add-on skills</strong>
-              <span>Superpowers</span>
-              <span>Obsidian Vault</span>
-              <span>Ponytail</span>
-              <span>Loop Engineering</span>
-            </div>
-          </div>
-        </div>
-
-        <table class="spec reveal">
-          <tbody>
-            <tr><th scope="row">Also</th><td>JavaScript, Kotlin, C#, QR workflows, bot follow-ups, reporting pipelines, enterprise data collection</td></tr>
-            <tr><th scope="row">Education</th><td>B.Sc. Software Engineering, Burapha University, 2020. GPA 3.53</td></tr>
-            <tr><th scope="row">Languages</th><td>Thai (native) · English (conversational)</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- footer -->
-    <footer class="foot" id="contact">
-      <h2>Ready to make operations legible.</h2>
-      <p>Open to Business Analyst &amp; Technical Product Owner roles — a developer who works close to the business side. Bangkok, Thailand.</p>
-      <div class="foot-keys">
-        <a class="key key--accent" href="mailto:pakawat.zon@gmail.com"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 5.5C2 4.67 2.67 4 3.5 4h17c.83 0 1.5.67 1.5 1.5v13c0 .83-.67 1.5-1.5 1.5h-17C2.67 20 2 19.33 2 18.5v-13zm2.2.5 7.8 5.2L19.8 6H4.2zM20 7.55l-7.45 4.97a1 1 0 01-1.1 0L4 7.55V18h16V7.55z"/></svg>pakawat.zon@gmail.com</a>
-        <a class="key" href="tel:+66971427997"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.62 10.79a15.15 15.15 0 006.59 6.59l2.2-2.2a1 1 0 011.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 011 1V20a1 1 0 01-1 1C10.4 21 3 13.6 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.24.2 2.45.57 3.57a1 1 0 01-.24 1.02l-2.21 2.2z"/></svg>(+66) 97-142-7997</a>
-        <a class="key" href="https://github.com/Zonxpk"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>GitHub</a>
-        <a class="key" href="https://www.linkedin.com/in/zonpk/"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 110-4.13 2.06 2.06 0 010 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z"/></svg>LinkedIn</a>
-      </div>
-      <div class="foot-meta mono">
-        <span>© 2026 Pakawat Smutkun</span>
-        <span>shortcuts: <kbd>q</kbd> <kbd>w</kbd> <kbd>e</kbd> <kbd>r</kbd> or <kbd>1</kbd>–<kbd>4</kbd> jump to modules</span>
-      </div>
-    </footer>
-
-  </main>
-</div>
-
-<script>
-document.documentElement.classList.add('js');
-
-// sound: synthesized click, opt-in, no audio files
-let audio = null;
-const sndBtn = document.getElementById('snd');
-let snd = localStorage.getItem('snd') === '1';
-function paintSnd() {
-  sndBtn.setAttribute('aria-pressed', String(snd));
-  sndBtn.textContent = 'snd ' + (snd ? '●' : '○');
-}
-function click() {
-  if (!snd) return;
-  audio = audio || new (window.AudioContext || window.webkitAudioContext)();
-  const o = audio.createOscillator(), g = audio.createGain();
-  o.type = 'square';
-  o.frequency.value = 2200;
-  g.gain.setValueAtTime(0.1, audio.currentTime);
-  g.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + 0.02);
-  o.connect(g).connect(audio.destination);
-  o.start();
-  o.stop(audio.currentTime + 0.03);
-}
-sndBtn.addEventListener('click', () => {
-  snd = !snd;
-  localStorage.setItem('snd', snd ? '1' : '0');
-  paintSnd();
-  click();
-});
-document.addEventListener('pointerdown', (e) => {
-  if (e.target.closest('.key, .head nav a, .brand')) click();
-});
-paintSnd();
-
-// readout: current section code in header
-const readout = document.getElementById('readout');
-const readoutIO = new IntersectionObserver((entries) => {
-  entries.forEach((en) => {
-    if (en.isIntersecting) readout.textContent = en.target.dataset.code;
-  });
-}, { rootMargin: '-40% 0px -55% 0px' });
-document.querySelectorAll('[data-code]').forEach((s) => readoutIO.observe(s));
-
-// QWER / 1-4 jump keys (ignore typing + modifiers)
-const modules = ['work', 'lab', 'log', 'spec'].map((id) => document.getElementById(id));
-const jump = { q: 0, w: 1, e: 2, r: 3, 1: 0, 2: 1, 3: 2, 4: 3 };
-document.addEventListener('keydown', (e) => {
-  if (e.metaKey || e.ctrlKey || e.altKey) return;
-  if (e.target.matches('input, textarea, select, [contenteditable]')) return;
-  const i = jump[e.key.toLowerCase()];
-  if (i !== undefined && modules[i]) {
-    modules[i].scrollIntoView({ behavior: 'smooth', block: 'start' });
-    click();
-  }
-});
-
-// iframe screens: match frame height to content (same-origin)
-function fitFrame(f) {
-  try {
-    const d = f.contentDocument;
-    if (d && d.readyState === 'complete' && d.body && d.body.offsetHeight > 40) {
-      f.style.height = d.body.offsetHeight + 'px';
-    }
-  } catch (e) {}
-}
-document.querySelectorAll('iframe.fit').forEach((f) => {
-  f.addEventListener('load', () => fitFrame(f));
-  fitFrame(f); // already loaded before this script ran
-});
-
-// reveals: quantized slide-in, once
-const revealIO = new IntersectionObserver((entries) => {
-  entries.forEach((en) => {
-    if (en.isIntersecting) {
-      en.target.classList.add('on');
-      revealIO.unobserve(en.target);
-    }
-  });
-}, { threshold: 0.15 });
-document.querySelectorAll('.reveal').forEach((el) => revealIO.observe(el));
-</script>
-</body>
+      // reveals: quantized slide-in, once
+      const revealIO = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((en) => {
+            if (en.isIntersecting) {
+              en.target.classList.add("on");
+              revealIO.unobserve(en.target);
+            }
+          });
+        },
+        { threshold: 0.15 },
+      );
+      document
+        .querySelectorAll(".reveal")
+        .forEach((el) => revealIO.observe(el));
+    </script>
+  </body>
 </html>
