@@ -220,27 +220,6 @@
         color: var(--ink-soft);
         margin-right: 6px;
       }
-      .snd {
-        margin-left: auto;
-        border: 0;
-        border-left: 1px solid var(--ink);
-        background: var(--chassis);
-        padding: 12px 16px;
-        font-family: var(--mono);
-        font-size: 12px;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        cursor: pointer;
-        white-space: nowrap;
-      }
-      .snd:hover {
-        background: #fff;
-      }
-      .snd[aria-pressed="true"] {
-        background: var(--ink);
-        color: #fff;
-      }
-
       /* ============ modules ============ */
       .module {
         border-bottom: 1px solid var(--ink);
@@ -400,9 +379,9 @@
         }
       }
       @keyframes fl-wiggle {
-        0%, 100% { transform: rotate(var(--r)); }
-        25% { transform: rotate(calc(var(--r) - 0.6deg)); }
-        75% { transform: rotate(calc(var(--r) + 0.6deg)); }
+        0%, 100% { transform: translate(var(--px, 0), var(--py, 0)) rotate(calc(var(--r) + var(--pr, 0deg))) scale(var(--ps, 1)); }
+        25% { transform: translate(var(--px, 0), var(--py, 0)) rotate(calc(var(--r) - 0.6deg + var(--pr, 0deg))) scale(var(--ps, 1)); }
+        75% { transform: translate(var(--px, 0), var(--py, 0)) rotate(calc(var(--r) + 0.6deg + var(--pr, 0deg))) scale(var(--ps, 1)); }
       }
       .signal .fl-cap {
         opacity: 0;
@@ -1079,14 +1058,6 @@
           <a href="#spec"><b>04</b>spec</a>
           <a href="#contact"><b>--</b>contact</a>
         </nav>
-        <button
-          class="snd"
-          id="snd"
-          aria-pressed="false"
-          aria-label="Toggle click sounds"
-        >
-          snd ○
-        </button>
       </header>
 
       <main id="main">
@@ -1963,39 +1934,6 @@
     <script>
       document.documentElement.classList.add("js");
 
-      // sound: synthesized click, opt-in, no audio files
-      let audio = null;
-      const sndBtn = document.getElementById("snd");
-      let snd = localStorage.getItem("snd") === "1";
-      function paintSnd() {
-        sndBtn.setAttribute("aria-pressed", String(snd));
-        sndBtn.textContent = "snd " + (snd ? "●" : "○");
-      }
-      function click() {
-        if (!snd) return;
-        audio =
-          audio || new (window.AudioContext || window.webkitAudioContext)();
-        const o = audio.createOscillator(),
-          g = audio.createGain();
-        o.type = "square";
-        o.frequency.value = 2200;
-        g.gain.setValueAtTime(0.1, audio.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + 0.02);
-        o.connect(g).connect(audio.destination);
-        o.start();
-        o.stop(audio.currentTime + 0.03);
-      }
-      sndBtn.addEventListener("click", () => {
-        snd = !snd;
-        localStorage.setItem("snd", snd ? "1" : "0");
-        paintSnd();
-        click();
-      });
-      document.addEventListener("pointerdown", (e) => {
-        if (e.target.closest(".key, .head nav a, .brand")) click();
-      });
-      paintSnd();
-
       // readout: current section code in header
       const readout = document.getElementById("readout");
       const readoutIO = new IntersectionObserver(
@@ -2096,6 +2034,85 @@
       document
         .querySelectorAll(".reveal")
         .forEach((el) => revealIO.observe(el));
+
+      // hero cards: each card tilts toward the cursor and lifts while you
+      // hover it (others stay put). Gated ~1.4s so the pop-in plays clean;
+      // desktop-pointer only; off for reduced-motion. Composes onto the
+      // fl-wiggle keyframes via CSS vars, lerped per card for a smooth glide.
+      (function heroCards() {
+        const fine = matchMedia("(hover: hover) and (pointer: fine)").matches;
+        const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (!fine || reduce) return;
+        const cards = [...document.querySelectorAll(".signal .fl")];
+        if (!cards.length) return;
+
+        const SHIFT = 6, TILT = 4, SCALE = 0.06, EASE = 0.12;
+        let armed = false;
+        setTimeout(() => (armed = true), 1400);
+
+        cards.forEach((el) => {
+          let tx = 0, ty = 0, ts = 0; // targets: x/y in [-1,1], hover 0/1
+          let cx = 0, cy = 0, cs = 0; // current (lerped)
+          let raf = 0;
+
+          function frame() {
+            cx += (tx - cx) * EASE;
+            cy += (ty - cy) * EASE;
+            cs += (ts - cs) * EASE;
+            el.style.setProperty("--px", (cx * SHIFT).toFixed(2) + "px");
+            el.style.setProperty("--py", (cy * SHIFT).toFixed(2) + "px");
+            el.style.setProperty("--pr", (cx * TILT).toFixed(2) + "deg");
+            el.style.setProperty("--ps", (1 + cs * SCALE).toFixed(4));
+            const settled =
+              Math.abs(tx - cx) + Math.abs(ty - cy) + Math.abs(ts - cs) < 0.001;
+            raf = settled ? 0 : requestAnimationFrame(frame);
+          }
+          function kick() {
+            if (!raf) raf = requestAnimationFrame(frame);
+          }
+
+          el.addEventListener("pointermove", (e) => {
+            if (!armed) return;
+            const r = el.getBoundingClientRect();
+            tx = ((e.clientX - r.left) / r.width) * 2 - 1;
+            ty = ((e.clientY - r.top) / r.height) * 2 - 1;
+            ts = 1;
+            kick();
+          });
+          el.addEventListener("pointerleave", () => {
+            tx = ty = ts = 0;
+            kick();
+          });
+        });
+      })();
+
+      (function countUpStats() {
+        const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (reduce) return; // HTML already shows final values
+        const nums = [...document.querySelectorAll(".stats .stat b")];
+        if (!nums.length) return;
+
+        const DUR = 1500, STAGGER = 150;
+        const easeOut = (t) => 1 - Math.pow(1 - t, 3);
+
+        nums.forEach((el, i) => {
+          const raw = el.textContent.trim();
+          const target = parseInt(raw.replace(/\D/g, ""), 10); // "2,000+" -> 2000
+          const suffix = raw.replace(/[\d,]/g, ""); // ponytail: keeps trailing "+"
+          if (!Number.isFinite(target)) return;
+
+          el.textContent = "0" + suffix;
+          let start = 0;
+          function frame(now) {
+            if (!start) start = now;
+            const t = Math.min((now - start) / DUR, 1);
+            el.textContent =
+              Math.round(easeOut(t) * target).toLocaleString("en-US") + suffix;
+            if (t < 1) requestAnimationFrame(frame);
+          }
+          setTimeout(() => requestAnimationFrame(frame), i * STAGGER);
+        });
+      })();
     </script>
     <!-- Microsoft Clarity -->
     <script type="text/javascript">
