@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>When? / กี่โมง? — Pakawat Smutkun</title>
+  <meta name="description" content="When? is a parody Thai super app engineered as a real cross-platform product: Expo, React Native, Supabase, a reusable failure engine, dating, merch, and automated tests." />
+  <meta name="theme-color" content="#f4f4f2" />
+  <style>
+    :root {
+      --paper:#f4f4f2;
+      --panel:#e8e8e6;
+      --ink:#111;
+      --soft:#555;
+      --rule:#cfcfcb;
+      --orange:#ff4d00;
+      --cyan:#00a4c8;
+      --green:#3fa435;
+      --yellow:#f5c400;
+      --coral:#ff7c69;
+      --mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+      --sans:"Helvetica Neue",Helvetica,Arial,sans-serif;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{background:var(--panel);color:var(--ink);font:16px/1.55 var(--sans);-webkit-font-smoothing:antialiased}
+    a{color:inherit}
+    .mono{font:11px/1.3 var(--mono);letter-spacing:.1em;text-transform:uppercase}
+    .shell{max-width:1440px;margin:auto;background:var(--paper);border-inline:1px solid var(--ink);min-height:100vh}
+    header{position:sticky;top:0;z-index:20;display:flex;align-items:stretch;background:var(--paper);border-bottom:1px solid var(--ink)}
+    header a{padding:13px 16px;text-decoration:none;border-right:1px solid var(--ink)}
+    header a:hover{background:#fff}
+    .brand{font-weight:700;display:flex;gap:10px;align-items:center}
+    .brand i{width:11px;height:11px;background:var(--orange);display:block}
+    .status{margin-left:auto;display:flex;align-items:center;gap:8px;padding:13px 16px;border-left:1px solid var(--ink)}
+    .status i{width:8px;height:8px;border-radius:50%;background:var(--green)}
+    .hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(360px,.8fr);border-bottom:1px solid var(--ink)}
+    .hero-copy{padding:56px 44px;border-right:1px solid var(--ink)}
+    .eyebrow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px}
+    .tag{border:1px solid var(--ink);padding:6px 9px;background:#fff}
+    .tag.hot{background:var(--coral)}
+    h1{font-size:clamp(58px,8vw,112px);line-height:.82;letter-spacing:-.055em;text-transform:uppercase;margin-bottom:24px}
+    h1 span{color:var(--orange)}
+    .lede{font-size:20px;max-width:46ch;color:var(--soft);margin-bottom:30px}
+    .lede strong{color:var(--ink)}
+    .actions{display:flex;gap:10px;flex-wrap:wrap}
+    .key{display:inline-block;text-decoration:none;font:11px var(--mono);letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--ink);padding:10px 14px;background:var(--paper);box-shadow:2px 2px 0 var(--ink)}
+    .key:hover{background:#fff}.key.primary{background:var(--orange);color:#fff}
+    .hero-side{padding:34px;display:flex;justify-content:center;align-items:center;background:linear-gradient(145deg,#f7df8d 0,#f7df8d 38%,#f9aa99 38%,#f9aa99 68%,#abd9cc 68%)}
+    .phone{width:min(390px,100%);background:#fff;border:2px solid var(--ink);border-radius:28px;padding:10px;box-shadow:10px 10px 0 rgba(17,17,17,.18);transform:rotate(1.2deg)}
+    .phone-top{height:24px;display:flex;align-items:center;justify-content:center}.notch{width:94px;height:7px;background:var(--ink);border-radius:99px}
+    .phone iframe{display:block;width:100%;height:720px;border:1px solid var(--ink);border-radius:17px;background:#fff}
+    .phone-note{padding:10px 5px 2px;color:#333;text-align:center}
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--ink)}
+    .stat{padding:22px 24px;border-right:1px solid var(--ink)}.stat:last-child{border-right:0}
+    .stat b{display:block;font:600 24px var(--mono);margin-bottom:4px}.stat span{font-size:13px;color:var(--soft)}
+    section{display:grid;grid-template-columns:86px 1fr;border-bottom:1px solid var(--ink)}
+    .rail{border-right:1px solid var(--ink);padding-top:26px;text-align:center}.rail i{display:block;width:14px;height:14px;border:1px solid var(--ink);margin:0 auto 10px}.rail .a{background:var(--cyan)}.rail .b{background:var(--yellow)}.rail .c{background:var(--green)}
+    .body{padding:44px}
+    .body h2{font:600 12px var(--mono);text-transform:uppercase;letter-spacing:.14em;margin-bottom:10px}
+    .headline{font-size:clamp(30px,4vw,52px);line-height:1.04;letter-spacing:-.035em;max-width:22ch;margin-bottom:14px}
+    .intro{max-width:68ch;color:var(--soft);margin-bottom:34px}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .card{border:1px solid var(--ink);background:#fff;padding:20px;min-height:190px}
+    .card .num{display:block;color:var(--orange);margin-bottom:28px}.card h3{font-size:18px;margin-bottom:8px}.card p{font-size:14px;color:var(--soft)}
+    .arch{border:1px solid var(--ink);background:#fff}
+    .arch-row{display:grid;grid-template-columns:170px 1fr;border-bottom:1px solid var(--rule)}.arch-row:last-child{border-bottom:0}
+    .arch-label{padding:16px;border-right:1px solid var(--rule);font:10px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--soft)}
+    .arch-content{padding:15px 18px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .pill{border:1px solid var(--ink);padding:5px 8px;font:11px var(--mono);background:var(--paper)}
+    .arrow{font-family:var(--mono);color:var(--soft)}
+    .flow{display:grid;grid-template-columns:repeat(5,1fr);border:1px solid var(--ink);background:#fff}
+    .step{padding:18px 16px;min-height:154px;border-right:1px solid var(--ink);position:relative}.step:last-child{border-right:0}
+    .step b{display:block;font:600 13px var(--mono);text-transform:uppercase;margin:30px 0 8px}.step p{font-size:13px;color:var(--soft)}.step:before{content:attr(data-n);position:absolute;top:14px;left:15px;font:11px var(--mono);color:var(--orange)}
+    .evidence{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .evidence article{border:1px solid var(--ink);background:#fff;padding:20px}.evidence h3{font-size:18px;margin-bottom:10px}.evidence ul{padding-left:18px;color:var(--soft);font-size:14px}.evidence li+li{margin-top:6px}
+    footer{padding:24px 34px;display:flex;justify-content:space-between;gap:20px;align-items:center}
+    @media(max-width:900px){.hero{grid-template-columns:1fr}.hero-copy{border-right:0;border-bottom:1px solid var(--ink)}.stats{grid-template-columns:1fr 1fr}.stat:nth-child(2){border-right:0}.stat:nth-child(-n+2){border-bottom:1px solid var(--ink)}.grid{grid-template-columns:1fr}.flow{grid-template-columns:1fr}.step{border-right:0;border-bottom:1px solid var(--ink)}.step:last-child{border-bottom:0}.evidence{grid-template-columns:1fr}.arch-row{grid-template-columns:120px 1fr}}
+    @media(max-width:620px){header .home-label{display:none}.status{display:none}.hero-copy,.body{padding:34px 22px}.hero-side{padding:24px 16px}.phone iframe{height:640px}section{grid-template-columns:44px 1fr}.rail .mono{font-size:9px;writing-mode:vertical-rl}.stats{grid-template-columns:1fr}.stat{border-right:0;border-bottom:1px solid var(--ink)}.stat:last-child{border-bottom:0}.arch-row{grid-template-columns:1fr}.arch-label{border-right:0;border-bottom:1px solid var(--rule)}footer{align-items:flex-start;flex-direction:column}}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <a class="brand" href="../index.html"><i></i><span class="home-label">PAKAWAT SMUTKUN</span></a>
+      <a class="mono" href="#system">System</a>
+      <a class="mono" href="#engine">Engine</a>
+      <a class="mono" href="#proof">Proof</a>
+      <div class="status mono"><i></i>live case study</div>
+    </header>
+
+    <main>
+      <div class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow">
+            <span class="tag mono hot">Product experiment</span>
+            <span class="tag mono">Expo · React Native</span>
+            <span class="tag mono">Supabase</span>
+          </div>
+          <h1>When<span>?</span></h1>
+          <p class="lede"><strong>A Thai super app where every feature works—except the outcome.</strong> I built the joke as a reusable product system: ordering, live tracking, dating, merch, vouchers, and partner campaigns all share real architecture underneath the absurdity.</p>
+          <div class="actions">
+            <a class="key primary" href="https://break-even-beta.vercel.app" target="_blank" rel="noopener">Open live app ↗</a>
+            <a class="key" href="#system">Inspect architecture ↓</a>
+          </div>
+        </div>
+        <div class="hero-side">
+          <div class="phone" aria-label="Live When? app preview">
+            <div class="phone-top"><span class="notch"></span></div>
+            <iframe src="https://break-even-beta.vercel.app" title="When? live application" loading="eager"></iframe>
+            <p class="phone-note mono">live production build · interactive</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><b>4</b><span>major product domains sharing one app</span></div>
+        <div class="stat"><b>2×</b><span>client + database test layers</span></div>
+        <div class="stat"><b>1</b><span>shared tracking / failure engine</span></div>
+        <div class="stat"><b>Web + Native</b><span>from the same Expo codebase</span></div>
+      </div>
+
+      <section id="system">
+        <div class="rail"><i class="a"></i><span class="mono">01</span></div>
+        <div class="body">
+          <h2>System shape</h2>
+          <p class="headline">The comedy is a domain layer, not a pile of screens.</p>
+          <p class="intro">The central product decision was to make “things go wrong” reusable. Food orders, date bookings, and future services can enter the same deterministic route / incident / failure lifecycle while keeping their own feature logic isolated.</p>
+          <div class="arch">
+            <div class="arch-row"><div class="arch-label">Presentation</div><div class="arch-content"><span class="pill">Expo Router</span><span class="pill">Doodle UI</span><span class="pill">Native / Web maps</span><span class="pill">Tabs + feature routes</span></div></div>
+            <div class="arch-row"><div class="arch-label">Feature state</div><div class="arch-content"><span class="pill">Food</span><span class="pill">Dating</span><span class="pill">Merch</span><span class="pill">Auth</span><span class="pill">Zustand</span></div></div>
+            <div class="arch-row"><div class="arch-label">Domain core</div><div class="arch-content"><span class="pill">Route</span><span class="arrow">→</span><span class="pill">Path</span><span class="arrow">→</span><span class="pill">Script selection</span><span class="arrow">→</span><span class="pill">Failure state</span></div></div>
+            <div class="arch-row"><div class="arch-label">Data boundary</div><div class="arch-content"><span class="pill">Typed API modules</span><span class="pill">Supabase client</span><span class="pill">Resilient guest boot</span></div></div>
+            <div class="arch-row"><div class="arch-label">Backend</div><div class="arch-content"><span class="pill">Postgres</span><span class="pill">Auth</span><span class="pill">RPCs</span><span class="pill">Deno Edge Function</span><span class="pill">pgTAP</span></div></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="engine">
+        <div class="rail"><i class="b"></i><span class="mono">02</span></div>
+        <div class="body">
+          <h2>Reusable engine</h2>
+          <p class="headline">One failure lifecycle. Multiple ridiculous products.</p>
+          <p class="intro">Instead of scripting each screen independently, the engine owns progression. A service creates an order-like event, the route progresses deterministically, incidents are selected, and the experience resolves into a shared failure finale.</p>
+          <div class="flow">
+            <div class="step" data-n="01"><b>Create</b><p>Food, ride, parcel, mart, or a date becomes an order-like lifecycle.</p></div>
+            <div class="step" data-n="02"><b>Route</b><p>Path and progress logic create a believable movement model.</p></div>
+            <div class="step" data-n="03"><b>Script</b><p>Seeded selection makes incidents repeatable and testable.</p></div>
+            <div class="step" data-n="04"><b>Track</b><p>Shared UI turns domain progress into the live parody experience.</p></div>
+            <div class="step" data-n="05"><b>Fail</b><p>The finale closes the loop and can feed rewards / follow-on features.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="proof">
+        <div class="rail"><i class="c"></i><span class="mono">03</span></div>
+        <div class="body">
+          <h2>Engineering proof</h2>
+          <p class="headline">Playful surface. Production-minded boundaries.</p>
+          <p class="intro">The project is intentionally unserious in tone, but the implementation keeps infrastructure, domain logic, state, UI, and persistence independently understandable.</p>
+          <div class="grid">
+            <article class="card"><span class="num mono">A · Cross-platform</span><h3>Expo as the delivery shell</h3><p>Expo Router drives mobile and web from one TypeScript application, with platform-specific map and spot-picker components where the platforms genuinely differ.</p></article>
+            <article class="card"><span class="num mono">B · Backend</span><h3>Migration-driven Supabase</h3><p>Postgres schema, seed data, RPCs, authentication, partner submissions, and sensitive state transitions live behind a structured backend rather than ad-hoc client persistence.</p></article>
+            <article class="card"><span class="num mono">C · Tests</span><h3>Rules tested at the right layer</h3><p>Jest covers deterministic domain behavior and UI/API smoke paths; pgTAP verifies database behavior and security hardening close to Postgres.</p></article>
+          </div>
+          <div style="height:16px"></div>
+          <div class="evidence">
+            <article><h3>Feature domains</h3><ul><li>Food browse, cart, orders, tracking</li><li>Dating deck, matches, chat, affection, date booking</li><li>Timed merch shop, vouchers, brand redemption</li><li>Partner campaign submission with Edge Function notification boundary</li></ul></article>
+            <article><h3>Portfolio takeaway</h3><ul><li>Product concept → real system architecture</li><li>Reusable domain modeling instead of screen-specific jokes</li><li>Hand-drawn component language without abandoning consistency</li><li>Client resilience when the backend is cold or unreachable</li></ul></article>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <span class="mono">When? / กี่โมง? · 2026</span>
+      <div class="actions"><a class="key" href="../index.html">← Portfolio</a><a class="key primary" href="https://break-even-beta.vercel.app" target="_blank" rel="noopener">Launch app ↗</a></div>
+    </footer>
+  </div>
+</body>
+</html>
