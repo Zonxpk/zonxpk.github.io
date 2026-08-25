@@ -36,57 +36,55 @@ jobs:
           if 'href="break-even/index.html">Case study</a>' in text:
               raise SystemExit("When? card already present")
 
-          marker = '''            <div class="projects">
-              <article class="proj">
-                <div class="proj-meta reveal">
-                  <span class="period mono">empeo</span>'''
+          empeo = '<span class="period mono">empeo</span>'
+          anchor = text.find(empeo)
+          if anchor < 0:
+              raise SystemExit("Lab project anchor not found")
+          article = text.rfind('<article class="proj">', 0, anchor)
+          if article < 0:
+              raise SystemExit("Lab article anchor not found")
 
-          card = '''            <div class="projects">
-              <article class="proj">
-                <div class="proj-meta reveal">
-                  <span class="period mono" style="color: var(--c-cyan)">2026 · product experiment</span>
-                  <h3>When? / กี่โมง?</h3>
-                  <p class="story">
-                    A parody Thai super app engineered as a real cross-platform product:
-                    food, dating, merch, vouchers, and partner campaigns share one
-                    deterministic tracking-and-failure engine.
-                  </p>
-                  <dl class="proj-dl">
-                    <div><dt>Kind</dt><dd>Full-stack product experiment</dd></div>
-                    <div><dt>Focus</dt><dd>Reusable domain engine · cross-platform UI</dd></div>
-                    <div><dt>Stack</dt><dd>Expo · React Native · Supabase</dd></div>
-                  </dl>
-                  <div class="proj-keys">
-                    <a class="key" href="break-even/index.html">Case study</a>
-                    <a class="key" href="https://break-even-beta.vercel.app" target="_blank" rel="noopener">Live app</a>
-                  </div>
-                </div>
-                <div class="proj-screens">
-                  <figure class="screen screen--phone reveal">
-                    <div class="screen-top"><span class="mono">WHEN? · HOME</span><span class="plat">Expo</span><span class="led" aria-hidden="true"></span></div>
-                    <div class="screen-body screen-body--frame"><img src="break-even/home.png" alt="When? Thai super app home screen" style="display:block;width:100%;height:auto" /></div>
-                    <figcaption class="mono">parody super-app home · hand-drawn UI system</figcaption>
-                  </figure>
-                  <figure class="screen screen--phone reveal">
-                    <div class="screen-top"><span class="mono">WHEN? · DATING</span><span class="plat">Expo</span><span class="led" aria-hidden="true"></span></div>
-                    <div class="screen-body screen-body--frame"><img src="break-even/dating.png" alt="When? dating simulation screen" style="display:block;width:100%;height:auto" /></div>
-                    <figcaption class="mono">dating domain · same shared failure lifecycle</figcaption>
-                  </figure>
-                  <figure class="screen screen--phone reveal">
-                    <div class="screen-top"><span class="mono">WHEN? · MERCH</span><span class="plat">Expo</span><span class="led" aria-hidden="true"></span></div>
-                    <div class="screen-body screen-body--frame"><img src="break-even/merch.png" alt="When? timed merch pop-up screen" style="display:block;width:100%;height:auto" /></div>
-                    <figcaption class="mono">timed merch · voucher and redemption workflow</figcaption>
-                  </figure>
-                </div>
-              </article>
+          indent = text[text.rfind('\n', 0, article) + 1:article]
+          card = f'''<article class="proj">
+{indent}  <div class="proj-meta reveal">
+{indent}    <span class="period mono" style="color: var(--c-cyan)">2026 · product experiment</span>
+{indent}    <h3>When? / กี่โมง?</h3>
+{indent}    <p class="story">
+{indent}      A parody Thai super app engineered as a real cross-platform product:
+{indent}      food, dating, merch, vouchers, and partner campaigns share one
+{indent}      deterministic tracking-and-failure engine.
+{indent}    </p>
+{indent}    <dl class="proj-dl">
+{indent}      <div><dt>Kind</dt><dd>Full-stack product experiment</dd></div>
+{indent}      <div><dt>Focus</dt><dd>Reusable domain engine · cross-platform UI</dd></div>
+{indent}      <div><dt>Stack</dt><dd>Expo · React Native · Supabase</dd></div>
+{indent}    </dl>
+{indent}    <div class="proj-keys">
+{indent}      <a class="key" href="break-even/index.html">Case study</a>
+{indent}      <a class="key" href="https://break-even-beta.vercel.app" target="_blank" rel="noopener">Live app</a>
+{indent}    </div>
+{indent}  </div>
+{indent}  <div class="proj-screens">
+{indent}    <figure class="screen screen--phone reveal">
+{indent}      <div class="screen-top"><span class="mono">WHEN? · HOME</span><span class="plat">Expo</span><span class="led" aria-hidden="true"></span></div>
+{indent}      <div class="screen-body screen-body--frame"><img src="break-even/home.png" alt="When? Thai super app home screen" style="display:block;width:100%;height:auto" /></div>
+{indent}      <figcaption class="mono">parody super-app home · hand-drawn UI system</figcaption>
+{indent}    </figure>
+{indent}    <figure class="screen screen--phone reveal">
+{indent}      <div class="screen-top"><span class="mono">WHEN? · DATING</span><span class="plat">Expo</span><span class="led" aria-hidden="true"></span></div>
+{indent}      <div class="screen-body screen-body--frame"><img src="break-even/dating.png" alt="When? dating simulation screen" style="display:block;width:100%;height:auto" /></div>
+{indent}      <figcaption class="mono">dating domain · same shared failure lifecycle</figcaption>
+{indent}    </figure>
+{indent}    <figure class="screen screen--phone reveal">
+{indent}      <div class="screen-top"><span class="mono">WHEN? · MERCH</span><span class="plat">Expo</span><span class="led" aria-hidden="true"></span></div>
+{indent}      <div class="screen-body screen-body--frame"><img src="break-even/merch.png" alt="When? timed merch pop-up screen" style="display:block;width:100%;height:auto" /></div>
+{indent}      <figcaption class="mono">timed merch · voucher and redemption workflow</figcaption>
+{indent}    </figure>
+{indent}  </div>
+{indent}</article>
 
-              <article class="proj">
-                <div class="proj-meta reveal">
-                  <span class="period mono">empeo</span>'''
-
-          if marker not in text:
-              raise SystemExit("Lab insertion marker not found")
-          path.write_text(text.replace(marker, card, 1), encoding="utf-8")
+{indent}'''
+          path.write_text(text[:article] + card + text[article:], encoding="utf-8")
 
       - name: Validate and publish evidence
         shell: bash
