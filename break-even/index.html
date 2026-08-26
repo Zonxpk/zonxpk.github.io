@@ -74,8 +74,12 @@
     .step b{display:block;font:600 13px var(--mono);text-transform:uppercase;margin:30px 0 8px}.step p{font-size:13px;color:var(--soft)}.step:before{content:attr(data-n);position:absolute;top:14px;left:15px;font:11px var(--mono);color:var(--orange)}
     .evidence{display:grid;grid-template-columns:1fr 1fr;gap:16px}
     .evidence article{border:1px solid var(--ink);background:#fff;padding:20px}.evidence h3{font-size:18px;margin-bottom:10px}.evidence ul{padding-left:18px;color:var(--soft);font-size:14px}.evidence li+li{margin-top:6px}
+    .shot-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:start}
+    .shot{border:1px solid var(--ink);background:#fff;padding:9px;box-shadow:5px 5px 0 rgba(17,17,17,.12)}
+    .shot img{display:block;width:100%;height:auto;border:1px solid var(--rule)}
+    .shot figcaption{padding:10px 4px 2px;color:var(--soft)}
     footer{padding:24px 34px;display:flex;justify-content:space-between;gap:20px;align-items:center}
-    @media(max-width:900px){.hero{grid-template-columns:1fr}.hero-copy{border-right:0;border-bottom:1px solid var(--ink)}.stats{grid-template-columns:1fr 1fr}.stat:nth-child(2){border-right:0}.stat:nth-child(-n+2){border-bottom:1px solid var(--ink)}.grid{grid-template-columns:1fr}.flow{grid-template-columns:1fr}.step{border-right:0;border-bottom:1px solid var(--ink)}.step:last-child{border-bottom:0}.evidence{grid-template-columns:1fr}.arch-row{grid-template-columns:120px 1fr}}
+    @media(max-width:900px){.hero{grid-template-columns:1fr}.hero-copy{border-right:0;border-bottom:1px solid var(--ink)}.stats{grid-template-columns:1fr 1fr}.stat:nth-child(2){border-right:0}.stat:nth-child(-n+2){border-bottom:1px solid var(--ink)}.grid{grid-template-columns:1fr}.shot-grid{grid-template-columns:1fr}.flow{grid-template-columns:1fr}.step{border-right:0;border-bottom:1px solid var(--ink)}.step:last-child{border-bottom:0}.evidence{grid-template-columns:1fr}.arch-row{grid-template-columns:120px 1fr}}
     @media(max-width:620px){header .home-label{display:none}.status{display:none}.hero-copy,.body{padding:34px 22px}.hero-side{padding:24px 16px}.phone iframe{height:640px}section{grid-template-columns:44px 1fr}.rail .mono{font-size:9px;writing-mode:vertical-rl}.stats{grid-template-columns:1fr}.stat{border-right:0;border-bottom:1px solid var(--ink)}.stat:last-child{border-bottom:0}.arch-row{grid-template-columns:1fr}.arch-label{border-right:0;border-bottom:1px solid var(--rule)}footer{align-items:flex-start;flex-direction:column}}
   </style>
 </head>
@@ -119,6 +123,20 @@
         <div class="stat"><b>1</b><span>shared tracking / failure engine</span></div>
         <div class="stat"><b>Web + Native</b><span>from the same Expo codebase</span></div>
       </div>
+
+      <section id="live-flow">
+        <div class="rail"><i class="a"></i><span class="mono">00</span></div>
+        <div class="body">
+          <h2>Live product flow</h2>
+          <p class="headline">One visual language from discovery to detail.</p>
+          <p class="intro">Captured from the production Vercel build at a 390×844 mobile viewport: main menu → food delivery → restaurant menu.</p>
+          <div class="shot-grid">
+            <figure class="shot"><img src="main.jpg" alt="When? main menu" /><figcaption class="mono">01 · Main menu</figcaption></figure>
+            <figure class="shot"><img src="food.jpg" alt="When? food delivery browse" /><figcaption class="mono">02 · Food delivery</figcaption></figure>
+            <figure class="shot"><img src="food-detail.jpg" alt="When? restaurant menu detail" /><figcaption class="mono">03 · Restaurant detail</figcaption></figure>
+          </div>
+        </div>
+      </section>
 
       <section id="system">
         <div class="rail"><i class="a"></i><span class="mono">01</span></div>
